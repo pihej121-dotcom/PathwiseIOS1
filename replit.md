@@ -20,6 +20,23 @@ Pathwise Institution Edition is a comprehensive career development platform desi
 - Database automatically seeds with demo institution, admin user, and student user on first run
 - Seeding only occurs when database is empty
 
+## iOS Native App Integration (October 2025)
+- **Platform**: Capacitor iOS wrapper for native app deployment
+- **Configuration**: 
+  - Capacitor 7.4.3 installed and configured
+  - iOS platform added with proper bundle ID: `com.pathwise.app`
+  - Server URL configured for development (points to Replit server)
+- **App Assets**:
+  - App icon configured using Pathwise logo (1024x1024)
+  - Splash screen settings in capacitor.config.ts
+  - iOS permissions added (Camera, Photo Library, Documents)
+- **Build Commands**:
+  - `npm run ios:build` - Builds web app and syncs to iOS
+  - `npm run ios:open` - Opens project in Xcode
+- **Documentation**: Complete setup guide in `IOS_APP_GUIDE.md`
+- **Next Steps**: Requires Mac with Xcode for App Store submission
+- **Note**: App works in both web (Replit) and native iOS modes with all features preserved
+
 ## Recent Changes (September 2025 - October 2025)
 
 ### Tabbed Dashboard - Single-Page Experience (October 2025)
