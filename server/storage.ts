@@ -127,12 +127,14 @@ export interface IStorage {
   getMicroProjectsBySkills(skills: string[]): Promise<MicroProject[]>;
   updateMicroProject(id: string, updates: Partial<InsertMicroProject>): Promise<MicroProject>;
   deleteMicroProject(id: string): Promise<void>;
+  clearAllMicroProjects(): Promise<void>;
   getAllMicroProjects(limit?: number, offset?: number): Promise<MicroProject[]>;
   
   createProjectCompletion(completion: InsertProjectCompletion): Promise<string>;
   getProjectCompletion(userId: string, projectId: string): Promise<ProjectCompletion | undefined>;
   getProjectCompletionsByUser(userId: string): Promise<ProjectCompletion[]>;
   updateProjectCompletion(id: string, updates: Partial<ProjectCompletion>): Promise<void>;
+  clearAllProjectCompletions(userId: string): Promise<void>;
   
   createPortfolioArtifact(artifact: InsertPortfolioArtifact): Promise<string>;
   getPortfolioArtifactsByUser(userId: string): Promise<PortfolioArtifact[]>;
@@ -851,6 +853,10 @@ export class DatabaseStorage implements IStorage {
     await db.delete(microProjects).where(eq(microProjects.id, id));
   }
 
+  async clearAllMicroProjects(): Promise<void> {
+    await db.delete(microProjects);
+  }
+
   async getAllMicroProjects(limit: number = 50, offset: number = 0): Promise<MicroProject[]> {
     return await db
       .select()
@@ -890,6 +896,10 @@ export class DatabaseStorage implements IStorage {
       .update(projectCompletions)
       .set({ ...updates, updatedAt: sql`now()` })
       .where(eq(projectCompletions.id, id));
+  }
+
+  async clearAllProjectCompletions(userId: string): Promise<void> {
+    await db.delete(projectCompletions).where(eq(projectCompletions.userId, userId));
   }
 
   async createPortfolioArtifact(artifact: InsertPortfolioArtifact): Promise<string> {

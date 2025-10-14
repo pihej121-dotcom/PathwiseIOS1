@@ -2051,18 +2051,19 @@ if (existingUser && !existingUser.isActive) {
   // NEW: Role-based project generation
   app.post("/api/micro-projects/generate-from-role", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
-      const { targetRole, count } = req.body;
+      const { targetRole, count, difficulty } = req.body;
       
       if (!targetRole || typeof targetRole !== 'string') {
         return res.status(400).json({ error: "Target role is required" });
       }
       
       const projectCount = count && typeof count === 'number' && count >= 1 && count <= 3 ? count : 2;
+      const projectDifficulty = difficulty && ['beginner', 'intermediate', 'advanced'].includes(difficulty) ? difficulty : 'intermediate';
       
       const { microProjectsService } = await import("./micro-projects");
       
-      console.log(`Generating ${projectCount} projects for role: ${targetRole}`);
-      const newProjects = await microProjectsService.generateProjectsForRole(targetRole, projectCount);
+      console.log(`Generating ${projectCount} ${projectDifficulty} projects for role: ${targetRole}`);
+      const newProjects = await microProjectsService.generateProjectsForRole(targetRole, projectCount, projectDifficulty);
       
       // Create activity for project generation
       if (newProjects.length > 0) {
@@ -2070,12 +2071,12 @@ if (existingUser && !existingUser.isActive) {
           req.user!.id,
           "role_projects_generated",
           "Role-Based Projects Generated",
-          `Generated ${newProjects.length} project(s) for ${targetRole}`
+          `Generated ${newProjects.length} ${projectDifficulty} project(s) for ${targetRole}`
         );
       }
       
       res.json({
-        message: `Generated ${newProjects.length} project(s) for ${targetRole}`,
+        message: `Generated ${newProjects.length} ${projectDifficulty} project(s) for ${targetRole}`,
         projects: newProjects
       });
     } catch (error) {
@@ -2178,6 +2179,22 @@ if (existingUser && !existingUser.isActive) {
     } catch (error) {
       console.error("Error deleting micro-project:", error);
       res.status(500).json({ error: "Failed to delete micro-project" });
+    }
+  });
+
+  // Clear all projects for the current user
+  app.delete("/api/micro-projects/clear", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+    try {
+      // Delete all micro projects from the database
+      await storage.clearAllMicroProjects();
+      
+      // Delete all project completions for this user
+      await storage.clearAllProjectCompletions(req.user!.id);
+      
+      res.json({ message: "All projects cleared successfully" });
+    } catch (error) {
+      console.error("Error clearing all micro-projects:", error);
+      res.status(500).json({ error: "Failed to clear all projects" });
     }
   });
 
