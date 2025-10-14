@@ -655,15 +655,23 @@ Do not just repeat the same actions for all phases.`;
 
   async tailorResume(baseResumeText: string, jobDescription: string, targetKeywords: string[], userProfile: any): Promise<TailoredResumeResult> {
     try {
-      const prompt = `Tailor this resume for the job. Focus on keyword optimization.
-      
+      const prompt = `CRITICAL ANTI-FABRICATION RULES - NEVER VIOLATE:
+1. DO NOT fabricate, invent, or add ANY information not present in the original resume
+2. DO NOT add skills, experiences, projects, or achievements the candidate doesn't have
+3. DO NOT remove any existing information from the resume
+4. ONLY rephrase, reword, and reorganize EXISTING content to better match the job description
+5. You may highlight relevant experiences more prominently, but cannot create new ones
+6. Keyword optimization means using the EXISTING content with job-relevant terminology, not inventing qualifications
+
+Your ONLY job is to reword and reorganize the candidate's REAL experiences to be more relevant to this specific job posting.
+
 Resume: ${baseResumeText}
 Job: ${jobDescription}
 Keywords: ${targetKeywords.join(", ")}
 
 Provide JSON:
 {
-  "tailoredContent": "Updated resume text",
+  "tailoredContent": "Updated resume text with ONLY reworded existing content",
   "jobSpecificScore": 85,
   "keywordsCovered": ["keyword1", "keyword2"],
   "remainingGaps": [{"skill": "Python", "importance": "high", "resources": [{"title": "Course Name", "provider": "Provider Name", "url": "", "cost": "Free"}]}],
