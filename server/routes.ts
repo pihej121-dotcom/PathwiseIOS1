@@ -2165,6 +2165,22 @@ if (existingUser && !existingUser.isActive) {
     }
   });
 
+  // Clear all projects for the current user (must come before /:id route)
+  app.delete("/api/micro-projects/clear", authenticate, async (req: AuthRequest, res) => {
+    try {
+      // Delete all micro projects from the database
+      await storage.clearAllMicroProjects();
+      
+      // Delete all project completions for this user
+      await storage.clearAllProjectCompletions(req.user!.id);
+      
+      res.json({ message: "All projects cleared successfully" });
+    } catch (error) {
+      console.error("Error clearing all micro-projects:", error);
+      res.status(500).json({ error: "Failed to clear all projects" });
+    }
+  });
+
   app.delete("/api/micro-projects/:id", requireAdmin, async (req: AuthRequest, res) => {
     try {
       const { id } = req.params;
@@ -2179,22 +2195,6 @@ if (existingUser && !existingUser.isActive) {
     } catch (error) {
       console.error("Error deleting micro-project:", error);
       res.status(500).json({ error: "Failed to delete micro-project" });
-    }
-  });
-
-  // Clear all projects for the current user
-  app.delete("/api/micro-projects/clear", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
-    try {
-      // Delete all micro projects from the database
-      await storage.clearAllMicroProjects();
-      
-      // Delete all project completions for this user
-      await storage.clearAllProjectCompletions(req.user!.id);
-      
-      res.json({ message: "All projects cleared successfully" });
-    } catch (error) {
-      console.error("Error clearing all micro-projects:", error);
-      res.status(500).json({ error: "Failed to clear all projects" });
     }
   });
 
