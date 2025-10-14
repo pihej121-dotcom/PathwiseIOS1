@@ -336,6 +336,12 @@ Focus on being brutally honest about competitiveness while providing constructiv
     try {
       const prompt = `Analyze this resume for the target role and provide a JSON response with specific scores, detailed section analysis, and gaps.
 
+CRITICAL: Base ALL gap recommendations on the TARGET ROLE specified below. DO NOT default to Python, Data Analytics, or generic tech skills unless they are specifically relevant to the target role. For example:
+- Marketing Manager → Content Marketing, SEO, Campaign Management, Analytics Tools
+- Mechanical Engineer → CAD, SolidWorks, Manufacturing Processes, Materials Science
+- Teacher → Classroom Management, Curriculum Development, Educational Technology
+- Finance Analyst → Financial Modeling, Excel, Bloomberg, SQL (if relevant)
+
 Resume text:
 ${resumeText}
 
@@ -396,15 +402,15 @@ Provide analysis in this exact JSON format:
   },
   "gaps": [
     {
-      "category": "Python Programming",
+      "category": "[Role-Specific Skill Gap Based on Target Role]",
       "priority": "high",
       "impact": 15,
-      "rationale": "Python is essential for this role",
+      "rationale": "Explain why this skill is essential for the TARGET ROLE",
       "resources": [
         {
-          "title": "Python for Everybody Specialization",
-          "provider": "Coursera",
-          "url": "",
+          "title": "[Course/Resource Name]",
+          "provider": "[Provider Name]",
+          "url": "[Use verified URL from list below]",
           "cost": "Free with audit option"
         }
       ]
