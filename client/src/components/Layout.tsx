@@ -1,8 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
 import { DropdownNav } from "./DropdownNav";
-import { Button } from "./ui/button";
-import { useTheme } from "@/contexts/ThemeContext";
-import { Moon, Sun } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +12,6 @@ interface LayoutProps {
 
 export function Layout({ children, title, subtitle }: LayoutProps) {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 
   const { data: dashboardStats } = useQuery({
@@ -52,21 +48,6 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
   
   return (
     <div className="min-h-screen bg-background">
-      {/* Theme Toggle */}
-      <Button
-        onClick={toggleTheme}
-        variant="outline"
-        size="sm"
-        className="fixed top-4 right-20 z-50 rounded-full shadow-lg"
-        data-testid="button-theme-toggle"
-      >
-        {theme === "dark" ? (
-          <Sun className="w-4 h-4" />
-        ) : (
-          <Moon className="w-4 h-4" />
-        )}
-      </Button>
-
       <DropdownNav />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

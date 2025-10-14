@@ -161,7 +161,7 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
 
           {/* Tailored Resumes Tab */}
           <TabsContent value="resumes" className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <h2 className="text-2xl font-bold">AI-Tailored Resumes</h2>
               <p className="text-sm text-muted-foreground">
                 Tailored resumes are created from Job Matching when you click "Tailor Resume"
@@ -186,15 +186,15 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                       </div>
                     ) : (tailoredResumes as any[]).length > 0 ? (
                       (tailoredResumes as any[]).map((resume: any) => (
-                        <div key={resume.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-4">
-                            <FileText className="w-8 h-8 text-blue-600" />
-                            <div>
-                              <h4 className="font-medium">{resume.jobTitle} - {resume.company}</h4>
-                              <p className="text-sm text-muted-foreground">
+                        <div key={resume.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border rounded-lg">
+                          <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
+                            <FileText className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-medium break-words">{resume.jobTitle} - {resume.company}</h4>
+                              <p className="text-sm text-muted-foreground break-words">
                                 Tailored for: {resume.jobTitle} position
                               </p>
-                              <div className="flex gap-2 mt-2">
+                              <div className="flex flex-wrap gap-2 mt-2">
                                 {resume.jobSpecificScore && (
                                   <Badge variant="secondary" className="text-xs">
                                     {resume.jobSpecificScore}% ATS Match
@@ -211,7 +211,7 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-shrink-0">
                             <Button 
                               size="sm" 
                               variant="outline" 
@@ -221,13 +221,14 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                                 setViewResumeModal(true);
                               }}
                               data-testid={`view-resume-${resume.id}`}
+                              className="whitespace-nowrap"
                             >
-                              <Eye className="w-4 h-4 mr-1" />
-                              View
+                              <Eye className="w-4 h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">View</span>
                             </Button>
-                            <Button size="sm" variant="outline" data-testid={`download-resume-${resume.id}`}>
-                              <Download className="w-4 h-4 mr-1" />
-                              Download
+                            <Button size="sm" variant="outline" data-testid={`download-resume-${resume.id}`} className="whitespace-nowrap">
+                              <Download className="w-4 h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Download</span>
                             </Button>
                           </div>
                         </div>

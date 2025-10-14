@@ -179,14 +179,16 @@ export default function AIJobMatching() {
         {/* Search Results */}
         {jobMatches?.jobs && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">
-                {jobMatches.totalCount} jobs found
-              </h3>
-              <div className="text-sm text-muted-foreground">
-                Page {jobMatches.page} of {Math.ceil(jobMatches.totalCount / jobMatches.limit)}
+            {jobMatches.totalCount > 0 && (
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">
+                  {jobMatches.totalCount} jobs found
+                </h3>
+                <div className="text-sm text-muted-foreground">
+                  Page {jobMatches.page} of {Math.ceil(jobMatches.totalCount / jobMatches.limit)}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 gap-4">
               {jobMatches.jobs.map((job: any, index: number) => (
