@@ -31,7 +31,8 @@ import {
   Menu,
   User,
   Moon,
-  Sun
+  Sun,
+  Heart
 } from "lucide-react";
 
 const studentNavigation = [
@@ -105,8 +106,11 @@ export function DropdownNav() {
               onClick={toggleTheme}
               className="w-9 h-9 p-0"
               data-testid="button-theme-toggle"
+              title={theme === "light" ? "Switch to dark mode" : theme === "dark" ? "Switch to pink mode" : "Switch to light mode"}
             >
               {theme === "dark" ? (
+                <Heart className="h-4 w-4" />
+              ) : theme === "pink" ? (
                 <Sun className="h-4 w-4" />
               ) : (
                 <Moon className="h-4 w-4" />
