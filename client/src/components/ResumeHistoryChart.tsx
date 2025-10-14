@@ -160,7 +160,7 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
     return null;
   };
 
-  // Custom Dot Component with enhanced styling
+  // Custom Dot Component with enhanced styling and larger size for mobile
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     return (
@@ -169,7 +169,7 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
         <circle
           cx={cx}
           cy={cy}
-          r={15}
+          r={18}
           fill="url(#dotGlow)"
           opacity={0.3}
           className="animate-pulse"
@@ -178,7 +178,7 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
         <circle
           cx={cx}
           cy={cy}
-          r={8}
+          r={10}
           fill="url(#dotGradient)"
           stroke="#ffffff"
           strokeWidth={3}
@@ -188,7 +188,7 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
         <circle
           cx={cx}
           cy={cy}
-          r={3}
+          r={4}
           fill="#ffffff"
           opacity={0.9}
         />
@@ -197,10 +197,10 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
           <circle
             cx={cx}
             cy={cy}
-            r={12}
+            r={15}
             fill="none"
             stroke="url(#activeGradient)"
-            strokeWidth={2}
+            strokeWidth={2.5}
             strokeDasharray="4 4"
             className="animate-spin"
             style={{ animationDuration: '3s' }}
@@ -213,24 +213,24 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
   return (
     <Card className="bg-gradient-to-br from-white via-blue-50/50 to-indigo-100/80 dark:from-gray-900 dark:via-blue-950/30 dark:to-indigo-950/50 border-0 shadow-2xl backdrop-blur-sm">
       <CardHeader className="pb-6">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-4 text-xl">
-            <div className="p-4 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-2xl shadow-lg animate-pulse">
-              <BarChart3 className="h-7 w-7 text-white" />
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <CardTitle className="flex items-center gap-3 sm:gap-4 text-xl">
+            <div className="p-3 sm:p-4 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-2xl shadow-lg animate-pulse flex-shrink-0">
+              <BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
             </div>
-            <div>
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent text-2xl font-bold">
+            <div className="min-w-0">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent text-xl sm:text-2xl font-bold">
                 Resume Progress Analytics
               </span>
-              <p className="text-sm text-muted-foreground font-normal mt-1">
+              <p className="text-xs sm:text-sm text-muted-foreground font-normal mt-1">
                 Track your resume improvements over time
               </p>
             </div>
           </CardTitle>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             {/* Enhanced Latest Score Display */}
-            <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl px-8 py-6 text-white shadow-2xl relative overflow-hidden">
+            <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl px-6 sm:px-8 py-4 sm:py-6 text-white shadow-2xl relative overflow-hidden">
               {/* Animated background */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent animate-pulse"></div>
               <div className="relative text-center">
@@ -239,8 +239,8 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
                   Latest Score
                 </div>
                 <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-4xl font-bold">{latestScore}</span>
-                  <span className="text-lg opacity-75">/100</span>
+                  <span className="text-3xl sm:text-4xl font-bold">{latestScore}</span>
+                  <span className="text-base sm:text-lg opacity-75">/100</span>
                 </div>
                 {scoreChange !== 0 && (
                   <div className={`flex items-center justify-center gap-1 mt-3 px-3 py-2 rounded-full text-sm font-semibold backdrop-blur-sm ${
@@ -269,10 +269,10 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
               size="lg"
               onClick={() => setShowSectionScores(!showSectionScores)}
               data-testid="toggle-section-scores"
-              className={showSectionScores 
+              className={`w-full sm:w-auto ${showSectionScores 
                 ? "bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white shadow-xl border-0 px-6 py-3" 
                 : "border-2 border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-950 px-6 py-3 shadow-lg backdrop-blur-sm"
-              }
+              }`}
             >
               {showSectionScores ? (
                 <>
@@ -338,36 +338,36 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
                 
                 <XAxis 
                   dataKey="displayDate"
-                  tick={{ fontSize: 12, fill: '#6B7280', fontWeight: 500 }}
+                  tick={{ fontSize: 14, fill: '#6B7280', fontWeight: 500 }}
                   angle={-35}
                   textAnchor="end"
                   height={70}
                   stroke="#9CA3AF"
-                  strokeWidth={1}
+                  strokeWidth={1.5}
                 />
                 
                 <YAxis 
                   domain={[0, 100]}
-                  tick={{ fontSize: 12, fill: '#6B7280', fontWeight: 500 }}
+                  tick={{ fontSize: 14, fill: '#6B7280', fontWeight: 500 }}
                   label={{ 
                     value: 'Score', 
                     angle: -90, 
                     position: 'insideLeft',
-                    style: { textAnchor: 'middle', fill: '#6B7280', fontSize: '13px', fontWeight: '500' }
+                    style: { textAnchor: 'middle', fill: '#6B7280', fontSize: '15px', fontWeight: '500' }
                   }}
                   stroke="#9CA3AF"
-                  strokeWidth={1}
+                  strokeWidth={1.5}
                 />
                 
                 <Tooltip content={<CustomTooltip />} />
                 
                 {/* Reference line for target score */}
                 <ReferenceLine 
-                  y={70} 
+                  y={80} 
                   stroke="#10B981" 
                   strokeDasharray="5 5" 
                   strokeOpacity={0.6}
-                  label={{ value: "Target: 70", position: "topRight", fill: "#10B981", fontSize: 12 }}
+                  label={{ value: "Target: 80", position: "topRight", fill: "#10B981", fontSize: 12 }}
                 />
                 
                 {/* Main area with gradient fill */}

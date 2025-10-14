@@ -233,28 +233,26 @@ export default function Applications({ embedded = false }: { embedded?: boolean 
         {/* Controls */}
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Filter className="w-4 h-4 text-muted-foreground" />
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40" data-testid="status-filter">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Applications</SelectItem>
-                      <SelectItem value="applied">Applied</SelectItem>
-                      <SelectItem value="interviewed">Interviewed</SelectItem>
-                      <SelectItem value="offered">Offered</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center space-x-2 w-full sm:w-auto">
+                <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full sm:w-40" data-testid="status-filter">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Applications</SelectItem>
+                    <SelectItem value="applied">Applied</SelectItem>
+                    <SelectItem value="interviewed">Interviewed</SelectItem>
+                    <SelectItem value="offered">Offered</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
                 <DialogTrigger asChild>
-                  <Button data-testid="button-add-application">
+                  <Button className="w-full sm:w-auto" data-testid="button-add-application">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Application
                   </Button>
@@ -336,10 +334,10 @@ export default function Applications({ embedded = false }: { embedded?: boolean 
                 data-testid={`application-${index}`}
               >
                 <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <Building className="w-5 h-5 text-muted-foreground" />
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                        <Building className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                         <h4 className="font-semibold text-lg">{application.company}</h4>
                         <Badge className={getStatusColor(application.status)}>
                           <div className="flex items-center space-x-1">
@@ -349,18 +347,18 @@ export default function Applications({ embedded = false }: { embedded?: boolean 
                         </Badge>
                       </div>
                       
-                      <div className="flex items-center space-x-6 text-muted-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-muted-foreground text-sm">
                         <span className="flex items-center">
-                          <Briefcase className="w-4 h-4 mr-1" />
+                          <Briefcase className="w-4 h-4 mr-1 flex-shrink-0" />
                           {application.position}
                         </span>
                         <span className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1" />
+                          <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
                           Applied {format(new Date(application.appliedDate), "MMM dd, yyyy")}
                         </span>
                         {application.responseDate && (
                           <span className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
+                            <Clock className="w-4 h-4 mr-1 flex-shrink-0" />
                             Updated {format(new Date(application.responseDate), "MMM dd, yyyy")}
                           </span>
                         )}
@@ -373,12 +371,13 @@ export default function Applications({ embedded = false }: { embedded?: boolean 
                       )}
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleViewDetails(application)}
                         data-testid={`button-view-${index}`}
+                        className="w-full sm:w-auto"
                       >
                         <Eye className="w-4 h-4 mr-1" />
                         View
@@ -388,7 +387,7 @@ export default function Applications({ embedded = false }: { embedded?: boolean 
                         value={application.status}
                         onValueChange={(status) => handleUpdateStatus(application.id, status)}
                       >
-                        <SelectTrigger className="w-32" data-testid={`status-select-${index}`}>
+                        <SelectTrigger className="w-full sm:w-32" data-testid={`status-select-${index}`}>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

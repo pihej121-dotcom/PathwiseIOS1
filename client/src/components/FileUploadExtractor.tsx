@@ -106,7 +106,7 @@ export function FileUploadExtractor({ onTextExtracted, disabled }: FileUploadExt
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <input
           ref={fileInputRef}
           type="file"
@@ -122,48 +122,53 @@ export function FileUploadExtractor({ onTextExtracted, disabled }: FileUploadExt
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || isExtracting}
           data-testid="button-select-file"
+          className="w-full sm:w-auto"
         >
           <Upload className="w-4 h-4 mr-2" />
           Select File
         </Button>
         {selectedFile && (
-          <Card className="flex-1 flex items-center justify-between p-3">
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium truncate max-w-xs" data-testid="text-selected-file">
-                {selectedFile.name}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                ({(selectedFile.size / 1024).toFixed(1)} KB)
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleExtract}
-                disabled={isExtracting}
-                data-testid="button-extract-text"
-              >
-                {isExtracting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Extracting...
-                  </>
-                ) : (
-                  'Extract Text'
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={handleRemoveFile}
-                disabled={isExtracting}
-                data-testid="button-remove-file"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+          <Card className="flex-1 w-full">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+                <span className="text-sm font-medium truncate" data-testid="text-selected-file">
+                  {selectedFile.name}
+                </span>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  ({(selectedFile.size / 1024).toFixed(1)} KB)
+                </span>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleExtract}
+                  disabled={isExtracting}
+                  data-testid="button-extract-text"
+                  className="flex-1 sm:flex-none"
+                >
+                  {isExtracting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Extracting...
+                    </>
+                  ) : (
+                    'Extract Text'
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRemoveFile}
+                  disabled={isExtracting}
+                  data-testid="button-remove-file"
+                  className="flex-shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </Card>
         )}

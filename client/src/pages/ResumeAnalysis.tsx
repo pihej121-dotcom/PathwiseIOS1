@@ -346,7 +346,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
             </Card>
 
             {/* Category Scores */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <Card 
                 className={`cursor-pointer border-none shadow-sm hover:shadow-md transition-all ${selectedSection === 'skills' ? 'bg-primary/5 ring-1 ring-primary/20' : ''}`}
                 onClick={() => setSelectedSection(selectedSection === 'skills' ? null : 'skills')}
@@ -354,13 +354,13 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               >
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center justify-between mb-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Skills</p>
-                      <p className={`text-2xl font-semibold ${getScoreColor((activeResume as any)?.skillsScore || 0)}`}>
+                      <p className={`text-xl sm:text-2xl font-semibold ${getScoreColor((activeResume as any)?.skillsScore || 0)}`}>
                         {(activeResume as any)?.skillsScore || 0}
                       </p>
                     </div>
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.skillsScore || 0)}`}>
+                    <div className={`w-9 h-9 flex-shrink-0 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.skillsScore || 0)}`}>
                       <Target className="w-4 h-4" />
                     </div>
                   </div>
@@ -375,13 +375,13 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               >
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center justify-between mb-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Experience</p>
-                      <p className={`text-2xl font-semibold ${getScoreColor((activeResume as any)?.experienceScore || 0)}`}>
+                      <p className={`text-xl sm:text-2xl font-semibold ${getScoreColor((activeResume as any)?.experienceScore || 0)}`}>
                         {(activeResume as any)?.experienceScore || 0}
                       </p>
                     </div>
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.experienceScore || 0)}`}>
+                    <div className={`w-9 h-9 flex-shrink-0 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.experienceScore || 0)}`}>
                       <Briefcase className="w-4 h-4" />
                     </div>
                   </div>
@@ -396,13 +396,13 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               >
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center justify-between mb-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Education</p>
-                      <p className={`text-2xl font-semibold ${getScoreColor((activeResume as any)?.educationScore || 0)}`}>
+                      <p className={`text-xl sm:text-2xl font-semibold ${getScoreColor((activeResume as any)?.educationScore || 0)}`}>
                         {(activeResume as any)?.educationScore || 0}
                       </p>
                     </div>
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.educationScore || 0)}`}>
+                    <div className={`w-9 h-9 flex-shrink-0 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.educationScore || 0)}`}>
                       <GraduationCap className="w-4 h-4" />
                     </div>
                   </div>
@@ -417,13 +417,13 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               >
                 <CardContent className="pt-6 pb-6">
                   <div className="flex items-center justify-between mb-3">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Keywords</p>
-                      <p className={`text-2xl font-semibold ${getScoreColor((activeResume as any)?.keywordsScore || 0)}`}>
+                      <p className={`text-xl sm:text-2xl font-semibold ${getScoreColor((activeResume as any)?.keywordsScore || 0)}`}>
                         {(activeResume as any)?.keywordsScore || 0}
                       </p>
                     </div>
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.keywordsScore || 0)}`}>
+                    <div className={`w-9 h-9 flex-shrink-0 rounded-lg flex items-center justify-center ${getScoreBgColor((activeResume as any)?.keywordsScore || 0)}`}>
                       <Hash className="w-4 h-4" />
                     </div>
                   </div>
@@ -455,7 +455,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
 
                     <Separator />
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <div className="flex items-center gap-2 mb-3">
                           <CheckCircle className="w-5 h-5 text-green-600" />

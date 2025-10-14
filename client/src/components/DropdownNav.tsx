@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserSettingsDialog } from "@/components/UserSettingsDialog";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +29,9 @@ import {
   Crown,
   Zap,
   Menu,
-  User
+  User,
+  Moon,
+  Sun
 } from "lucide-react";
 
 const studentNavigation = [
@@ -53,6 +56,7 @@ const adminNavigation = [
 export function DropdownNav() {
   const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -93,26 +97,41 @@ export function DropdownNav() {
             </div>
           </div>
 
-          {/* Dropdown Menu */}
-          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center space-x-2"
-                data-testid="button-menu"
-              >
-                <Avatar className="w-6 h-6">
-                  <AvatarFallback className="bg-gradient-to-br from-accent to-primary text-white font-semibold text-xs">
-                    {getInitials(user?.firstName, user?.lastName)}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden sm:inline text-sm">
-                  {user?.firstName} {user?.lastName}
-                </span>
-                <Menu className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
+          {/* Theme Toggle and Dropdown Menu */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleTheme}
+              className="w-9 h-9 p-0"
+              data-testid="button-theme-toggle"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
+            
+            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center space-x-2"
+                  data-testid="button-menu"
+                >
+                  <Avatar className="w-6 h-6">
+                    <AvatarFallback className="bg-gradient-to-br from-accent to-primary text-white font-semibold text-xs">
+                      {getInitials(user?.firstName, user?.lastName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline text-sm">
+                    {user?.firstName} {user?.lastName}
+                  </span>
+                  <Menu className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
               {/* User Info */}
               <DropdownMenuLabel>
@@ -159,6 +178,7 @@ export function DropdownNav() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </div>
 
