@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TourButton } from "@/components/TourButton";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -17,7 +18,8 @@ import {
   ExternalLink,
   Award,
   Target,
-  Clock
+  Clock,
+  Trash2
 } from "lucide-react";
 
 // Updated interface matching new schema
@@ -67,6 +69,7 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
   const { toast } = useToast();
   const [targetRole, setTargetRole] = useState("Data Scientist");
   const [projectCount, setProjectCount] = useState(2);
+  const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
 
   // Fetch all projects (role-based generation will add to this list)
   const { data: allProjects = [], isLoading: projectsLoading } = useQuery<MicroProject[]>({
@@ -84,7 +87,7 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
       const response = await fetch('/api/micro-projects/generate-from-role', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetRole, count: projectCount }),
+        body: JSON.stringify({ targetRole, count: projectCount, difficulty }),
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Failed to generate projects');
@@ -94,13 +97,36 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
       queryClient.invalidateQueries({ queryKey: ['/api/micro-projects'] });
       toast({
         title: "Projects Generated!",
-        description: `Generated ${data.projects.length} project(s) for ${targetRole}`,
+        description: `Generated ${data.projects.length} ${difficulty} project(s) for ${targetRole}`,
       });
     },
     onError: (error: any) => {
       toast({
         title: "Generation Failed",
         description: "Failed to generate projects. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Clear all projects mutation
+  const clearProjects = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('DELETE', '/api/micro-projects/clear');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/micro-projects'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/project-completions'] });
+      toast({
+        title: "Projects Cleared",
+        description: "All projects have been successfully removed",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Clear Failed",
+        description: "Failed to clear projects. Please try again.",
         variant: "destructive",
       });
     },
@@ -185,7 +211,7 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-2 space-y-2">
                 <label htmlFor="targetRole" className="text-sm font-medium">Target Role</label>
                 <Input
@@ -207,6 +233,19 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
                   onChange={(e) => setProjectCount(parseInt(e.target.value) || 2)}
                   data-testid="input-project-count"
                 />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="difficulty" className="text-sm font-medium">Difficulty</label>
+                <Select value={difficulty} onValueChange={(value: any) => setDifficulty(value)}>
+                  <SelectTrigger id="difficulty" data-testid="select-difficulty">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <Button 
@@ -232,9 +271,32 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
 
         {/* Available Projects Section */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-semibold" data-testid="projects-section-title">
-            Available Projects ({allProjects.length})
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold" data-testid="projects-section-title">
+              Available Projects ({allProjects.length})
+            </h2>
+            {allProjects.length > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => clearProjects.mutate()}
+                disabled={clearProjects.isPending}
+                data-testid="button-clear-projects"
+              >
+                {clearProjects.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Clearing...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Clear All Projects
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
           
           {allProjects.length === 0 ? (
             <Card>
