@@ -336,7 +336,15 @@ Focus on being brutally honest about competitiveness while providing constructiv
     try {
       const prompt = `Analyze this resume for the target role and provide a JSON response with specific scores, detailed section analysis, and gaps.
 
-CRITICAL: Base ALL gap recommendations on the TARGET ROLE specified below. DO NOT default to Python, Data Analytics, or generic tech skills unless they are specifically relevant to the target role. For example:
+CRITICAL REQUIREMENTS:
+1. Base ALL gap recommendations on the TARGET ROLE specified below. DO NOT default to Python, Data Analytics, or generic tech skills unless they are specifically relevant to the target role.
+2. MINIMUM 5 SPECIFIC STRENGTHS and MINIMUM 5 SPECIFIC GAPS for each section: Skills, Experience, Keywords, and Education
+3. BE EXTREMELY SPECIFIC - Use exact tool names, version numbers, technologies, certifications, experience levels, job titles, companies, projects
+   - BAD: "Good programming skills" | GOOD: "Proficient in React 18 with Hooks, Context API, and TypeScript for building scalable SPAs"
+   - BAD: "Marketing experience" | GOOD: "3 years managing $500K+ digital ad campaigns across Google Ads, Meta, and LinkedIn with 25% average ROAS improvement"
+   - BAD: "Education in business" | GOOD: "MBA in Strategic Management from Stanford GSB with focus on Digital Transformation and FinTech"
+
+Role-Specific Examples:
 - Marketing Manager → Content Marketing, SEO, Campaign Management, Analytics Tools
 - Mechanical Engineer → CAD, SolidWorks, Manufacturing Processes, Materials Science
 - Teacher → Classroom Management, Curriculum Development, Educational Technology
@@ -366,29 +374,77 @@ Provide analysis in this exact JSON format:
   "sectionAnalysis": {
     "skills": {
       "score": 70,
-      "strengths": ["Specific skill 1 they have", "Specific skill 2 they have"],
-      "gaps": ["Missing skill 1 for target role", "Missing skill 2 for target role"],
+      "strengths": [
+        "Proficient in Python 3.10+ with NumPy, Pandas for data analysis pipelines processing 1M+ records daily",
+        "Expert in SQL query optimization achieving 60% faster execution on PostgreSQL 14 databases",
+        "Advanced Excel with Power Query, VBA macros, and dynamic dashboards for C-suite reporting",
+        "Certified AWS Solutions Architect with 2 years deploying scalable cloud infrastructure (EC2, S3, Lambda)",
+        "Fluent in Tableau and Power BI for creating interactive data visualizations viewed by 500+ stakeholders"
+      ],
+      "gaps": [
+        "No experience with Apache Spark or distributed computing frameworks required for big data processing",
+        "Missing R programming skills needed for advanced statistical modeling in this role",
+        "Lacks Snowflake data warehouse expertise listed as preferred qualification",
+        "No certification in Azure (target company uses Azure + AWS hybrid cloud)",
+        "Insufficient machine learning library experience (scikit-learn, TensorFlow) for predictive analytics requirements"
+      ],
       "explanation": "Detailed explanation of their skills match",
       "improvements": ["How to improve skill area 1", "How to improve skill area 2"]
     },
     "experience": {
       "score": 60,
-      "strengths": ["Relevant experience they have", "Another strong point"],
-      "gaps": ["Missing experience type", "Years of experience gap"],
+      "strengths": [
+        "5 years as Data Analyst at Fortune 500 financial services firm managing $50M+ portfolio analytics",
+        "Led cross-functional team of 8 analysts delivering monthly KPI reports to VP-level stakeholders",
+        "Built automated ETL pipeline reducing manual data processing time by 75% (40 hours to 10 hours weekly)",
+        "Implemented A/B testing framework increasing conversion rates by 18% across 3 product lines",
+        "Mentored 6 junior analysts resulting in 4 internal promotions within 18 months"
+      ],
+      "gaps": [
+        "No startup or fast-paced tech environment experience (target company is Series B startup)",
+        "Missing customer-facing analytics experience required for client deliverables",
+        "Lacks experience with real-time data streaming (Kafka, Kinesis) needed for live dashboards",
+        "No international or multi-regional team collaboration experience",
+        "Insufficient experience with Agile/Scrum methodologies used by target team"
+      ],
       "explanation": "Detailed explanation of their experience match",
       "improvements": ["How to gain experience 1", "How to gain experience 2"]
     },
     "keywords": {
       "score": 55,
-      "strengths": ["Keywords they use well", "Industry terms present"],
-      "gaps": ["Missing important keywords", "ATS optimization gaps"],
+      "strengths": [
+        "Resume includes 'data-driven decision making' and 'stakeholder management' - key ATS keywords",
+        "Uses quantified metrics (75% efficiency gain, $50M portfolio) matching job description language",
+        "Contains industry-specific terms like 'ETL pipeline', 'KPI reporting', 'A/B testing framework'",
+        "Mentions relevant tools by name (PostgreSQL, Tableau, Power BI) matching job requirements",
+        "Includes leadership keywords ('led team of 8', 'mentored analysts') for senior-level positioning"
+      ],
+      "gaps": [
+        "Missing 'predictive analytics' and 'forecasting models' keywords appearing 5+ times in job description",
+        "Lacks 'business intelligence' and 'data governance' terminology critical for ATS optimization",
+        "No mention of 'API integration' or 'RESTful services' required for technical skill validation",
+        "Absent 'customer segmentation' and 'churn analysis' keywords specific to target industry",
+        "Missing certification keywords (AWS Certified, Google Analytics, Tableau Desktop Specialist)"
+      ],
       "explanation": "Analysis of keyword optimization and ATS compatibility",
       "improvements": ["Add keyword X to Y section", "Rephrase Z using industry terms"]
     },
     "education": {
       "score": 80,
-      "strengths": ["Relevant degree/certification", "Academic achievement"],
-      "gaps": ["Additional certifications needed", "Specialized training"],
+      "strengths": [
+        "Master's in Data Science from UC Berkeley with thesis on machine learning applications in finance",
+        "Bachelor's in Computer Science (GPA 3.8/4.0) with minor in Statistics from Carnegie Mellon",
+        "Completed Stanford Online Machine Learning Specialization (Andrew Ng) - 4.9/5.0 rating",
+        "Google Data Analytics Professional Certificate (2023) - aligns with target company's tech stack",
+        "Relevant coursework: Database Systems, Statistical Modeling, Data Visualization, Cloud Computing"
+      ],
+      "gaps": [
+        "No MBA or business management degree preferred for senior analytics leadership role",
+        "Missing domain-specific certifications in healthcare analytics (target company is in healthtech)",
+        "Lacks formal training in data ethics and privacy regulations (GDPR, HIPAA) required for compliance",
+        "No certification in specific tools mentioned in job posting (Snowflake SnowPro, dbt certification)",
+        "Insufficient continuing education in AI/LLM technologies emerging in analytics field"
+      ],
       "explanation": "How education aligns with role requirements",
       "improvements": ["Consider certification X", "Take course in Y"]
     },
