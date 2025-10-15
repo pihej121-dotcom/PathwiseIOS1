@@ -1,4 +1,4 @@
-import logoImage from "@assets/Black White Minimalist Simple Monogram Typography Logo_1760488570122.png";
+import logoImage from "@assets/pathwise-logo-new.png";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
