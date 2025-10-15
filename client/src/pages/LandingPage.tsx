@@ -23,19 +23,19 @@ export default function LandingPage() {
       <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="sm" />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <Link href="/contact">
-              <Button variant="ghost" data-testid="nav-button-contact">
+              <Button variant="ghost" className="hidden sm:inline-flex" data-testid="nav-button-contact">
                 Contact Us
               </Button>
             </Link>
             <Link href="/register">
-              <Button variant="outline" data-testid="nav-button-register">
+              <Button variant="outline" className="text-sm sm:text-base px-3 sm:px-4" data-testid="nav-button-register">
                 Get Started
               </Button>
             </Link>
             <Link href="/login">
-              <Button data-testid="nav-button-login">
+              <Button className="text-sm sm:text-base px-3 sm:px-4" data-testid="nav-button-login">
                 Sign In
               </Button>
             </Link>
