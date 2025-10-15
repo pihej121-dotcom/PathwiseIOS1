@@ -43,7 +43,7 @@ export default function BeyondJobsTab() {
   
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState(user?.location || "");
-  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedType, setSelectedType] = useState<string>("internship");
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [currentLimit, setCurrentLimit] = useState(5);
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
@@ -153,13 +153,8 @@ export default function BeyondJobsTab() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
                       <SelectItem value="volunteer">Volunteer</SelectItem>
                       <SelectItem value="internship">Internship</SelectItem>
-                      <SelectItem value="hackathon">Hackathon</SelectItem>
-                      <SelectItem value="competition">Competition</SelectItem>
-                      <SelectItem value="apprenticeship">Apprenticeship</SelectItem>
-                      <SelectItem value="externship">Externship</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
