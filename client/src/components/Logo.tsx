@@ -1,4 +1,4 @@
-import logoImage from "@assets/UpdatedLogo_20251014_1760486822169.png";
+import logoImage from "@assets/Black White Minimalist Simple Monogram Typography Logo_1760488570122.png";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
