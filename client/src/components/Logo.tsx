@@ -1,3 +1,5 @@
+import logoImage from "@assets/UpdatedLogo_20251014_1760486822169.png";
+
 interface LogoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -5,19 +7,19 @@ interface LogoProps {
 
 export function Logo({ size = "md", className = "" }: LogoProps) {
   const sizeClasses = {
-    sm: "text-lg",
-    md: "text-2xl", 
-    lg: "text-4xl"
+    sm: "h-8 w-8",
+    md: "h-12 w-12", 
+    lg: "h-16 w-16"
   };
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <h1 
-        className={`${sizeClasses[size]} font-bold text-blue-600 dark:text-blue-400`}
+      <img 
+        src={logoImage}
+        alt="Pathwise Logo"
+        className={`${sizeClasses[size]} object-contain`}
         data-testid="pathwise-logo"
-      >
-        Pathwise
-      </h1>
+      />
     </div>
   );
 }
