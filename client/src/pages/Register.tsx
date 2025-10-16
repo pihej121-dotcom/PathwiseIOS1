@@ -128,7 +128,7 @@ export default function Register() {
                 {selectedPlan && !invitationToken && (
                   <Alert className="border-blue-200 bg-blue-50 text-blue-800">
                     <AlertDescription>
-                      Selected plan: <strong>Pro ($10/month)</strong>
+                      Selected plan: <strong>Pro ($15/month) - 14 days free trial</strong>
                     </AlertDescription>
                   </Alert>
                 )}

@@ -75,72 +75,52 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Subscription Plans */}
-          <div className="grid md:grid-cols-2 gap-6 pt-12 max-w-4xl mx-auto">
-            <Card className="border-2">
-              <CardContent className="pt-6 text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 mb-4">
-                  <GraduationCap className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">Institutional</h3>
-                <div className="text-3xl font-bold text-primary mb-2">Full Access</div>
-                <p className="text-sm text-muted-foreground mb-4">For invited students</p>
-                <ul className="text-sm text-left space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
-                    <span>All Pro features included</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
-                    <span>Institution branding</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
-                    <span>Priority support</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-primary relative">
+          {/* Subscription Plan */}
+          <div className="pt-12 max-w-md mx-auto">
+            <Card className="border-2 border-primary relative shadow-xl">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                  Most Popular
+                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                  14 Days Free Trial
                 </div>
               </div>
-              <CardContent className="pt-6 text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
-                  <Sparkles className="w-6 h-6" />
+              <CardContent className="pt-10 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
+                  <Sparkles className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Pro</h3>
-                <div className="text-3xl font-bold text-primary mb-2">$10<span className="text-sm text-muted-foreground">/month</span></div>
-                <p className="text-sm text-muted-foreground mb-4">Full access to all features</p>
-                <ul className="text-sm text-left space-y-2">
+                <h3 className="text-2xl font-bold mb-3">Pro</h3>
+                <div className="text-5xl font-bold text-primary mb-3">$15<span className="text-lg text-muted-foreground">/month</span></div>
+                <p className="text-base text-muted-foreground mb-6">Full access to all features</p>
+                <ul className="text-sm text-left space-y-3 mb-6">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                     <span>Resume Analysis with AI</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                     <span>AI Career Co-Pilot</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                     <span>Career Roadmaps</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                     <span>Job Matching & Tracking</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                     <span>Portfolio Micro-Projects</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                     <span>Beyond Jobs opportunities</span>
                   </li>
                 </ul>
+                <Link href="/register">
+                  <Button size="lg" className="w-full text-base py-6" data-testid="pricing-button-getstarted">
+                    Start Free Trial
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>

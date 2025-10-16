@@ -477,10 +477,10 @@ export function UserSettingsDialog({ open, onOpenChange }: UserSettingsDialogPro
                       <div className="border rounded-lg p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
                         <h4 className="font-medium mb-2">Upgrade to Pro</h4>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Unlock detailed resume insights, unlimited roadmaps, and priority support for just $10/month
+                          Unlock detailed resume insights, unlimited roadmaps, and priority support for just $15/month. Start with a 14-day free trial!
                         </p>
                         <Button className="w-full" data-testid="button-upgrade-to-pro">
-                          Upgrade Now
+                          Start Free Trial
                         </Button>
                       </div>
                     )}

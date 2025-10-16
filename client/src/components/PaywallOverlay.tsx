@@ -27,7 +27,7 @@ export function PaywallOverlay({ children, showPaywall, onUpgrade }: PaywallOver
           </div>
           <h3 className="text-2xl font-bold">Unlock with Pro</h3>
           <p className="text-muted-foreground">
-            Get full access to detailed insights, improvement recommendations, and all premium features for just $10/month.
+            Get full access to detailed insights, improvement recommendations, and all premium features for just $15/month. Start with a 14-day free trial!
           </p>
           <Button 
             size="lg" 

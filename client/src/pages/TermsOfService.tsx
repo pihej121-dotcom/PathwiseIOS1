@@ -63,7 +63,7 @@ export default function TermsOfService() {
               </p>
               <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
                 <li><strong>Free Tier:</strong> Access to basic features including resume analysis and AI career co-pilot</li>
-                <li><strong>Pro Tier:</strong> Full access to all features for $10/month, billed monthly</li>
+                <li><strong>Pro Tier:</strong> Full access to all features for $15/month with a 14-day free trial, billed monthly</li>
                 <li>Subscriptions automatically renew unless cancelled before the renewal date</li>
                 <li>Refunds are provided on a case-by-case basis within 7 days of purchase</li>
                 <li>We reserve the right to modify pricing with 30 days notice to existing subscribers</li>
