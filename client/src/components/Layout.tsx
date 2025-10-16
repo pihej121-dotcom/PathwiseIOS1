@@ -3,6 +3,7 @@ import { DropdownNav } from "./DropdownNav";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import type { Achievement } from "@shared/schema";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,23 +15,13 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const { data: dashboardStats } = useQuery({
+  const { data: dashboardStats } = useQuery<any>({
     queryKey: ["/api/dashboard/stats"],
-    queryFn: async () => {
-      const res = await fetch("/api/dashboard/stats");
-      if (!res.ok) throw new Error("Failed to fetch dashboard stats");
-      return res.json();
-    },
   });
 
-  const { data: achievements } = useQuery({
+  const { data: achievements } = useQuery<Achievement[]>({
     queryKey: ["/api/achievements"],
     refetchInterval: 30000,
-    queryFn: async () => {
-      const res = await fetch("/api/achievements");
-      if (!res.ok) throw new Error("Failed to fetch achievements");
-      return res.json();
-    },
   });
 
   const [lastAchievementCount, setLastAchievementCount] = useState(0);
