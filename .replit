@@ -23,16 +23,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "NODE_ENV=development npx tsx server/index.ts"
 waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 33493
-externalPort = 3000
 
 [[ports]]
 localPort = 35653
@@ -41,6 +40,10 @@ externalPort = 4200
 [[ports]]
 localPort = 41667
 externalPort = 3003
+
+[[ports]]
+localPort = 42891
+externalPort = 3000
 
 [[ports]]
 localPort = 43271
