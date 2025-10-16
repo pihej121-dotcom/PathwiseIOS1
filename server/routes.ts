@@ -206,12 +206,21 @@ if (existingUser && !existingUser.isActive) {
           customer: customer.id,
           mode: 'subscription',
           payment_method_types: ['card'],
+          payment_method_collection: 'always', // Require payment method upfront
           line_items: [
             {
               price: process.env.STRIPE_PRICE_ID,
               quantity: 1,
             },
           ],
+          subscription_data: {
+            trial_period_days: 14,
+            trial_settings: {
+              end_behavior: {
+                missing_payment_method: 'cancel', // Cancel subscription if no payment method
+              },
+            },
+          },
           success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${baseUrl}/register`,
           metadata: {
@@ -2434,25 +2443,85 @@ if (existingUser && !existingUser.isActive) {
           const subscriptionId = session.subscription as string;
 
           if (userId && subscriptionId) {
-            // Update user subscription status
+            // Update user subscription status - will be 'trialing' during trial period
             await storage.updateUser(userId, {
               stripeSubscriptionId: subscriptionId,
-              subscriptionStatus: 'active',
+              subscriptionStatus: 'trialing',
             });
-            console.log(`✅ Subscription activated for user ${userId}`);
+            console.log(`✅ Subscription created for user ${userId} (trial period active)`);
           }
           break;
         }
 
-        case 'customer.subscription.updated':
+        case 'customer.subscription.updated': {
+          const subscription = event.data.object as Stripe.Subscription;
+          const customerId = subscription.customer as string;
+
+          // Find user by Stripe customer ID
+          const user = await storage.getUserByStripeCustomerId(customerId);
+          
+          if (user) {
+            // Map Stripe status to our subscription status
+            let subscriptionStatus: 'active' | 'canceled' | 'past_due' | 'trialing' | 'incomplete' = 'active';
+            
+            if (subscription.status === 'trialing') {
+              subscriptionStatus = 'trialing';
+            } else if (subscription.status === 'past_due') {
+              subscriptionStatus = 'past_due';
+            } else if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
+              subscriptionStatus = 'canceled';
+            } else if (subscription.status === 'incomplete' || subscription.status === 'incomplete_expired') {
+              subscriptionStatus = 'incomplete';
+            } else if (subscription.status === 'active') {
+              subscriptionStatus = 'active';
+            }
+
+            await storage.updateUser(user.id, {
+              subscriptionStatus,
+              subscriptionTier: subscriptionStatus === 'active' || subscriptionStatus === 'trialing' ? 'paid' : 'free',
+            });
+            
+            console.log(`✅ Subscription updated for user ${user.id}: ${subscriptionStatus}`);
+          }
+          break;
+        }
+
         case 'customer.subscription.deleted': {
           const subscription = event.data.object as Stripe.Subscription;
           const customerId = subscription.customer as string;
 
           // Find user by Stripe customer ID
-          // Since we don't have getAllUsers, we'll store the user ID in metadata
-          // For now, skip this case - it will be handled via the checkout.session.completed event
-          console.log(`Subscription event ${event.type} for customer ${customerId}`);
+          const user = await storage.getUserByStripeCustomerId(customerId);
+          
+          if (user) {
+            // Downgrade to free tier and clear subscription data
+            await storage.updateUser(user.id, {
+              subscriptionStatus: 'canceled',
+              subscriptionTier: 'free',
+              stripeSubscriptionId: null,
+            });
+            
+            console.log(`✅ Subscription canceled for user ${user.id}, downgraded to free tier`);
+          }
+          break;
+        }
+
+        case 'invoice.payment_failed': {
+          const invoice = event.data.object as Stripe.Invoice;
+          const customerId = invoice.customer as string;
+
+          // Find user by Stripe customer ID
+          const user = await storage.getUserByStripeCustomerId(customerId);
+          
+          if (user) {
+            // Update user to past_due status to restrict access
+            await storage.updateUser(user.id, {
+              subscriptionStatus: 'past_due',
+              subscriptionTier: 'free', // Downgrade access immediately
+            });
+            
+            console.log(`⚠️ Payment failed for user ${user.id}, status set to past_due`);
+          }
           break;
         }
 
