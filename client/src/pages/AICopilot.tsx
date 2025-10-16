@@ -211,7 +211,7 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-2 flex-shrink-0">
+                          <div className="flex flex-shrink-0">
                             <Button 
                               size="sm" 
                               variant="outline" 
@@ -225,10 +225,6 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                             >
                               <Eye className="w-4 h-4 sm:mr-1" />
                               <span className="hidden sm:inline">View</span>
-                            </Button>
-                            <Button size="sm" variant="outline" data-testid={`download-resume-${resume.id}`} className="whitespace-nowrap">
-                              <Download className="w-4 h-4 sm:mr-1" />
-                              <span className="hidden sm:inline">Download</span>
                             </Button>
                           </div>
                         </div>
