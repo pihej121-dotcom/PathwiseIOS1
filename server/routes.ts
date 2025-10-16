@@ -2373,17 +2373,26 @@ if (existingUser && !existingUser.isActive) {
       const url = new URL(referer);
       const baseUrl = `${url.protocol}//${url.host}`;
 
-      // Create checkout session
+      // Create checkout session with 14-day trial
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: 'subscription',
         payment_method_types: ['card'],
+        payment_method_collection: 'always', // Require payment method upfront
         line_items: [
           {
             price: process.env.STRIPE_PRICE_ID,
             quantity: 1,
           },
         ],
+        subscription_data: {
+          trial_period_days: 14,
+          trial_settings: {
+            end_behavior: {
+              missing_payment_method: 'cancel', // Cancel subscription if no payment method
+            },
+          },
+        },
         success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
         metadata: {
