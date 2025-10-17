@@ -136,15 +136,6 @@ export default function LandingPage() {
                       <CheckCircle2 className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold">AI Career Co-Pilot</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <CheckCircle2 className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
                       <p className="font-semibold">Career Roadmaps</p>
                       <p className="text-sm text-muted-foreground">Custom development plans</p>
                     </div>
@@ -170,7 +161,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all sm:col-span-2">
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <CheckCircle2 className="w-4 h-4 text-white" />
                     </div>
@@ -643,10 +634,15 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <Logo size="sm" />
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Pathwise Institution Edition. 
-              Empowering students to navigate their career paths.
-            </p>
+            <div className="flex flex-col items-center md:items-end gap-2">
+              <p className="text-sm text-muted-foreground">
+                © {new Date().getFullYear()} Pathwise Institution Edition. 
+                Empowering students to navigate their career paths.
+              </p>
+              <p className="text-sm text-muted-foreground font-medium">
+                Pathwise LLC
+              </p>
+            </div>
           </div>
         </div>
       </footer>
