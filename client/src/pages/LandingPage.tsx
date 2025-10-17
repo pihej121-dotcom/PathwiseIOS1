@@ -107,11 +107,11 @@ export default function LandingPage() {
                 </div>
 
                 {/* Header */}
-                <div className="text-center mb-10">
+                <div className="text-center mb-10 pt-8">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-accent/80 text-primary-foreground mb-6 shadow-lg">
                     <Sparkles className="w-10 h-10" />
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-bold mb-4">Pro Plan</h3>
+                  <h3 className="text-3xl md:text-4xl font-bold mb-4">Start Your Path</h3>
                   <div className="flex items-baseline justify-center gap-2 mb-3">
                     <span className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">$15</span>
                     <span className="text-xl text-muted-foreground font-medium">/month</span>
@@ -137,7 +137,6 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <p className="font-semibold">AI Career Co-Pilot</p>
-                      <p className="text-sm text-muted-foreground">Personalized guidance 24/7</p>
                     </div>
                   </div>
                   
@@ -194,7 +193,6 @@ export default function LandingPage() {
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </Link>
-                  <p className="text-sm text-muted-foreground mt-4">No credit card required • Cancel anytime</p>
                 </div>
               </div>
             </div>
