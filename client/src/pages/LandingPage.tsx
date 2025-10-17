@@ -15,6 +15,7 @@ import {
   Star,
   Quote
 } from "lucide-react";
+import demoVideo from "@assets/Pathwise Your Career Powered by AI_1080p_1760659870596.mp4";
 
 export default function LandingPage() {
   return (
@@ -75,54 +76,128 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Subscription Plan */}
-          <div className="pt-12 max-w-md mx-auto">
-            <Card className="border-2 border-primary relative shadow-xl">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
-                  14 Days Free Trial
+          {/* Demo Video */}
+          <div className="pt-16 max-w-5xl mx-auto">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-1">
+              <video 
+                className="w-full h-auto rounded-xl"
+                controls
+                playsInline
+                preload="metadata"
+                data-testid="demo-video"
+              >
+                <source src={demoVideo} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+
+          {/* Subscription Plan - Modern Design */}
+          <div className="pt-20 max-w-5xl mx-auto">
+            <div className="relative">
+              {/* Background Decorative Elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 rounded-3xl blur-3xl opacity-50"></div>
+              
+              <div className="relative bg-gradient-to-br from-background via-background to-primary/5 rounded-3xl p-8 md:p-12 border border-primary/20 shadow-2xl">
+                {/* Badge */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <div className="bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+                    🎉 14 Days Free Trial
+                  </div>
+                </div>
+
+                {/* Header */}
+                <div className="text-center mb-10">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-accent/80 text-primary-foreground mb-6 shadow-lg">
+                    <Sparkles className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-3xl md:text-4xl font-bold mb-4">Pro Plan</h3>
+                  <div className="flex items-baseline justify-center gap-2 mb-3">
+                    <span className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">$15</span>
+                    <span className="text-xl text-muted-foreground font-medium">/month</span>
+                  </div>
+                  <p className="text-lg text-muted-foreground">Full access to all premium features</p>
+                </div>
+
+                {/* Features Grid */}
+                <div className="grid sm:grid-cols-2 gap-4 mb-10 max-w-3xl mx-auto">
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Resume Analysis with AI</p>
+                      <p className="text-sm text-muted-foreground">Instant feedback & scoring</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">AI Career Co-Pilot</p>
+                      <p className="text-sm text-muted-foreground">Personalized guidance 24/7</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Career Roadmaps</p>
+                      <p className="text-sm text-muted-foreground">Custom development plans</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Job Matching & Tracking</p>
+                      <p className="text-sm text-muted-foreground">AI-powered opportunities</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Portfolio Micro-Projects</p>
+                      <p className="text-sm text-muted-foreground">Build real-world experience</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 transition-all">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">Beyond Jobs Opportunities</p>
+                      <p className="text-sm text-muted-foreground">Internships & volunteering</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <div className="text-center">
+                  <Link href="/register">
+                    <Button 
+                      size="lg" 
+                      className="text-lg px-12 py-7 rounded-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-xl hover:shadow-2xl transition-all hover:scale-105" 
+                      data-testid="pricing-button-getstarted"
+                    >
+                      Start Free Trial
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </Link>
+                  <p className="text-sm text-muted-foreground mt-4">No credit card required • Cancel anytime</p>
                 </div>
               </div>
-              <CardContent className="pt-10 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
-                  <Sparkles className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Pro</h3>
-                <div className="text-5xl font-bold text-primary mb-3">$15<span className="text-lg text-muted-foreground">/month</span></div>
-                <p className="text-base text-muted-foreground mb-6">Full access to all features</p>
-                <ul className="text-sm text-left space-y-3 mb-6">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Resume Analysis with AI</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>AI Career Co-Pilot</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Career Roadmaps</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Job Matching & Tracking</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Portfolio Micro-Projects</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Beyond Jobs opportunities</span>
-                  </li>
-                </ul>
-                <Link href="/register">
-                  <Button size="lg" className="w-full text-base py-6" data-testid="pricing-button-getstarted">
-                    Start Free Trial
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
       </section>
