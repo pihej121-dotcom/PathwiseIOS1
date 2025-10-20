@@ -339,7 +339,8 @@ Focus on being brutally honest about competitiveness while providing constructiv
 CRITICAL REQUIREMENTS:
 1. Base ALL gap recommendations on the TARGET ROLE specified below. DO NOT default to Python, Data Analytics, or generic tech skills unless they are specifically relevant to the target role.
 2. MINIMUM 5 SPECIFIC STRENGTHS and MINIMUM 5 SPECIFIC GAPS for each section: Skills, Experience, Keywords, and Education
-3. BE EXTREMELY SPECIFIC - Use exact tool names, version numbers, technologies, certifications, experience levels, job titles, companies, projects
+3. IF RESUME DOESN'T CHANGE, KEEP THE ANALYSIS CONSISTENT
+4. BE EXTREMELY SPECIFIC - Use exact tool names, version numbers, technologies, certifications, experience levels, job titles, companies, projects
    - BAD: "Good programming skills" | GOOD: "Proficient in React 18 with Hooks, Context API, and TypeScript for building scalable SPAs"
    - BAD: "Marketing experience" | GOOD: "3 years managing $500K+ digital ad campaigns across Google Ads, Meta, and LinkedIn with 25% average ROAS improvement"
    - BAD: "Education in business" | GOOD: "MBA in Strategic Management from Stanford GSB with focus on Digital Transformation and FinTech"
