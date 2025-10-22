@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,6 +45,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetIndustry, setTargetIndustry] = useState("");
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
