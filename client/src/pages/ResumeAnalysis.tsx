@@ -41,12 +41,13 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
   const [resumeText, setResumeText] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [targetIndustry, setTargetIndustry] = useState("");
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-
+  
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
 
@@ -146,14 +147,29 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       return;
     }
     
+    // Clear any pending timeout and reset mutation flag
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    mutationCompleted.current = false;
+    
+    // --- Start analysis and manual display timer ---
     setIsAnalyzing(true);
+    setShowLoader(true); // show loader immediately
+    
     analyzeMutation.mutate({
       resumeText: resumeText.trim(),
       targetRole: targetRole.trim(),
       targetIndustry: targetIndustry.trim(),
-      targetCompanies: targetCompanies.trim()
+      targetCompanies: targetCompanies.trim(),
     });
-  };
+    
+    // Minimum display duration (e.g., 90 s)
+    timeoutRef.current = setTimeout(() => {
+      setShowLoader(false); // stop loader after 90 s
+    }, 90000);
+      };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -198,7 +214,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const content = (
     <>
       <LoadingExperience 
-        isLoading={analyzeMutation.isPending} 
+        isLoading={showLoader || analyzeMutation.isPending} 
         operation="resume"
         showMiniGame={true}
       />
