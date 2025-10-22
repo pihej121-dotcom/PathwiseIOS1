@@ -166,6 +166,33 @@ export const resumes = pgTable("resumes", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+// Resume Analysis History - Track all analyses over time
+export const resumeAnalysisHistory = pgTable("resume_analysis_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  resumeId: varchar("resume_id").notNull().references(() => resumes.id, { onDelete: "cascade" }),
+  fileName: text("file_name").notNull(),
+  rmsScore: integer("rms_score").notNull(),
+  skillsScore: integer("skills_score"),
+  experienceScore: integer("experience_score"),
+  keywordsScore: integer("keywords_score"),
+  educationScore: integer("education_score"),
+  certificationsScore: integer("certifications_score"),
+  gaps: jsonb("gaps"),
+  overallInsights: jsonb("overall_insights"),
+  sectionAnalysis: jsonb("section_analysis"),
+  targetRole: text("target_role"),
+  targetIndustry: text("target_industry"),
+  targetCompanies: text("target_companies").array(),
+  analysisHash: jsonb("analysis_hash").$type<{
+    hash: string;
+    method?: string;
+    source?: string;
+    createdAt?: string;
+  } | null>(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 // Career roadmaps
 export const roadmaps = pgTable("roadmaps", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -439,6 +466,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   institution: one(institutions, { fields: [users.institutionId], references: [institutions.id] }),
   sessions: many(sessions),
   resumes: many(resumes),
+  resumeAnalysisHistory: many(resumeAnalysisHistory),
   roadmaps: many(roadmaps),
   roadmapSubsections: many(roadmapSubsections),
   jobMatches: many(jobMatches),
@@ -458,6 +486,12 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export const resumesRelations = relations(resumes, ({ one, many }) => ({
   user: one(users, { fields: [resumes.userId], references: [users.id] }),
   tailoredResumes: many(tailoredResumes),
+  analysisHistory: many(resumeAnalysisHistory),
+}));
+
+export const resumeAnalysisHistoryRelations = relations(resumeAnalysisHistory, ({ one }) => ({
+  user: one(users, { fields: [resumeAnalysisHistory.userId], references: [users.id] }),
+  resume: one(resumes, { fields: [resumeAnalysisHistory.resumeId], references: [resumes.id] }),
 }));
 
 export const roadmapsRelations = relations(roadmaps, ({ one, many }) => ({
@@ -590,6 +624,11 @@ export const insertResumeSchema = createInsertSchema(resumes).omit({
   createdAt: true,
 });
 
+export const insertResumeAnalysisHistorySchema = createInsertSchema(resumeAnalysisHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertRoadmapSchema = createInsertSchema(roadmaps).omit({
   id: true,
   createdAt: true,
@@ -691,6 +730,8 @@ export type PromoCode = typeof promoCodes.$inferSelect;
 export type InsertPromoCode = z.infer<typeof insertPromoCodeSchema>;
 export type Resume = typeof resumes.$inferSelect;
 export type InsertResume = z.infer<typeof insertResumeSchema>;
+export type ResumeAnalysisHistory = typeof resumeAnalysisHistory.$inferSelect;
+export type InsertResumeAnalysisHistory = z.infer<typeof insertResumeAnalysisHistorySchema>;
 export type Roadmap = typeof roadmaps.$inferSelect;
 export type InsertRoadmap = z.infer<typeof insertRoadmapSchema>;
 export type RoadmapSubsection = typeof roadmapSubsections.$inferSelect;
