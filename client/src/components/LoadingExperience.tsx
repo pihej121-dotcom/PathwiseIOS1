@@ -93,12 +93,12 @@ export function LoadingExperience({ isLoading, operation = "default" }: LoadingE
       timer = setTimeout(() => {
         setFadeOut(true);
         // fade out after 1.5s
-        setTimeout(() => setVisible(false), 1500);
+        setTimeout(() => setVisible(false), 60000);
       }, 60000);
     } else if (visible) {
       // Optional: allow smooth fade if parent stops early
       setFadeOut(true);
-      setTimeout(() => setVisible(false), 1500);
+      setTimeout(() => setVisible(false), 60000);
     }
     return () => clearTimeout(timer);
   }, [isLoading]);
@@ -114,7 +114,7 @@ export function LoadingExperience({ isLoading, operation = "default" }: LoadingE
         const increment = (100 - prev) / 25;
         return prev + increment;
       });
-    }, 1000);
+    }, 60000);
 
     return () => clearInterval(progressInterval);
   }, [visible]);
