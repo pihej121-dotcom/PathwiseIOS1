@@ -51,18 +51,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
 
-  // Auto-hide loading when mutation completes AND refetch finishes
-  useEffect(() => {
-    if (mutationCompleted.current && !isActiveResumeFetching && !analyzeMutation.isPending) {
-      setIsAnalyzing(false);
-      mutationCompleted.current = false;
-      toast({
-        title: "Resume analyzed successfully!",
-        description: "Your resume has been analyzed. Check the scores and recommendations below.",
-      });
-    }
-  }, [isActiveResumeFetching, analyzeMutation.isPending, toast]);
-
   // Handle upgrade to Pro
   const handleUpgrade = async () => {
     try {
@@ -127,6 +115,18 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       setIsAnalyzing(false);
     },
   });
+
+  // Auto-hide loading when mutation completes AND refetch finishes
+  useEffect(() => {
+    if (mutationCompleted.current && !isActiveResumeFetching && !analyzeMutation.isPending) {
+      setIsAnalyzing(false);
+      mutationCompleted.current = false;
+      toast({
+        title: "Resume analyzed successfully!",
+        description: "Your resume has been analyzed. Check the scores and recommendations below.",
+      });
+    }
+  }, [isActiveResumeFetching, analyzeMutation.isPending, toast]);
 
   const handleFileTextExtracted = (text: string, fileName: string) => {
     setResumeText(text);
