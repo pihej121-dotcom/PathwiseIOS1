@@ -34,6 +34,7 @@ import {
 import { format } from "date-fns";
 import { ResumeHistoryChart } from "@/components/ResumeHistoryChart";
 import { FileUploadExtractor } from "@/components/FileUploadExtractor";
+import { ResumeAnalysisHistory } from "@/components/ResumeAnalysisHistory";
 
 export default function ResumeAnalysis({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
@@ -616,6 +617,11 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
             activeResumeId={(activeResume as any)?.id}
           />
         )}
+
+        {/* Resume Analysis History */}
+        <div className="mt-8">
+          <ResumeAnalysisHistory embedded={true} />
+        </div>
       </div>
     </>
   );
