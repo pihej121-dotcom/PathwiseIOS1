@@ -1,469 +1,391 @@
-import { useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-  ReferenceLine,
-} from "recharts";
-import { Button } from "@/components/ui/button";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, TrendingUp, TrendingDown, Minus, BarChart3, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
-import type { Resume } from "@shared/schema";
+import {
+  FileText,
+  Calendar as CalendarIcon,
+  X,
+  AlertTriangle,
+  Target,
+  Building2,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { apiRequest } from "@/lib/queryClient";
 
-interface ResumeHistoryChartProps {
-  resumes: Resume[];
-  activeResumeId?: string;
-}
-
-interface ChartDataPoint {
-  date: string;
-  displayDate: string;
+interface ResumeAnalysisHistoryItem {
+  id: string;
   fileName: string;
   rmsScore: number;
-  skillsScore: number;
-  experienceScore: number;
-  keywordsScore: number;
-  educationScore: number;
-  certificationsScore: number;
-  isActive: boolean;
+  skillsScore?: number;
+  experienceScore?: number;
+  keywordsScore?: number;
+  educationScore?: number;
+  certificationsScore?: number;
+  gaps?: Array<{
+    category: string;
+    priority: string;
+    issue: string;
+    impact: string;
+    rationale: string;
+    resources?: Array<{ title: string; url: string }>;
+  }>;
+  overallInsights?: {
+    strengths?: string[];
+    improvements?: string[];
+    summary?: string;
+  };
+  sectionAnalysis?: Record<string, any>;
+  targetRole?: string;
+  targetIndustry?: string;
+  targetCompanies?: string[];
+  createdAt: string;
 }
 
-export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryChartProps) {
-  const [showSectionScores, setShowSectionScores] = useState(false);
+interface ResumeAnalysisHistoryProps {
+  embedded?: boolean;
+}
 
-  // Transform resume data for the chart
-  const chartData: ChartDataPoint[] = resumes
-    .filter(resume => resume.rmsScore !== null)
-    .map(resume => ({
-      date: new Date(resume.createdAt).toISOString(),
-      displayDate: format(new Date(resume.createdAt), "MMM d, h:mm a"),
-      fileName: resume.fileName,
-      rmsScore: resume.rmsScore || 0,
-      skillsScore: resume.skillsScore || 0,
-      experienceScore: resume.experienceScore || 0,
-      keywordsScore: resume.keywordsScore || 0,
-      educationScore: resume.educationScore || 0,
-      certificationsScore: resume.certificationsScore || 0,
-      isActive: resume.id === activeResumeId,
-    }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistoryProps) {
+  const [selectedRole, setSelectedRole] = useState<string>("");
+  const [selectedIndustry, setSelectedIndustry] = useState<string>("");
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
 
-  if (chartData.length === 0) {
+  // --- Build query string safely ---
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams();
+    if (selectedRole) params.append("targetRole", selectedRole);
+    if (selectedIndustry) params.append("targetIndustry", selectedIndustry);
+    if (startDate) params.append("startDate", startDate.toISOString());
+    if (endDate) params.append("endDate", endDate.toISOString());
+    const qs = params.toString();
+    return qs ? `?${qs}` : "";
+  }, [selectedRole, selectedIndustry, startDate, endDate]);
+
+  // --- Fetch filtered / full data ---
+  const { data: historyData = [], isLoading } = useQuery<ResumeAnalysisHistoryItem[]>({
+    queryKey: [
+      "/api/resume-analysis-history",
+      selectedRole,
+      selectedIndustry,
+      startDate?.toISOString(),
+      endDate?.toISOString(),
+    ],
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/resume-analysis-history${queryString}`);
+      return response.json();
+    },
+  });
+
+  // --- Fetch all for dropdowns only when not embedded ---
+  const { data: allHistoryData = [] } = useQuery<ResumeAnalysisHistoryItem[]>({
+    queryKey: ["/api/resume-analysis-history"],
+    enabled: !embedded,
+  });
+
+  // --- Extract filter options ---
+  const { uniqueRoles, uniqueIndustries } = useMemo(() => {
+    const roles = new Set<string>();
+    const industries = new Set<string>();
+    allHistoryData.forEach((item) => {
+      if (item.targetRole) roles.add(item.targetRole);
+      if (item.targetIndustry) industries.add(item.targetIndustry);
+    });
+    return {
+      uniqueRoles: Array.from(roles).sort(),
+      uniqueIndustries: Array.from(industries).sort(),
+    };
+  }, [allHistoryData]);
+
+  const hasActiveFilters = selectedRole || selectedIndustry || startDate || endDate;
+
+  // --- Utility function ---
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case "high":
+        return "bg-red-500 text-white";
+      case "medium":
+        return "bg-yellow-500 text-white";
+      case "low":
+        return "bg-green-500 text-white";
+      default:
+        return "bg-gray-500 text-white";
+    }
+  };
+
+  const clearFilters = () => {
+    setSelectedRole("");
+    setSelectedIndustry("");
+    setStartDate(undefined);
+    setEndDate(undefined);
+  };
+
+  // --- Loading skeleton ---
+  if (isLoading) {
     return (
-      <Card className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-0 shadow-lg">
-        <CardHeader className="text-center pb-8">
-          <CardTitle className="flex items-center justify-center gap-3 text-xl">
-            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse">
-              <BarChart3 className="h-6 w-6 text-white" />
-            </div>
-            Resume Progress Analytics
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center text-muted-foreground py-12">
-            <div className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-              <FileText className="h-10 w-10 text-blue-500" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No Data Yet</h3>
-            <p className="text-base mb-1">Upload and analyze a resume to see your progress over time</p>
-            <p className="text-sm">Track improvements across different resume versions</p>
-          </div>
+      <div className={cn(!embedded && "space-y-6")}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-96 rounded-2xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // --- Empty State ---
+  const noData =
+    (!historyData || historyData.length === 0) &&
+    (!hasActiveFilters) &&
+    (!(!embedded && allHistoryData.length > 0));
+
+  if (noData) {
+    return (
+      <Card className="border-none shadow-sm">
+        <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <FileText className="h-16 w-16 text-muted-foreground mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No Analysis History Yet</h3>
+          <p className="text-muted-foreground max-w-md">
+            Start analyzing your resume to see your progress over time. Your analysis history will
+            appear here.
+          </p>
         </CardContent>
       </Card>
     );
   }
 
-  const latestScore = chartData[chartData.length - 1]?.rmsScore || 0;
-  const previousScore = chartData.length > 1 ? chartData[chartData.length - 2]?.rmsScore || 0 : latestScore;
-  const scoreChange = latestScore - previousScore;
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-0 rounded-2xl p-5 shadow-2xl border border-white/20 dark:border-gray-700/50">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
-              <FileText className="h-5 w-5 text-white" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-900 dark:text-gray-100 text-base">{data.fileName}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{data.displayDate}</p>
-            </div>
-            {data.isActive && (
-              <Badge className="bg-gradient-to-r from-green-400 to-blue-500 text-white text-xs px-3 py-1 animate-pulse">
-                ✨ Current
-              </Badge>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            <div className="bg-gradient-to-r from-blue-500/10 to-purple-600/10 backdrop-blur-sm rounded-xl p-4 border border-blue-200/20">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  Overall Score
-                </span>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  {data.rmsScore}/100
-                </span>
-              </div>
-            </div>
-            
-            {showSectionScores && (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/40 rounded-xl p-3 border border-purple-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Skills</span>
-                    <span className="text-lg font-bold text-purple-600 dark:text-purple-400">{data.skillsScore}</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/40 rounded-xl p-3 border border-green-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-green-700 dark:text-green-300">Experience</span>
-                    <span className="text-lg font-bold text-green-600 dark:text-green-400">{data.experienceScore}</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-900/40 rounded-xl p-3 border border-yellow-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-yellow-700 dark:text-yellow-300">Keywords</span>
-                    <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{data.keywordsScore}</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-red-50 to-pink-100 dark:from-red-900/20 dark:to-pink-900/40 rounded-xl p-3 border border-red-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-red-700 dark:text-red-300">Education</span>
-                    <span className="text-lg font-bold text-red-600 dark:text-red-400">{data.educationScore}</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/20 dark:to-blue-900/40 rounded-xl p-3 border border-cyan-200/30 col-span-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-cyan-700 dark:text-cyan-300">Certifications</span>
-                    <span className="text-lg font-bold text-cyan-600 dark:text-cyan-400">{data.certificationsScore}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Custom Dot Component with enhanced styling and larger size for mobile
-  const CustomDot = (props: any) => {
-    const { cx, cy, payload } = props;
-    return (
-      <g>
-        {/* Outer glow */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={18}
-          fill="url(#dotGlow)"
-          opacity={0.3}
-          className="animate-pulse"
-        />
-        {/* Main dot */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={10}
-          fill="url(#dotGradient)"
-          stroke="#ffffff"
-          strokeWidth={3}
-          className="drop-shadow-lg"
-        />
-        {/* Center highlight */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={4}
-          fill="#ffffff"
-          opacity={0.9}
-        />
-        {/* Active indicator */}
-        {payload.isActive && (
-          <circle
-            cx={cx}
-            cy={cy}
-            r={15}
-            fill="none"
-            stroke="url(#activeGradient)"
-            strokeWidth={2.5}
-            strokeDasharray="4 4"
-            className="animate-spin"
-            style={{ animationDuration: '3s' }}
-          />
-        )}
-      </g>
-    );
-  };
-
+  // --- Render UI ---
   return (
-    <Card className="bg-gradient-to-br from-white via-blue-50/50 to-indigo-100/80 dark:from-gray-900 dark:via-blue-950/30 dark:to-indigo-950/50 border-0 shadow-2xl backdrop-blur-sm">
-      <CardHeader className="pb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <CardTitle className="flex items-center gap-3 sm:gap-4 text-xl">
-            <div className="p-3 sm:p-4 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 rounded-2xl shadow-lg animate-pulse flex-shrink-0">
-              <BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
-            </div>
-            <div className="min-w-0">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent text-xl sm:text-2xl font-bold">
-                Resume Progress Analytics
-              </span>
-              <p className="text-xs sm:text-sm text-muted-foreground font-normal mt-1">
-                Track your resume improvements over time
-              </p>
-            </div>
-          </CardTitle>
-          
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-            {/* Enhanced Latest Score Display */}
-            <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl px-6 sm:px-8 py-4 sm:py-6 text-white shadow-2xl relative overflow-hidden">
-              {/* Animated background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent animate-pulse"></div>
-              <div className="relative text-center">
-                <div className="text-xs font-medium opacity-90 mb-2 flex items-center justify-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  Latest Score
-                </div>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-3xl sm:text-4xl font-bold">{latestScore}</span>
-                  <span className="text-base sm:text-lg opacity-75">/100</span>
-                </div>
-                {scoreChange !== 0 && (
-                  <div className={`flex items-center justify-center gap-1 mt-3 px-3 py-2 rounded-full text-sm font-semibold backdrop-blur-sm ${
-                    scoreChange > 0 
-                      ? 'bg-green-400/20 text-green-100 border border-green-400/30' 
-                      : scoreChange < 0 
-                      ? 'bg-red-400/20 text-red-100 border border-red-400/30' 
-                      : 'bg-gray-400/20 text-gray-100 border border-gray-400/30'
-                  }`}>
-                    {scoreChange > 0 ? (
-                      <TrendingUp className="h-4 w-4" />
-                    ) : scoreChange < 0 ? (
-                      <TrendingDown className="h-4 w-4" />
-                    ) : (
-                      <Minus className="h-4 w-4" />
-                    )}
-                    <span>{scoreChange > 0 ? '+' : ''}{scoreChange}</span>
-                  </div>
-                )}
+    <div className={cn(!embedded && "space-y-6")}>
+      {/* Filter Controls (hide in embedded mode) */}
+      {!embedded && (
+        <Card className="border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-medium flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Filter History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Role Filter */}
+              <div className="space-y-2">
+                <Label>Target Role</Label>
+                <Select value={selectedRole} onValueChange={setSelectedRole}>
+                  <SelectTrigger className="min-h-[44px]">
+                    <SelectValue placeholder="All roles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All roles</SelectItem>
+                    {uniqueRoles.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Industry Filter */}
+              <div className="space-y-2">
+                <Label>Target Industry</Label>
+                <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
+                  <SelectTrigger className="min-h-[44px]">
+                    <SelectValue placeholder="All industries" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All industries</SelectItem>
+                    {uniqueIndustries.map((industry) => (
+                      <SelectItem key={industry} value={industry}>
+                        {industry}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Start Date */}
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* End Date */}
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "PP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
-            {/* Enhanced Toggle Button */}
-            <Button
-              variant={showSectionScores ? "default" : "outline"}
-              size="lg"
-              onClick={() => setShowSectionScores(!showSectionScores)}
-              data-testid="toggle-section-scores"
-              className={`w-full sm:w-auto ${showSectionScores 
-                ? "bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white shadow-xl border-0 px-6 py-3" 
-                : "border-2 border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-950 px-6 py-3 shadow-lg backdrop-blur-sm"
-              }`}
-            >
-              {showSectionScores ? (
-                <>
-                  <TrendingDown className="h-5 w-5 mr-2" />
-                  Hide Details
-                </>
-              ) : (
-                <>
-                  <BarChart3 className="h-5 w-5 mr-2" />
-                  Show Details
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        <div className="bg-gradient-to-br from-white/80 to-blue-50/50 dark:from-gray-900/80 dark:to-gray-800/50 rounded-2xl p-8 shadow-inner border border-white/20 dark:border-gray-700/20 backdrop-blur-sm">
-          <div className="h-96">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart 
-                data={chartData} 
-                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-              >
-                <defs>
-                  {/* Enhanced gradients */}
-                  <linearGradient id="mainGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.4}/>
-                    <stop offset="30%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                    <stop offset="70%" stopColor="#6366F1" stopOpacity={0.2}/>
-                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.05}/>
-                  </linearGradient>
-                  
-                  <linearGradient id="strokeGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#3B82F6"/>
-                    <stop offset="50%" stopColor="#8B5CF6"/>
-                    <stop offset="100%" stopColor="#6366F1"/>
-                  </linearGradient>
-                  
-                  <linearGradient id="dotGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#60A5FA"/>
-                    <stop offset="50%" stopColor="#3B82F6"/>
-                    <stop offset="100%" stopColor="#1D4ED8"/>
-                  </linearGradient>
-                  
-                  <radialGradient id="dotGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.6}/>
-                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0}/>
-                  </radialGradient>
-                  
-                  <linearGradient id="activeGradient" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#10B981"/>
-                    <stop offset="100%" stopColor="#059669"/>
-                  </linearGradient>
-                </defs>
-                
-                <CartesianGrid 
-                  strokeDasharray="2 4" 
-                  stroke="#E5E7EB" 
-                  className="opacity-20" 
-                />
-                
-                <XAxis 
-                  dataKey="displayDate"
-                  tick={{ fontSize: 14, fill: '#6B7280', fontWeight: 500 }}
-                  angle={-35}
-                  textAnchor="end"
-                  height={70}
-                  stroke="#9CA3AF"
-                  strokeWidth={1.5}
-                />
-                
-                <YAxis 
-                  domain={[0, 100]}
-                  tick={{ fontSize: 14, fill: '#6B7280', fontWeight: 500 }}
-                  label={{ 
-                    value: 'Score', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { textAnchor: 'middle', fill: '#6B7280', fontSize: '15px', fontWeight: '500' }
-                  }}
-                  stroke="#9CA3AF"
-                  strokeWidth={1.5}
-                />
-                
-                <Tooltip content={<CustomTooltip />} />
-                
-                {/* Reference line for target score */}
-                <ReferenceLine 
-                  y={80} 
-                  stroke="#10B981" 
-                  strokeDasharray="5 5" 
-                  strokeOpacity={0.6}
-                  label={{ value: "Target: 80", position: "topRight", fill: "#10B981", fontSize: 12 }}
-                />
-                
-                {/* Main area with gradient fill */}
-                <Area
-                  type="monotone"
-                  dataKey="rmsScore"
-                  stroke="url(#strokeGradient)"
-                  strokeWidth={4}
-                  fill="url(#mainGradient)"
-                  dot={<CustomDot />}
-                  activeDot={{ 
-                    r: 0 // Hide default active dot since we use custom
-                  }}
-                  name="Overall Score"
-                  className="drop-shadow-lg"
-                />
-                
-                {/* Section scores with enhanced styling */}
-                {showSectionScores && (
-                  <>
-                    <Line
-                      type="monotone"
-                      dataKey="skillsScore"
-                      stroke="#8B5CF6"
-                      strokeWidth={3}
-                      dot={{ fill: "#8B5CF6", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#8B5CF6", strokeWidth: 3, fill: "#FFFFFF" }}
-                      name="Skills"
-                      strokeDasharray="6 3"
-                      opacity={0.8}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="experienceScore"
-                      stroke="#10B981"
-                      strokeWidth={3}
-                      dot={{ fill: "#10B981", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#10B981", strokeWidth: 3, fill: "#FFFFFF" }}
-                      name="Experience"
-                      strokeDasharray="6 3"
-                      opacity={0.8}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="keywordsScore"
-                      stroke="#F59E0B"
-                      strokeWidth={3}
-                      dot={{ fill: "#F59E0B", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#F59E0B", strokeWidth: 3, fill: "#FFFFFF" }}
-                      name="Keywords"
-                      strokeDasharray="6 3"
-                      opacity={0.8}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="educationScore"
-                      stroke="#EF4444"
-                      strokeWidth={3}
-                      dot={{ fill: "#EF4444", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#EF4444", strokeWidth: 3, fill: "#FFFFFF" }}
-                      name="Education"
-                      strokeDasharray="6 3"
-                      opacity={0.8}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="certificationsScore"
-                      stroke="#06B6D4"
-                      strokeWidth={3}
-                      dot={{ fill: "#06B6D4", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#06B6D4", strokeWidth: 3, fill: "#FFFFFF" }}
-                      name="Certifications"
-                      strokeDasharray="6 3"
-                      opacity={0.8}
-                    />
-                  </>
-                )}
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          
-          {chartData.length > 1 && (
-            <div className="mt-8 text-center">
-              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-50/80 to-indigo-100/80 dark:from-blue-950/30 dark:to-indigo-950/50 rounded-full px-6 py-3 border border-blue-200/30 dark:border-blue-700/30 backdrop-blur-sm shadow-lg">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full">
-                  <FileText className="h-4 w-4 text-white" />
-                </div>
-                <span className="text-sm bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent font-semibold">
-                  Tracking progress across {chartData.length} resume versions
-                </span>
-                <Sparkles className="h-4 w-4 text-blue-500 animate-pulse" />
+            {hasActiveFilters && (
+              <div className="mt-4 flex justify-end">
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="mr-2 h-4 w-4" />
+                  Clear Filters
+                </Button>
               </div>
-            </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Analysis Cards */}
+      {historyData.length > 0 && (
+        <div
+          className={cn(
+            embedded
+              ? "grid grid-cols-1 gap-6"
+              : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-8 p-4"
           )}
+        >
+          {historyData.map((analysis) => (
+            <Card
+              key={analysis.id}
+              className="border shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl bg-white/90 dark:bg-gray-900/70 backdrop-blur-md"
+            >
+              <CardHeader className="pb-2 md:pb-3">
+                <CardTitle className="text-lg md:text-xl font-semibold truncate flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-500" />
+                  {analysis.fileName}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {format(new Date(analysis.createdAt), "MMMM do, yyyy")}
+                </p>
+              </CardHeader>
+
+              <CardContent className="space-y-5 p-5 md:p-6 min-h-[420px] flex flex-col justify-between">
+                {(analysis.overallInsights || analysis.gaps) ? (
+                  <>
+                    {/* Strengths */}
+                    {analysis.overallInsights?.strengths?.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-base font-semibold text-green-600 dark:text-green-400">
+                          💪 Strengths
+                        </p>
+                        <ul className="text-sm md:text-base text-muted-foreground list-disc list-inside space-y-1.5">
+                          {analysis.overallInsights.strengths.slice(0, 3).map((s, i) => (
+                            <li key={i}>{s}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Improvements */}
+                    {analysis.overallInsights?.improvements?.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-base font-semibold text-yellow-600 dark:text-yellow-400">
+                          ⚡ Areas for Improvement
+                        </p>
+                        <ul className="text-sm md:text-base text-muted-foreground list-disc list-inside space-y-1.5">
+                          {analysis.overallInsights.improvements.slice(0, 3).map((i, j) => (
+                            <li key={j}>{i}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Gaps */}
+                    {analysis.gaps?.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-base font-semibold text-red-600 dark:text-red-400">
+                          🚧 Key Gaps
+                        </p>
+                        {analysis.gaps.slice(0, 2).map((gap, idx) => (
+                          <div
+                            key={idx}
+                            className="p-4 bg-muted/40 rounded-xl text-sm md:text-base border border-muted-foreground/10 shadow-inner"
+                          >
+                            <p className="font-medium text-foreground">{gap.category}</p>
+                            <p className="text-muted-foreground">{gap.issue}</p>
+                            <p className="text-xs italic mt-1">
+                              Priority:{" "}
+                              <span
+                                className={cn(
+                                  "font-semibold uppercase px-2 py-0.5 rounded",
+                                  getPriorityColor(gap.priority)
+                                )}
+                              >
+                                {gap.priority}
+                              </span>
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Summary */}
+                    {analysis.overallInsights?.summary && (
+                      <div className="pt-3 mt-2 border-t border-muted-foreground/10">
+                        <p className="text-sm italic text-muted-foreground leading-snug">
+                          “{analysis.overallInsights.summary}”
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">
+                    No detailed insights recorded for this analysis.
+                  </p>
+                )}
+
+                {/* Footer tags */}
+                <div className="flex flex-wrap gap-2 pt-5 mt-auto border-t border-muted-foreground/10">
+                  {analysis.targetRole && (
+                    <Badge variant="secondary" className="text-sm py-1 px-3">
+                      {analysis.targetRole}
+                    </Badge>
+                  )}
+                  {analysis.targetIndustry && (
+                    <Badge variant="secondary" className="text-sm py-1 px-3">
+                      {analysis.targetIndustry}
+                    </Badge>
+                  )}
+                  {analysis.targetCompanies?.map((c, i) => (
+                    <Badge key={i} variant="outline" className="text-sm py-1 px-3">
+                      {c}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
+
