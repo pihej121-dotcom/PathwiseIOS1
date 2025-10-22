@@ -144,11 +144,17 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       return;
     }
     
+    // Clear any existing timer before starting a new one
+    if (loadingTimerRef.current) {
+      clearTimeout(loadingTimerRef.current);
+    }
+    
     setIsAnalyzing(true);
     
-    // Set a 60-second timer to hide loading screen
-    setTimeout(() => {
+    // Set a 60-second timer to hide loading screen and store it in ref
+    loadingTimerRef.current = setTimeout(() => {
       setIsAnalyzing(false);
+      loadingTimerRef.current = null;
     }, 60000);
     
     analyzeMutation.mutate({
