@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { 
   Sparkles, 
   Brain, 
@@ -11,14 +8,12 @@ import {
   Zap, 
   TrendingUp,
   Lightbulb,
-  Trophy,
-  Timer
+  Trophy
 } from "lucide-react";
 
 interface LoadingExperienceProps {
   isLoading: boolean;
   operation?: string;
-  showMiniGame?: boolean;
 }
 
 const careerTips = [
@@ -32,12 +27,6 @@ const careerTips = [
   { icon: Target, text: "Use the STAR method (Situation, Task, Action, Result) for interviews", color: "text-indigo-500" },
   { icon: TrendingUp, text: "Companies with employee referrals hire 55% faster", color: "text-emerald-500" },
   { icon: Brain, text: "Research shows asking questions in interviews increases offer rates by 30%", color: "text-violet-500" },
-];
-
-const typingWords = [
-  "resume", "career", "interview", "skills", "experience", "achievement", "leadership", 
-  "teamwork", "innovation", "project", "collaboration", "communication", "analysis",
-  "development", "strategy", "success", "growth", "potential"
 ];
 
 const operationMessages: Record<string, string[]> = {
@@ -85,18 +74,10 @@ const operationMessages: Record<string, string[]> = {
   ]
 };
 
-export function LoadingExperience({ isLoading, operation = "default", showMiniGame = true }: LoadingExperienceProps) {
+export function LoadingExperience({ isLoading, operation = "default" }: LoadingExperienceProps) {
   const [progress, setProgress] = useState(0);
   const [currentTip, setCurrentTip] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
-  const [showGame, setShowGame] = useState(false);
-  
-  // Mini-game state
-  const [currentWord, setCurrentWord] = useState("");
-  const [inputValue, setInputValue] = useState("");
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [gameActive, setGameActive] = useState(false);
 
   const messages = operationMessages[operation] || operationMessages.default;
 
@@ -105,8 +86,6 @@ export function LoadingExperience({ isLoading, operation = "default", showMiniGa
     if (!isLoading) {
       setProgress(0);
       setMessageIndex(0);
-      setGameActive(false);
-      setShowGame(false);
       return;
     }
 
@@ -142,48 +121,12 @@ export function LoadingExperience({ isLoading, operation = "default", showMiniGa
     return () => clearInterval(tipInterval);
   }, [isLoading]);
 
-  // Mini-game timer
-  useEffect(() => {
-    if (!gameActive || !isLoading) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setGameActive(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameActive, isLoading]);
-
-  // Start game
-  const startGame = () => {
-    setGameActive(true);
-    setScore(0);
-    setTimeLeft(30);
-    setInputValue("");
-    setCurrentWord(typingWords[Math.floor(Math.random() * typingWords.length)]);
-  };
-
-  // Handle typing
-  const handleTyping = (value: string) => {
-    setInputValue(value);
-    if (value === currentWord) {
-      setScore((prev) => prev + 1);
-      setInputValue("");
-      setCurrentWord(typingWords[Math.floor(Math.random() * typingWords.length)]);
-    }
-  };
-
   if (!isLoading) return null;
 
   const TipIcon = careerTips[currentTip].icon;
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" data-testid="loading-experience-overlay">
       <Card className="w-full max-w-2xl shadow-2xl border-2">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
@@ -194,7 +137,7 @@ export function LoadingExperience({ isLoading, operation = "default", showMiniGa
               <Sparkles className="w-12 h-12 text-primary relative" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold" data-testid="loading-message">
             {messages[messageIndex]}
           </CardTitle>
         </CardHeader>
@@ -203,7 +146,7 @@ export function LoadingExperience({ isLoading, operation = "default", showMiniGa
           {/* Progress Bar */}
           <div className="space-y-2">
             <Progress value={progress} className="h-3" data-testid="loading-progress" />
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-sm text-muted-foreground text-center" data-testid="progress-percentage">
               {Math.round(progress)}% Complete
             </p>
           </div>
@@ -215,89 +158,13 @@ export function LoadingExperience({ isLoading, operation = "default", showMiniGa
                 <TipIcon className={`w-6 h-6 ${careerTips[currentTip].color} flex-shrink-0 mt-1`} />
                 <div>
                   <p className="text-sm font-medium mb-1">Career Tip:</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground" data-testid="career-tip-text">
                     {careerTips[currentTip].text}
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Mini-Game Section */}
-          {showMiniGame && !showGame && (
-            <div className="text-center">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowGame(true)}
-                data-testid="button-play-minigame"
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                Play Mini-Game While Waiting
-              </Button>
-            </div>
-          )}
-
-          {showMiniGame && showGame && (
-            <Card className="border-2 border-primary/30">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-yellow-500" />
-                    Type Speed Challenge
-                  </CardTitle>
-                  <div className="flex items-center gap-4">
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      <Trophy className="w-3 h-3" />
-                      {score} words
-                    </Badge>
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      <Timer className="w-3 h-3" />
-                      {timeLeft}s
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {!gameActive ? (
-                  <div className="text-center space-y-4">
-                    {timeLeft === 0 && score > 0 && (
-                      <div>
-                        <p className="text-lg font-semibold text-primary">
-                          Great job! You typed {score} words in 30 seconds!
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          That's {Math.round((score / 30) * 60)} words per minute!
-                        </p>
-                      </div>
-                    )}
-                    <Button onClick={startGame} data-testid="button-start-game">
-                      {timeLeft === 0 ? "Play Again" : "Start Game"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-2">Type this word:</p>
-                      <p className="text-3xl font-bold text-primary tracking-wider" data-testid="text-target-word">
-                        {currentWord}
-                      </p>
-                    </div>
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => handleTyping(e.target.value)}
-                      placeholder="Start typing..."
-                      className="text-center text-lg"
-                      autoFocus
-                      data-testid="input-typing"
-                    />
-                    <p className="text-xs text-center text-muted-foreground">
-                      Type the word exactly as shown and press enter
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
 
           <p className="text-xs text-center text-muted-foreground">
             This usually takes 10-30 seconds...
