@@ -126,7 +126,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
           title: "Resume analyzed successfully!",
           description: "Your resume has been analyzed. Check the scores and recommendations below.",
         });
-      }, 1500); // show loading at least 1.5 seconds
+      }, 60000); // show loading at least 1.5 seconds
   
       return () => clearTimeout(timeout);
     }
