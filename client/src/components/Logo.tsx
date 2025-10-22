@@ -1,4 +1,4 @@
-import logoImage from "@assets/pathwise-logo-new.png";
+import logoImage from "@assets/Pathwise_Logo_BlackP_1761100016024.png";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
