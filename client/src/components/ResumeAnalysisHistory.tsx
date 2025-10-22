@@ -36,6 +36,7 @@ import {
   Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiRequest } from "@/lib/queryClient";
 
 interface ResumeAnalysisHistoryItem {
   id: string;
@@ -91,8 +92,7 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
   const { data: historyData = [], isLoading } = useQuery<ResumeAnalysisHistoryItem[]>({
     queryKey: ["/api/resume-analysis-history", selectedRole, selectedIndustry, startDate?.toISOString(), endDate?.toISOString()],
     queryFn: async () => {
-      const response = await fetch(`/api/resume-analysis-history${queryString}`);
-      if (!response.ok) throw new Error("Failed to fetch analysis history");
+      const response = await apiRequest("GET", `/api/resume-analysis-history${queryString}`);
       return response.json();
     },
   });
