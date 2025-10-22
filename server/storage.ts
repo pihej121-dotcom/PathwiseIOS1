@@ -41,6 +41,7 @@ export interface IStorage {
   getActiveResume(userId: string): Promise<Resume | undefined>;
   updateResumeAnalysis(id: string, analysis: any): Promise<Resume>;
   getResumeById(id: string): Promise<Resume | undefined>;
+  getResumeByHash(userId: string, analysisHash: string): Promise<Resume | undefined>;
   
   // Roadmaps
   createRoadmap(roadmap: InsertRoadmap): Promise<Roadmap>;
@@ -787,6 +788,18 @@ export class DatabaseStorage implements IStorage {
   // Additional required methods
   async getResumeById(id: string): Promise<Resume | undefined> {
     const [resume] = await db.select().from(resumes).where(eq(resumes.id, id));
+    return resume || undefined;
+  }
+
+  async getResumeByHash(userId: string, analysisHash: string): Promise<Resume | undefined> {
+    const [resume] = await db
+      .select()
+      .from(resumes)
+      .where(and(
+        eq(resumes.userId, userId),
+        eq(resumes.analysisHash, analysisHash),
+        eq(resumes.isActive, true)
+      ));
     return resume || undefined;
   }
 

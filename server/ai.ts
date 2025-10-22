@@ -1,12 +1,30 @@
 import OpenAI from "openai";
 import { z } from "zod";
-import { randomUUID } from "crypto";
+import { randomUUID, createHash } from "crypto";
 import { jobMatchAnalysisSchema, JobMatchAnalysis, getCompetitivenessBand } from '@shared/schema';
+import { storage } from './storage';
 
 // Using GPT-4o for reliable performance
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key" 
 });
+
+// Generate a deterministic hash from resume content and analysis context
+function generateAnalysisHash(
+  resumeText: string,
+  targetRole?: string,
+  targetIndustry?: string,
+  targetCompanies?: string
+): string {
+  const normalizedText = resumeText.trim().toLowerCase();
+  const normalizedRole = (targetRole || '').trim().toLowerCase();
+  const normalizedIndustry = (targetIndustry || '').trim().toLowerCase();
+  const normalizedCompanies = (targetCompanies || '').trim().toLowerCase();
+  
+  const combinedInput = `${normalizedText}|${normalizedRole}|${normalizedIndustry}|${normalizedCompanies}`;
+  
+  return createHash('sha256').update(combinedInput).digest('hex');
+}
 
 interface ResumeAnalysis {
   rmsScore: number;
@@ -332,8 +350,38 @@ Focus on being brutally honest about competitiveness while providing constructiv
     };
   }
 
-  async analyzeResume(resumeText: string, targetRole?: string, targetIndustry?: string, targetCompanies?: string): Promise<ResumeAnalysis> {
+  async analyzeResume(
+    userId: string,
+    resumeText: string,
+    targetRole?: string,
+    targetIndustry?: string,
+    targetCompanies?: string
+  ): Promise<ResumeAnalysis & { analysisHash: string }> {
     try {
+      // Generate hash for caching
+      const analysisHash = generateAnalysisHash(resumeText, targetRole, targetIndustry, targetCompanies);
+      
+      // Check if we have a cached analysis with the same hash
+      const cachedResume = await storage.getResumeByHash(userId, analysisHash);
+      
+      if (cachedResume && cachedResume.rmsScore !== null && cachedResume.overallInsights && cachedResume.sectionAnalysis) {
+        console.log('✅ Returning cached resume analysis');
+        return {
+          rmsScore: cachedResume.rmsScore,
+          skillsScore: cachedResume.skillsScore || 0,
+          experienceScore: cachedResume.experienceScore || 0,
+          keywordsScore: cachedResume.keywordsScore || 0,
+          educationScore: cachedResume.educationScore || 0,
+          certificationsScore: cachedResume.certificationsScore || 0,
+          overallInsights: cachedResume.overallInsights as ResumeAnalysis['overallInsights'],
+          sectionAnalysis: cachedResume.sectionAnalysis as ResumeAnalysis['sectionAnalysis'],
+          gaps: (cachedResume.gaps || []) as ResumeAnalysis['gaps'],
+          analysisHash
+        };
+      }
+      
+      console.log('🔄 Generating new resume analysis (no cache found)');
+      
       const prompt = `Analyze this resume for the target role and provide a JSON response with specific scores, detailed section analysis, and gaps.
 
 CRITICAL REQUIREMENTS:
@@ -527,7 +575,8 @@ Be realistic with scores (40-80 range). Focus on identifying actual gaps between
         response_format: { type: "json_object" },
       });
 
-      return JSON.parse(response.choices[0].message.content || "{}");
+      const analysis = JSON.parse(response.choices[0].message.content || "{}");
+      return { ...analysis, analysisHash };
     } catch (error) {
       console.error("Resume analysis error:", error);
       throw new Error("Failed to analyze resume");

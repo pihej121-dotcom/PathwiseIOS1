@@ -899,6 +899,7 @@ if (existingUser && !existingUser.isActive) {
       if (extractedText) {
         try {
           const analysis = await aiService.analyzeResume(
+            req.user!.id,
             extractedText,
             targetRole,
             targetIndustry,
@@ -931,7 +932,11 @@ if (existingUser && !existingUser.isActive) {
             certificationsScore: analysis.certificationsScore,
             gaps: analysis.gaps,
             overallInsights: analysis.overallInsights,
-            sectionAnalysis: analysis.sectionAnalysis
+            sectionAnalysis: analysis.sectionAnalysis,
+            targetRole: targetRole,
+            targetIndustry: targetIndustry,
+            targetCompanies: targetCompanies,
+            analysisHash: analysis.analysisHash
           });
 
           // Create activity

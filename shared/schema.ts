@@ -153,6 +153,10 @@ export const resumes = pgTable("resumes", {
   gaps: jsonb("gaps"), // Array of gap objects with priority, impact, rationale, resources
   overallInsights: jsonb("overall_insights"), // Overall analysis insights
   sectionAnalysis: jsonb("section_analysis"), // Detailed section-by-section analysis
+  targetRole: text("target_role"), // Role the resume was analyzed for
+  targetIndustry: text("target_industry"), // Industry the resume was analyzed for
+  targetCompanies: text("target_companies"), // Companies the resume was analyzed for
+  analysisHash: text("analysis_hash"), // Hash of resume content + context for caching
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
