@@ -70,23 +70,44 @@ interface ResumeAnalysisHistoryProps {
   embedded?: boolean;
 }
 
-export default function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistoryProps) {
+export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistoryProps) {
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [selectedIndustry, setSelectedIndustry] = useState<string>("");
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
 
-  // Fetch history data
+  // Build query string with filters
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams();
+    if (selectedRole) params.append("targetRole", selectedRole);
+    if (selectedIndustry) params.append("targetIndustry", selectedIndustry);
+    if (startDate) params.append("startDate", startDate.toISOString());
+    if (endDate) params.append("endDate", endDate.toISOString());
+    const queryStr = params.toString();
+    return queryStr ? `?${queryStr}` : "";
+  }, [selectedRole, selectedIndustry, startDate, endDate]);
+
+  // Fetch history data with server-side filtering
   const { data: historyData = [], isLoading } = useQuery<ResumeAnalysisHistoryItem[]>({
+    queryKey: ["/api/resume-analysis-history", selectedRole, selectedIndustry, startDate?.toISOString(), endDate?.toISOString()],
+    queryFn: async () => {
+      const response = await fetch(`/api/resume-analysis-history${queryString}`);
+      if (!response.ok) throw new Error("Failed to fetch analysis history");
+      return response.json();
+    },
+  });
+
+  // Fetch ALL history data (without filters) to populate filter dropdowns
+  const { data: allHistoryData = [] } = useQuery<ResumeAnalysisHistoryItem[]>({
     queryKey: ["/api/resume-analysis-history"],
   });
 
-  // Extract unique roles and industries from history data
+  // Extract unique roles and industries from ALL history data for filter dropdowns
   const { uniqueRoles, uniqueIndustries } = useMemo(() => {
     const roles = new Set<string>();
     const industries = new Set<string>();
 
-    historyData.forEach((item) => {
+    allHistoryData.forEach((item) => {
       if (item.targetRole) roles.add(item.targetRole);
       if (item.targetIndustry) industries.add(item.targetIndustry);
     });
@@ -95,21 +116,10 @@ export default function ResumeAnalysisHistory({ embedded = false }: ResumeAnalys
       uniqueRoles: Array.from(roles).sort(),
       uniqueIndustries: Array.from(industries).sort(),
     };
-  }, [historyData]);
+  }, [allHistoryData]);
 
-  // Filter data based on selected filters
-  const filteredData = useMemo(() => {
-    return historyData.filter((item) => {
-      const roleMatch = !selectedRole || item.targetRole === selectedRole;
-      const industryMatch = !selectedIndustry || item.targetIndustry === selectedIndustry;
-      
-      const itemDate = new Date(item.createdAt);
-      const startMatch = !startDate || itemDate >= startDate;
-      const endMatch = !endDate || itemDate <= endDate;
-
-      return roleMatch && industryMatch && startMatch && endMatch;
-    });
-  }, [historyData, selectedRole, selectedIndustry, startDate, endDate]);
+  // Use filtered data from server (no client-side filtering needed)
+  const filteredData = historyData;
 
   // Clear all filters
   const clearFilters = () => {
@@ -165,8 +175,8 @@ export default function ResumeAnalysisHistory({ embedded = false }: ResumeAnalys
     );
   }
 
-  // Empty state
-  if (historyData.length === 0) {
+  // Empty state - only show if there's genuinely no history AND no filters active
+  if (allHistoryData.length === 0 && !hasActiveFilters) {
     return (
       <Card className="border-none shadow-sm">
         <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
@@ -203,7 +213,7 @@ export default function ResumeAnalysisHistory({ embedded = false }: ResumeAnalys
                   <SelectValue placeholder="All roles" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">All roles</SelectItem>
+                  <SelectItem value="">All roles</SelectItem>
                   {uniqueRoles.map((role) => (
                     <SelectItem key={role} value={role}>
                       {role}
@@ -223,7 +233,7 @@ export default function ResumeAnalysisHistory({ embedded = false }: ResumeAnalys
                   <SelectValue placeholder="All industries" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__all__">All industries</SelectItem>
+                  <SelectItem value="">All industries</SelectItem>
                   {uniqueIndustries.map((industry) => (
                     <SelectItem key={industry} value={industry}>
                       {industry}
@@ -309,9 +319,9 @@ export default function ResumeAnalysisHistory({ embedded = false }: ResumeAnalys
       </Card>
 
       {/* Results Count */}
-      {hasActiveFilters && (
+      {hasActiveFilters && filteredData.length > 0 && (
         <div className="text-sm text-muted-foreground">
-          Showing {filteredData.length} of {historyData.length} analyses
+          Showing {filteredData.length} of {allHistoryData.length} analyses
         </div>
       )}
 
