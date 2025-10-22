@@ -98,9 +98,10 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
   });
 
   // Fetch ALL history data (without filters) to populate filter dropdowns
-  const { data: allHistoryData = [] } = useQuery<ResumeAnalysisHistoryItem[]>({
-    queryKey: ["/api/resume-analysis-history"],
-  });
+    const { data: allHistoryData = [] } = useQuery<ResumeAnalysisHistoryItem[]>({
+      queryKey: ["/api/resume-analysis-history"],
+      enabled: !embedded,
+    });
 
   // Extract unique roles and industries from ALL history data for filter dropdowns
   const { uniqueRoles, uniqueIndustries } = useMemo(() => {
