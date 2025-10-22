@@ -3,7 +3,7 @@ import {
   applications, achievements, activities, resources, institutions,
   licenses, invitations, emailVerifications, promoCodes, passwordResetTokens,
   skillGapAnalyses, microProjects, projectCompletions, portfolioArtifacts,
-  opportunities, savedOpportunities, tourCompletions,
+  opportunities, savedOpportunities, tourCompletions, resumeAnalysisHistory,
   type User, type InsertUser, type Resume, type InsertResume,
   type Roadmap, type InsertRoadmap, type JobMatch, type InsertJobMatch,
   type TailoredResume, type Application, type InsertApplication,
@@ -15,7 +15,8 @@ import {
   type SkillGapAnalysis, type InsertSkillGapAnalysis, type MicroProject,
   type InsertMicroProject, type ProjectCompletion, type InsertProjectCompletion,
   type PortfolioArtifact, type InsertPortfolioArtifact,
-  type TourCompletion, type InsertTourCompletion
+  type TourCompletion, type InsertTourCompletion,
+  type ResumeAnalysisHistory, type InsertResumeAnalysisHistory
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -42,6 +43,16 @@ export interface IStorage {
   updateResumeAnalysis(id: string, analysis: any): Promise<Resume>;
   getResumeById(id: string): Promise<Resume | undefined>;
   getResumeByHash(userId: string, analysisHash: string): Promise<Resume | undefined>;
+  
+  // Resume Analysis History
+  createResumeAnalysisHistory(history: InsertResumeAnalysisHistory): Promise<ResumeAnalysisHistory>;
+  getUserResumeAnalysisHistory(userId: string, filters?: {
+    targetRole?: string;
+    targetIndustry?: string;
+    targetCompanies?: string[];
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<ResumeAnalysisHistory[]>;
   
   // Roadmaps
   createRoadmap(roadmap: InsertRoadmap): Promise<Roadmap>;
@@ -259,6 +270,50 @@ export class DatabaseStorage implements IStorage {
       .where(eq(resumes.id, id))
       .returning();
     return resume;
+  }
+
+  async createResumeAnalysisHistory(history: InsertResumeAnalysisHistory): Promise<ResumeAnalysisHistory> {
+    const [newHistory] = await db.insert(resumeAnalysisHistory).values(history).returning();
+    return newHistory;
+  }
+
+  async getUserResumeAnalysisHistory(userId: string, filters?: {
+    targetRole?: string;
+    targetIndustry?: string;
+    targetCompanies?: string[];
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<ResumeAnalysisHistory[]> {
+    let query = db
+      .select()
+      .from(resumeAnalysisHistory)
+      .where(eq(resumeAnalysisHistory.userId, userId))
+      .$dynamic();
+
+    // Apply filters if provided
+    const conditions = [eq(resumeAnalysisHistory.userId, userId)];
+    
+    if (filters?.targetRole) {
+      conditions.push(eq(resumeAnalysisHistory.targetRole, filters.targetRole));
+    }
+    
+    if (filters?.targetIndustry) {
+      conditions.push(eq(resumeAnalysisHistory.targetIndustry, filters.targetIndustry));
+    }
+    
+    if (filters?.startDate) {
+      conditions.push(sql`${resumeAnalysisHistory.createdAt} >= ${filters.startDate}`);
+    }
+    
+    if (filters?.endDate) {
+      conditions.push(sql`${resumeAnalysisHistory.createdAt} <= ${filters.endDate}`);
+    }
+
+    return await db
+      .select()
+      .from(resumeAnalysisHistory)
+      .where(and(...conditions))
+      .orderBy(desc(resumeAnalysisHistory.createdAt));
   }
 
   async createRoadmap(roadmap: InsertRoadmap): Promise<Roadmap> {
