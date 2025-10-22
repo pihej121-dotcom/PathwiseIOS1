@@ -34,22 +34,18 @@ import {
 import { format } from "date-fns";
 import { ResumeHistoryChart } from "@/components/ResumeHistoryChart";
 import { FileUploadExtractor } from "@/components/FileUploadExtractor";
-import { LoadingExperience } from "@/components/LoadingExperience";
 
 export default function ResumeAnalysis({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
   const [resumeText, setResumeText] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [targetIndustry, setTargetIndustry] = useState("");
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const mutationCompleted = useRef(false);
-  
+
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
 
@@ -149,29 +145,14 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       return;
     }
     
-    // Clear any pending timeout and reset mutation flag
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    mutationCompleted.current = false;
-    
-    // --- Start analysis and manual display timer ---
     setIsAnalyzing(true);
-    setShowLoader(true); // show loader immediately
-    
     analyzeMutation.mutate({
       resumeText: resumeText.trim(),
       targetRole: targetRole.trim(),
       targetIndustry: targetIndustry.trim(),
-      targetCompanies: targetCompanies.trim(),
+      targetCompanies: targetCompanies.trim()
     });
-    
-    // Minimum display duration (e.g., 90 s)
-    timeoutRef.current = setTimeout(() => {
-      setShowLoader(false); // stop loader after 90 s
-    }, 90000);
-      };
+  };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -215,12 +196,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
 
   const content = (
     <>
-      <LoadingExperience 
-        isLoading={showLoader || analyzeMutation.isPending} 
-        operation="resume"
-        showMiniGame={true}
-      />
-      
       <div className="flex justify-end mb-4">
         <TourButton 
           tourId="resume-analysis"
@@ -236,7 +211,18 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {!analyzeMutation.isPending && (
+              {isAnalyzing ? (
+                <div className="text-center space-y-4 py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 mx-auto border-b-2 border-primary"></div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">Analyzing Your Resume</h3>
+                    <p className="text-sm text-muted-foreground">AI is processing your resume and identifying gaps for your target role...</p>
+                    <div className="w-48 mx-auto bg-muted h-2 rounded-full overflow-hidden">
+                      <div className="bg-primary h-2 rounded-full w-1/3 animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
