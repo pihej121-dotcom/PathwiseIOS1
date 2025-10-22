@@ -48,7 +48,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const mutationCompleted = useRef(false);
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
