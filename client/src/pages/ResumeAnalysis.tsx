@@ -115,14 +115,28 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
         timeoutRef.current = null;
       }
       
-      // Set timeout to show a warning if analysis takes too long (but don't auto-hide)
-      timeoutRef.current = setTimeout(() => {
+      // Set timeout to hide loading screen after 60 seconds (with score validation)
+      timeoutRef.current = setTimeout(async () => {
         timeoutRef.current = null;
-        toast({
-          title: "Analysis is taking longer than expected",
-          description: "Your resume is still being processed. Please wait for the analysis to complete.",
-          variant: "default",
-        });
+        
+        // Get the latest resume data
+        const latestResume = queryClient.getQueryData<Resume | null>(["/api/resumes/active"]);
+        const validScore = latestResume?.rmsScore && latestResume.rmsScore > 0;
+        
+        if (validScore) {
+          setIsAnalyzing(false);
+          toast({
+            title: "Resume analyzed successfully!",
+            description: "Your resume has been analyzed. Check the scores and recommendations below.",
+          });
+          mutationCompleted.current = false;
+        } else {
+          toast({
+            title: "Analysis is taking longer than expected",
+            description: "Your resume is still being processed. Please wait for the analysis to complete.",
+            variant: "default",
+          });
+        }
       }, 60000);
     },
     onError: (error: any) => {
