@@ -939,6 +939,26 @@ if (existingUser && !existingUser.isActive) {
             analysisHash: analysis.analysisHash
           });
 
+          // Save to analysis history for tracking over time
+          await storage.createResumeAnalysisHistory({
+            userId: req.user!.id,
+            resumeId: resume.id,
+            fileName: resume.fileName,
+            rmsScore: finalRmsScore,
+            skillsScore: analysis.skillsScore,
+            experienceScore: analysis.experienceScore,
+            keywordsScore: analysis.keywordsScore,
+            educationScore: analysis.educationScore,
+            certificationsScore: analysis.certificationsScore,
+            gaps: analysis.gaps,
+            overallInsights: analysis.overallInsights,
+            sectionAnalysis: analysis.sectionAnalysis,
+            targetRole: targetRole || null,
+            targetIndustry: targetIndustry || null,
+            targetCompanies: targetCompanies ? [targetCompanies] : null,
+            analysisHash: analysis.analysisHash
+          });
+
           // Create activity
           await storage.createActivity(
             req.user!.id,
@@ -976,6 +996,25 @@ if (existingUser && !existingUser.isActive) {
     } catch (error) {
       console.error("Get active resume error:", error);
       res.status(500).json({ error: "Failed to get active resume" });
+    }
+  });
+
+  // Resume Analysis History
+  app.get("/api/resume-analysis-history", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const { targetRole, targetIndustry, startDate, endDate } = req.query;
+      
+      const filters: any = {};
+      if (targetRole) filters.targetRole = targetRole as string;
+      if (targetIndustry) filters.targetIndustry = targetIndustry as string;
+      if (startDate) filters.startDate = new Date(startDate as string);
+      if (endDate) filters.endDate = new Date(endDate as string);
+
+      const history = await storage.getUserResumeAnalysisHistory(req.user!.id, filters);
+      res.json(history);
+    } catch (error) {
+      console.error("Get resume analysis history error:", error);
+      res.status(500).json({ error: "Failed to get resume analysis history" });
     }
   });
 
