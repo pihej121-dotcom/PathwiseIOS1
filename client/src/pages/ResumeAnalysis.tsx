@@ -148,7 +148,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     // Set a 60-second timer to hide loading screen
     setTimeout(() => {
       setIsAnalyzing(false);
-    }, 6000000);
+    }, 60000);
     
     analyzeMutation.mutate({
       resumeText: resumeText.trim(),
