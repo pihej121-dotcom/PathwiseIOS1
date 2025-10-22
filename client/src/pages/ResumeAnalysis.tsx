@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Resume } from "@shared/schema";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const mutationCompleted = useRef(false);
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
@@ -75,11 +77,11 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     }
   };
 
-  const { data: resumes = [], isLoading } = useQuery({
+  const { data: resumes = [], isLoading } = useQuery<Resume[]>({
     queryKey: ["/api/resumes"],
   });
 
-  const { data: activeResume = null, isFetching: isActiveResumeFetching } = useQuery({
+  const { data: activeResume = null, isFetching: isActiveResumeFetching } = useQuery<Resume | null>({
     queryKey: ["/api/resumes/active"],
   });
 
@@ -104,13 +106,16 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       setTargetIndustry("");
       setTargetCompanies("");
       
+      // Mark mutation as completed
+      mutationCompleted.current = true;
+      
       // Clear any existing timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
       
-      // Set timeout to hide loading screen after 60 seconds
+      // Set fallback timeout to hide loading screen after 60 seconds
       timeoutRef.current = setTimeout(() => {
         setIsAnalyzing(false);
         timeoutRef.current = null;
@@ -129,6 +134,27 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       setIsAnalyzing(false);
     },
   });
+
+  // Validate score before stopping loader
+  useEffect(() => {
+    const validScore = activeResume?.rmsScore && activeResume.rmsScore > 0;
+    if (mutationCompleted.current && validScore && !isActiveResumeFetching && !analyzeMutation.isPending) {
+      // Clear the fallback timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      setIsAnalyzing(false);
+      toast({
+        title: "Resume analyzed successfully!",
+        description: "Your resume has been analyzed. Check the scores and recommendations below.",
+      });
+      
+      // Reset mutation completed flag
+      mutationCompleted.current = false;
+    }
+  }, [activeResume, isActiveResumeFetching, analyzeMutation.isPending, toast]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -169,6 +195,13 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       });
       return;
     }
+    
+    // Clear any pending timeout and reset mutation flag
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    mutationCompleted.current = false;
     
     setIsAnalyzing(true);
     analyzeMutation.mutate({
