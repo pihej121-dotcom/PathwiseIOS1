@@ -75,58 +75,83 @@ const operationMessages: Record<string, string[]> = {
 };
 
 export function LoadingExperience({ isLoading, operation = "default" }: LoadingExperienceProps) {
+  const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTip, setCurrentTip] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
+  const [fadeOut, setFadeOut] = useState(false);
 
   const messages = operationMessages[operation] || operationMessages.default;
 
-  // Progress animation
+  // Handle visibility duration (~60 seconds)
   useEffect(() => {
-    if (!isLoading) {
-      setProgress(0);
-      setMessageIndex(0);
-      return;
+    let timer: NodeJS.Timeout;
+    if (isLoading) {
+      setVisible(true);
+      setFadeOut(false);
+      // Keep visible for at least 60 seconds
+      timer = setTimeout(() => {
+        setFadeOut(true);
+        // fade out after 1.5s
+        setTimeout(() => setVisible(false), 1500);
+      }, 60000);
+    } else if (visible) {
+      // Optional: allow smooth fade if parent stops early
+      setFadeOut(true);
+      setTimeout(() => setVisible(false), 1500);
     }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  // Progress bar animation
+  useEffect(() => {
+    if (!visible) return;
 
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 95) return prev;
-        return prev + Math.random() * 15;
+        if (prev >= 99) return prev;
+        // slow down progress near the end
+        const increment = (100 - prev) / 25;
+        return prev + increment;
       });
-    }, 800);
+    }, 1000);
 
     return () => clearInterval(progressInterval);
-  }, [isLoading]);
+  }, [visible]);
 
   // Rotate messages
   useEffect(() => {
-    if (!isLoading) return;
-    
+    if (!visible) return;
+
     const messageInterval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(messageInterval);
-  }, [isLoading, messages.length]);
+  }, [visible, messages.length]);
 
-  // Rotate tips
+  // Rotate career tips
   useEffect(() => {
-    if (!isLoading) return;
+    if (!visible) return;
 
     const tipInterval = setInterval(() => {
       setCurrentTip((prev) => (prev + 1) % careerTips.length);
     }, 5000);
 
     return () => clearInterval(tipInterval);
-  }, [isLoading]);
+  }, [visible]);
 
-  if (!isLoading) return null;
+  if (!visible) return null;
 
   const TipIcon = careerTips[currentTip].icon;
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" data-testid="loading-experience-overlay">
+    <div
+      className={`fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-1000 ${
+        fadeOut ? "opacity-0" : "opacity-100"
+      }`}
+      data-testid="loading-experience-overlay"
+    >
       <Card className="w-full max-w-2xl shadow-2xl border-2">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
@@ -167,10 +192,11 @@ export function LoadingExperience({ isLoading, operation = "default" }: LoadingE
           </Card>
 
           <p className="text-xs text-center text-muted-foreground">
-            This usually takes 10-30 seconds...
+            This may take up to 60 seconds — sit tight while we work our magic ✨
           </p>
         </CardContent>
       </Card>
     </div>
   );
 }
+
