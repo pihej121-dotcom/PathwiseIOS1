@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,9 +46,22 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetIndustry, setTargetIndustry] = useState("");
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const mutationCompleted = useRef(false);
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
+
+  // Auto-hide loading when mutation completes AND refetch finishes
+  useEffect(() => {
+    if (mutationCompleted.current && !isActiveResumeFetching && !analyzeMutation.isPending) {
+      setIsAnalyzing(false);
+      mutationCompleted.current = false;
+      toast({
+        title: "Resume analyzed successfully!",
+        description: "Your resume has been analyzed. Check the scores and recommendations below.",
+      });
+    }
+  }, [isActiveResumeFetching, analyzeMutation.isPending, toast]);
 
   // Handle upgrade to Pro
   const handleUpgrade = async () => {
@@ -78,7 +91,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     queryKey: ["/api/resumes"],
   });
 
-  const { data: activeResume = null } = useQuery({
+  const { data: activeResume = null, isFetching: isActiveResumeFetching } = useQuery({
     queryKey: ["/api/resumes/active"],
   });
 
@@ -98,13 +111,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       await queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
       
-      setTimeout(() => {
-        setIsAnalyzing(false);
-        toast({
-          title: "Resume analyzed successfully!",
-          description: "Your resume has been analyzed. Check the scores and recommendations below.",
-        });
-      }, 500);
+      mutationCompleted.current = true;
       
       setResumeText("");
       setTargetRole("");
@@ -151,6 +158,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     }
     
     setIsAnalyzing(true);
+    mutationCompleted.current = false;
     analyzeMutation.mutate({
       resumeText: resumeText.trim(),
       targetRole: targetRole.trim(),
