@@ -181,9 +181,9 @@ export const resumeAnalysisHistory = pgTable("resume_analysis_history", {
   gaps: jsonb("gaps"),
   overallInsights: jsonb("overall_insights"),
   sectionAnalysis: jsonb("section_analysis"),
-  targetRole: text("target_role"),
-  targetIndustry: text("target_industry"),
-  targetCompanies: text("target_companies").array(),
+  targetRole: jsonb("target_role"),
+  targetIndustry: jsonb("target_industry"),
+  targetCompanies: jsonb("target_companies"),
   analysisHash: jsonb("analysis_hash").$type<{
     hash: string;
     method?: string;
