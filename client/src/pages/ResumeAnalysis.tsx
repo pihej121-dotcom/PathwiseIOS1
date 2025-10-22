@@ -221,7 +221,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {!analyzeMutation.isPending && (
+              {!isAnalyzing && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
