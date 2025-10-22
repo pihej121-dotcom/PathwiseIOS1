@@ -50,6 +50,15 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
 
+  // Cleanup timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+    };
+  }, []);
+
   // Handle upgrade to Pro
   const handleUpgrade = async () => {
     try {
