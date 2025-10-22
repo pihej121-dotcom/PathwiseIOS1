@@ -48,6 +48,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const mutationCompleted = useRef(false);
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
@@ -84,7 +85,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     queryKey: ["/api/resumes/active"],
   });
 
-    const analyzeMutation = useMutation({
+  const analyzeMutation = useMutation({
     mutationFn: async ({ resumeText, targetRole, targetIndustry, targetCompanies }: { resumeText: string; targetRole: string; targetIndustry?: string; targetCompanies?: string }) => {
       const res = await apiRequest("POST", "/api/resumes", { 
         fileName: "resume.txt", 
@@ -96,27 +97,47 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       });
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
       queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
-  
+      
       setResumeText("");
       setTargetRole("");
       setTargetIndustry("");
       setTargetCompanies("");
-  
-      // Start manual-only loader cutoff (1.5 minutes)
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  
-      timeoutRef.current = setTimeout(() => {
-        setIsAnalyzing(false);
-        toast({
-          title: "Analysis complete",
-          description:
-            "If results don’t appear immediately, refresh in a few seconds to load your updated résumé analysis.",
-          variant: "default",
-        });
-      }, 90000); // 1.5 minutes
+      
+      // Mark mutation as completed
+      mutationCompleted.current = true;
+      
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      // Set timeout to hide loading screen after 60 seconds (with score validation)
+      timeoutRef.current = setTimeout(async () => {
+        timeoutRef.current = null;
+        
+        // Get the latest resume data
+        const latestResume = queryClient.getQueryData<Resume | null>(["/api/resumes/active"]);
+        const validScore = latestResume?.rmsScore && latestResume.rmsScore > 0;
+        
+        if (validScore) {
+          setIsAnalyzing(false);
+          toast({
+            title: "Resume analyzed successfully!",
+            description: "Your resume has been analyzed. Check the scores and recommendations below.",
+          });
+          mutationCompleted.current = false;
+        } else {
+          toast({
+            title: "Analysis is taking longer than expected",
+            description: "Your resume is still being processed. Please wait for the analysis to complete.",
+            variant: "default",
+          });
+        }
+      }, 60000);
     },
     onError: (error: any) => {
       toast({
@@ -127,7 +148,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       setIsAnalyzing(false);
     },
   });
-
 
   // Validate score before stopping loader
     onSuccess: (data) => {
