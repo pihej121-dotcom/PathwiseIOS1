@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Resume } from "@shared/schema";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,8 +46,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetIndustry, setTargetIndustry] = useState("");
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const mutationCompleted = useRef(false);
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
@@ -77,11 +74,11 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     }
   };
 
-  const { data: resumes = [], isLoading } = useQuery<Resume[]>({
+  const { data: resumes = [], isLoading } = useQuery({
     queryKey: ["/api/resumes"],
   });
 
-  const { data: activeResume = null, isFetching: isActiveResumeFetching } = useQuery<Resume | null>({
+  const { data: activeResume = null } = useQuery({
     queryKey: ["/api/resumes/active"],
   });
 
@@ -100,44 +97,15 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
       queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
-      
+      toast({
+        title: "Resume analyzed successfully!",
+        description: "Your resume has been analyzed. Check the scores and recommendations below.",
+      });
+      setIsAnalyzing(false);
       setResumeText("");
       setTargetRole("");
       setTargetIndustry("");
       setTargetCompanies("");
-      
-      // Mark mutation as completed
-      mutationCompleted.current = true;
-      
-      // Clear any existing timeout
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-      
-      // Set timeout to hide loading screen after 60 seconds (with score validation)
-      timeoutRef.current = setTimeout(async () => {
-        timeoutRef.current = null;
-        
-        // Get the latest resume data
-        const latestResume = queryClient.getQueryData<Resume | null>(["/api/resumes/active"]);
-        const validScore = latestResume?.rmsScore && latestResume.rmsScore > 0;
-        
-        if (validScore) {
-          setIsAnalyzing(false);
-          toast({
-            title: "Resume analyzed successfully!",
-            description: "Your resume has been analyzed. Check the scores and recommendations below.",
-          });
-          mutationCompleted.current = false;
-        } else {
-          toast({
-            title: "Analysis is taking longer than expected",
-            description: "Your resume is still being processed. Please wait for the analysis to complete.",
-            variant: "default",
-          });
-        }
-      }, 60000);
     },
     onError: (error: any) => {
       toast({
@@ -148,42 +116,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       setIsAnalyzing(false);
     },
   });
-
-  // Validate score before stopping loader
-    onSuccess: (data) => {
-    queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
-    queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
-  
-    setResumeText("");
-    setTargetRole("");
-    setTargetIndustry("");
-    setTargetCompanies("");
-  
-    // Start a manual 90s timer to stop the loader
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  
-    timeoutRef.current = setTimeout(() => {
-      setIsAnalyzing(false);
-      toast({
-        title: "Analysis complete",
-        description:
-          "If results don’t appear immediately, refresh in a few seconds to load your updated résumé analysis.",
-        variant: "default",
-      });
-    }, 90000); // 90 seconds
-  },
-
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, []);
-
 
   const handleFileTextExtracted = (text: string, fileName: string) => {
     setResumeText(text);
@@ -213,13 +145,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       });
       return;
     }
-    
-    // Clear any pending timeout and reset mutation flag
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    mutationCompleted.current = false;
     
     setIsAnalyzing(true);
     analyzeMutation.mutate({
@@ -273,8 +198,9 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const content = (
     <>
       <LoadingExperience 
-        isLoading={isAnalyzing} 
+        isLoading={analyzeMutation.isPending} 
         operation="resume"
+        showMiniGame={true}
       />
       
       <div className="flex justify-end mb-4">
@@ -292,7 +218,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {!isAnalyzing ? (
+              {!analyzeMutation.isPending && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
@@ -384,7 +310,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
                     Analyze Resume
                   </Button>
                 </form>
-              ) : null}
+              )}
           </CardContent>
         </Card>
 
