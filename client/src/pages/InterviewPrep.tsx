@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { TourButton } from '@/components/TourButton';
+import { LoadingExperience } from '@/components/LoadingExperience';
 
 interface MockQuestion {
   id: string;
@@ -137,6 +138,12 @@ export function InterviewPrep({ embedded = false }: { embedded?: boolean } = {})
 
   const content = (
     <>
+      <LoadingExperience 
+        isLoading={generateQuestionsMutation.isPending} 
+        operation="interview"
+        showMiniGame={true}
+      />
+      
       <div className="flex justify-end mb-4">
         <TourButton tourId="interview-prep" />
       </div>

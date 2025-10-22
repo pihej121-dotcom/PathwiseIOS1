@@ -34,6 +34,7 @@ import {
 import { format } from "date-fns";
 import { ResumeHistoryChart } from "@/components/ResumeHistoryChart";
 import { FileUploadExtractor } from "@/components/FileUploadExtractor";
+import { LoadingExperience } from "@/components/LoadingExperience";
 
 export default function ResumeAnalysis({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
@@ -196,6 +197,12 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
 
   const content = (
     <>
+      <LoadingExperience 
+        isLoading={analyzeMutation.isPending} 
+        operation="resume"
+        showMiniGame={true}
+      />
+      
       <div className="flex justify-end mb-4">
         <TourButton 
           tourId="resume-analysis"
@@ -211,18 +218,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {isAnalyzing ? (
-                <div className="text-center space-y-4 py-8">
-                  <div className="animate-spin rounded-full h-12 w-12 mx-auto border-b-2 border-primary"></div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Analyzing Your Resume</h3>
-                    <p className="text-sm text-muted-foreground">AI is processing your resume and identifying gaps for your target role...</p>
-                    <div className="w-48 mx-auto bg-muted h-2 rounded-full overflow-hidden">
-                      <div className="bg-primary h-2 rounded-full w-1/3 animate-pulse"></div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
+              {!analyzeMutation.isPending && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">

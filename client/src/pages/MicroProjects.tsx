@@ -21,6 +21,7 @@ import {
   Clock,
   Trash2
 } from "lucide-react";
+import { LoadingExperience } from "@/components/LoadingExperience";
 
 // Updated interface matching new schema
 interface MicroProject {
@@ -194,6 +195,12 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
 
   const content = (
     <>
+      <LoadingExperience 
+        isLoading={generateProjects.isPending} 
+        operation="projects"
+        showMiniGame={true}
+      />
+      
       <div className="flex justify-end mb-4">
         <TourButton tourId="micro-projects" />
       </div>

@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { format, addDays, addMonths } from "date-fns";
 import type { Roadmap } from "@shared/schema";
+import { LoadingExperience } from "@/components/LoadingExperience";
 
 export default function CareerRoadmap({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
@@ -275,6 +276,12 @@ export default function CareerRoadmap({ embedded = false }: { embedded?: boolean
 
   const content = (
     <>
+      <LoadingExperience 
+        isLoading={generateRoadmapMutation.isPending} 
+        operation="roadmap"
+        showMiniGame={true}
+      />
+      
       <div className="flex justify-end mb-4">
         <TourButton tourId="career-roadmap" />
       </div>

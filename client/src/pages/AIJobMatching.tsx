@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { PersonalizedMatchAnalysis } from "@/components/PersonalizedMatchAnalysis";
 import { format } from "date-fns";
+import { LoadingExperience } from "@/components/LoadingExperience";
 
 export default function AIJobMatching() {
   const { user } = useAuth();
@@ -136,6 +137,12 @@ export default function AIJobMatching() {
 
   return (
     <div className="space-y-6">
+        <LoadingExperience 
+          isLoading={tailorResumeMutation.isPending} 
+          operation="jobs"
+          showMiniGame={true}
+        />
+        
         {/* Search Filters */}
         <Card>
           <CardContent className="pt-6">
