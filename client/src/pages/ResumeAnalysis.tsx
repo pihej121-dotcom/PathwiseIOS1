@@ -47,6 +47,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const mutationCompleted = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
@@ -118,17 +119,23 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
 
   // Auto-hide loading when mutation completes AND refetch finishes
   useEffect(() => {
-    if (mutationCompleted.current && !isActiveResumeFetching && !analyzeMutation.isPending) {
-      const timeout = setTimeout(() => {
-        setIsAnalyzing(false);
+    if (mutationCompleted.current && !isActiveResumeFetching && !analyzeMutation.isPending && !timeoutRef.current) {
+      setIsAnalyzing(false);
+      
+      timeoutRef.current = setTimeout(() => {
         mutationCompleted.current = false;
+        timeoutRef.current = null;
         toast({
           title: "Resume analyzed successfully!",
           description: "Your resume has been analyzed. Check the scores and recommendations below.",
         });
-      }, 60000); // show loading at least 1.5 seconds
-  
-      return () => clearTimeout(timeout);
+      }, 60000); // show loading for 60 seconds
+
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
     }
   }, [isActiveResumeFetching, analyzeMutation.isPending, toast]);
 
