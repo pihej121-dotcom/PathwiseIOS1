@@ -907,8 +907,23 @@ if (existingUser && !existingUser.isActive) {
           
           console.log("AI Analysis Response:", JSON.stringify(analysis, null, 2));
           
+          // Calculate rmsScore if not provided by AI or if it's 0
+          let finalRmsScore = analysis.rmsScore;
+          if (!finalRmsScore || finalRmsScore === 0) {
+            // Calculate as weighted average of section scores
+            const scores = [
+              analysis.skillsScore || 0,
+              analysis.experienceScore || 0,
+              analysis.keywordsScore || 0,
+              analysis.educationScore || 0,
+              analysis.certificationsScore || 0
+            ];
+            finalRmsScore = Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+            console.log(`Calculated rmsScore from section scores: ${finalRmsScore}`);
+          }
+          
           await storage.updateResumeAnalysis(resume.id, {
-            rmsScore: analysis.rmsScore,
+            rmsScore: finalRmsScore,
             skillsScore: analysis.skillsScore,
             experienceScore: analysis.experienceScore,
             keywordsScore: analysis.keywordsScore,
@@ -924,7 +939,7 @@ if (existingUser && !existingUser.isActive) {
             req.user!.id,
             "resume_analyzed",
             "Resume Analysis Complete",
-            `Your resume scored ${analysis.rmsScore}/100`
+            `Your resume scored ${finalRmsScore}/100`
           );
         } catch (aiError) {
           console.error("AI analysis error:", aiError);

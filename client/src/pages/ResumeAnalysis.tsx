@@ -115,13 +115,13 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
         timeoutRef.current = null;
       }
       
-      // Set fallback timeout to hide loading screen after 60 seconds
+      // Set timeout to show a warning if analysis takes too long (but don't auto-hide)
       timeoutRef.current = setTimeout(() => {
-        setIsAnalyzing(false);
         timeoutRef.current = null;
         toast({
-          title: "Resume analyzed successfully!",
-          description: "Your resume has been analyzed. Check the scores and recommendations below.",
+          title: "Analysis is taking longer than expected",
+          description: "Your resume is still being processed. Please wait for the analysis to complete.",
+          variant: "default",
         });
       }, 60000);
     },

@@ -1,0 +1,118 @@
+        "No experience with product management tools like JIRA or Trello",
+        "Missing skills in strategic market analysis or business planning",
+        "Lacks experience in user experience design and testing crucial for product managers",
+        "No training in Lean/Agile methodologies common in tech product development",
+        "Not proficient in advanced product analytics tools like Google Analytics or Tableau"
+      ],
+      "explanation": "While the candidate demonstrates strong technical skills in cybersecurity, these do not directly translate to product management which requires strategic thinking and planning skills.",
+      "improvements": [
+        "Enroll in a course on product management principles",
+        "Gain skills in Agile methodologies through online certifications"
+      ]
+    },
+    "experience": {
+      "score": 50,
+      "strengths": [
+        "Internship at EY provided exposure to technology risk consulting relevant to risk assessment in product management",
+        "Project management experience from organizing events as a Resident Assistant",
+        "Developed secure cloud architecture in a capstone project, demonstrating ability to handle complex problems",
+        "Participated in cybersecurity bootcamp providing strong foundational knowledge",
+        "Experience in mentoring and leadership demonstrated through extracurricular activities"
+      ],
+      "gaps": [
+        "No direct product lifecycle management experience",
+        "Lacks cross-functional team leadership experience in a product context",
+        "Missing any startup or tech company-specific experience important for rapid development settings",
+        "No experience working specifically on product feature definitions and iterations",
+        "Does not mention customer feedback analysis or product market fit evaluations"
+      ],
+      "explanation": "The candidate's experience provides insights into technical and leadership skills but not into direct product management tasks.",
+      "improvements": [
+        "Seek internships that specifically offer product management responsibilities",
+        "No mention of 'user experience', 'customer feedback', or related product terms",
+        "Participate in hackathons that simulate product development cycles"
+        "Absent 'strategic planning' and 'roadmap development' keywords often appearing in job descriptions",
+        "Lacks mention of 'market analysis' or 'competitive analysis' important for the industry",
+      ]
+        "Does not include 'agile' or 'scrum' methodologies required in job descriptions"
+    },
+      ],
+      "explanation": "While some technical and cybersecurity terms are present, crucial product management-specific terms are missing.",
+    "keywords": {
+      "score": 45,
+      "strengths": [
+        "Resume includes 'cybersecurity' and 'risk assessment' relevant to data security roles",
+        "Mentions technical project involvement such as the Microsoft Capstone Project",
+        "Includes team collaboration and report preparation, aligning with basic role requirements",
+        "Uses academic project terminology like 'MySQL database' development",
+        "Highlights knowledge in 'Azure' which is relevant to cloud environments"
+      ],
+      "gaps": [
+        "Missing key 'product management' terminology crucial for relevant ATS hits",
+      "improvements": [
+        "Incorporate 'product management' and 'roadmap development' into relevant experiences",
+        "Add 'market analysis' in project descriptions to reflect strategic involvement"
+      ]
+    },
+    "education": {
+      "score": 70,
+      "strengths": [
+        "Bachelor's degree in Computer Information Systems with Cybersecurity focus provides a strong technical base",
+        "Consistent high academic achievement with Cum Laude honors",
+        "Completed relevant coursework in network security, information security which aligns with tech product environments",
+        "Engagement in numerous extracurricular clubs demonstrating initiative and varied interests",
+        "Active participation in competitive learning programs like PicoCTF and TryHackMe"
+      ],
+      "gaps": [
+        "No business or leadership courses relevant to managing product teams",
+        "Lacks education in advanced product development or management",
+        "Does not have any formal training in market analysis or financial acumen for tech product management",
+        "Missing certifications from business schools or product management programs",
+        "No capstone project explicitly involving customer product feedback loops"
+      ],
+      "explanation": "The candidate's education provides a solid technical foundation but misses business and product management focuses.",
+      "improvements": [
+        "Consider enrolling in a minor or courses in business management",
+        "Pursue product management or strategic business courses"
+      ]
+    },
+    "certifications": {
+      "score": 30,
+      "strengths": [
+        "CompTIA Security+ (in progress) relevant to security-focused product roles"
+      ],
+      "gaps": [
+        "No certifications in product management from recognized bodies like AIPMM",
+        "Missing project management certifications such as PMP or Agile certifications",
+        "Lacks certifications in key programming languages or tools essential for tech product management",
+        "No formal Google, AWS, or Microsoft product development certifications",
+        "Absent any recognized credentials in strategic planning or competitive analysis"
+      ],
+      "explanation": "The candidate's certification pursuits are largely technical and focused on cybersecurity, lacking breadth in product management.",
+      "improvements": [
+        "Get certified in project management methodologies",
+        "Consider product management certifications from Google or PMI"
+      ]
+    }
+  },
+  "gaps": [
+    {
+      "category": "Product Management Experience",
+      "priority": "high",
+      "impact": 15,
+      "rationale": "Product management requires direct experience in managing cross-functional teams, product lifecycle activities, and market strategies.",
+      "resources": [
+        {
+          "title": "Google Project Management: Professional Certificate",
+          "provider": "Coursera",
+          "url": "https://www.coursera.org/professional-certificates/google-project-management",
+          "cost": "Free with audit option"
+        }
+      ]
+    }
+  ]
+}
+5:57:25 AM [express] POST /api/resumes 201 in 46153ms :: {"id":"c9f75d1c-0e0f-42a0-8fbb-96b83d660bad…
+5:57:49 AM [express] GET /api/achievements 304 in 114ms :: []
+5:57:49 AM [express] GET /api/activities 200 in 108ms :: [{"id":"9c7d4f9b-01b3-4d40-9438-d31fca041a7…
+2025-10-22 05:58:29.700 UTC [76] LOG:  checkpoint starting: time
