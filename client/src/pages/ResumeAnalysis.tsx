@@ -46,7 +46,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetIndustry, setTargetIndustry] = useState("");
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const mutationCompleted = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if user has free tier
@@ -96,16 +95,30 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       });
       return res.json();
     },
-    onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
-      await queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
-      
-      mutationCompleted.current = true;
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
       
       setResumeText("");
       setTargetRole("");
       setTargetIndustry("");
       setTargetCompanies("");
+      
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      // Set timeout to hide loading screen after 60 seconds
+      timeoutRef.current = setTimeout(() => {
+        setIsAnalyzing(false);
+        timeoutRef.current = null;
+        toast({
+          title: "Resume analyzed successfully!",
+          description: "Your resume has been analyzed. Check the scores and recommendations below.",
+        });
+      }, 60000);
     },
     onError: (error: any) => {
       toast({
@@ -117,27 +130,15 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     },
   });
 
-  // Auto-hide loading when mutation completes AND refetch finishes
+  // Cleanup timeout on unmount
   useEffect(() => {
-    if (mutationCompleted.current && !isActiveResumeFetching && !analyzeMutation.isPending && !timeoutRef.current) {
-      setIsAnalyzing(false);
-      
-      timeoutRef.current = setTimeout(() => {
-        mutationCompleted.current = false;
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
-        toast({
-          title: "Resume analyzed successfully!",
-          description: "Your resume has been analyzed. Check the scores and recommendations below.",
-        });
-      }, 60000); // show loading for 60 seconds
-
-      return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-      };
-    }
-  }, [isActiveResumeFetching, analyzeMutation.isPending, toast]);
+      }
+    };
+  }, []);
 
 
   const handleFileTextExtracted = (text: string, fileName: string) => {
@@ -170,7 +171,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     }
     
     setIsAnalyzing(true);
-    mutationCompleted.current = false;
     analyzeMutation.mutate({
       resumeText: resumeText.trim(),
       targetRole: targetRole.trim(),
@@ -241,7 +241,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {!isAnalyzing && (
+              {!isAnalyzing ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
@@ -333,7 +333,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
                     Analyze Resume
                   </Button>
                 </form>
-              )}
+              ) : null}
           </CardContent>
         </Card>
 
