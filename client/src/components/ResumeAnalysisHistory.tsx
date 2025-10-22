@@ -77,18 +77,18 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
 
-  // Build query string with filters
+  // --- Build query string safely ---
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (selectedRole) params.append("targetRole", selectedRole);
     if (selectedIndustry) params.append("targetIndustry", selectedIndustry);
     if (startDate) params.append("startDate", startDate.toISOString());
     if (endDate) params.append("endDate", endDate.toISOString());
-    const queryStr = params.toString();
-    return queryStr ? `?${queryStr}` : "";
+    const qs = params.toString();
+    return qs ? `?${qs}` : "";
   }, [selectedRole, selectedIndustry, startDate, endDate]);
 
-  // Fetch history data with server-side filtering
+  // --- Fetch filtered / full data ---
   const { data: historyData = [], isLoading } = useQuery<ResumeAnalysisHistoryItem[]>({
     queryKey: ["/api/resume-analysis-history", selectedRole, selectedIndustry, startDate?.toISOString(), endDate?.toISOString()],
     queryFn: async () => {
@@ -97,32 +97,45 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     },
   });
 
-  // Fetch ALL history data (without filters) to populate filter dropdowns
-    const { data: allHistoryData = [] } = useQuery<ResumeAnalysisHistoryItem[]>({
-      queryKey: ["/api/resume-analysis-history"],
-      enabled: !embedded,
-    });
+  // --- Fetch all for dropdowns only when not embedded ---
+  const { data: allHistoryData = [] } = useQuery<ResumeAnalysisHistoryItem[]>({
+    queryKey: ["/api/resume-analysis-history"],
+    enabled: !embedded,
+  });
 
-  // Extract unique roles and industries from ALL history data for filter dropdowns
+  // --- Extract filter options ---
   const { uniqueRoles, uniqueIndustries } = useMemo(() => {
     const roles = new Set<string>();
     const industries = new Set<string>();
-
     allHistoryData.forEach((item) => {
       if (item.targetRole) roles.add(item.targetRole);
       if (item.targetIndustry) industries.add(item.targetIndustry);
     });
-
     return {
       uniqueRoles: Array.from(roles).sort(),
       uniqueIndustries: Array.from(industries).sort(),
     };
   }, [allHistoryData]);
 
-  // Use filtered data from server (no client-side filtering needed)
-  const filteredData = historyData;
+  const hasActiveFilters = selectedRole || selectedIndustry || startDate || endDate;
 
-  // Clear all filters
+  // --- Utility functions ---
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600 dark:text-green-500";
+    if (score >= 60) return "text-yellow-600 dark:text-yellow-500";
+    return "text-red-600 dark:text-red-500";
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case "high": return "bg-red-500 text-white";
+      case "medium": return "bg-yellow-500 text-white";
+      case "low": return "bg-green-500 text-white";
+      default: return "bg-gray-500 text-white";
+    }
+  };
+
+  // --- Handle filter clearing ---
   const clearFilters = () => {
     setSelectedRole("");
     setSelectedIndustry("");
@@ -130,35 +143,7 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     setEndDate(undefined);
   };
 
-  const hasActiveFilters = selectedRole || selectedIndustry || startDate || endDate;
-
-  // Get score color based on value
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 dark:text-green-500";
-    if (score >= 60) return "text-yellow-600 dark:text-yellow-500";
-    return "text-red-600 dark:text-red-500";
-  };
-
-  const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "bg-green-500";
-    if (score >= 60) return "bg-yellow-500";
-    return "bg-red-500";
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority?.toLowerCase()) {
-      case "high":
-        return "bg-red-500 text-white dark:bg-red-600";
-      case "medium":
-        return "bg-yellow-500 text-white dark:bg-yellow-600";
-      case "low":
-        return "bg-green-500 text-white dark:bg-green-600";
-      default:
-        return "bg-gray-500 text-white dark:bg-gray-600";
-    }
-  };
-
-  // Loading skeleton
+  // --- Loading skeleton ---
   if (isLoading) {
     return (
       <div className={cn(!embedded && "space-y-6")}>
@@ -176,419 +161,144 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     );
   }
 
-  // Empty state - only show if there's genuinely no history AND no filters active
-  if (allHistoryData.length === 0 && !hasActiveFilters) {
+  // --- Correct empty-state logic ---
+  const noData =
+    (!historyData || historyData.length === 0) &&
+    (!hasActiveFilters) &&
+    (!(!embedded && allHistoryData.length > 0));
+
+  if (noData) {
     return (
       <Card className="border-none shadow-sm">
         <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
           <FileText className="h-16 w-16 text-muted-foreground mb-4" />
           <h3 className="text-xl font-semibold mb-2">No Analysis History Yet</h3>
           <p className="text-muted-foreground max-w-md">
-            Start analyzing your resume to see your progress over time. Your analysis history will
-            appear here.
+            Start analyzing your resume to see your progress over time. Your analysis history will appear here.
           </p>
         </CardContent>
       </Card>
     );
   }
 
+  // --- Render UI ---
   return (
     <div className={cn(!embedded && "space-y-6")}>
-      {/* Filter Controls */}
-      <Card className="border-none shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-lg font-medium flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            Filter History
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {/* Target Role Filter */}
-            <div className="space-y-2">
-              <Label htmlFor="filter-role" className="text-sm font-medium">
-                Target Role
-              </Label>
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger id="filter-role" data-testid="select-filter-role" className="min-h-[44px]">
-                  <SelectValue placeholder="All roles" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All roles</SelectItem>
-                  {uniqueRoles.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {role}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Target Industry Filter */}
-            <div className="space-y-2">
-              <Label htmlFor="filter-industry" className="text-sm font-medium">
-                Target Industry
-              </Label>
-              <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
-                <SelectTrigger id="filter-industry" data-testid="select-filter-industry" className="min-h-[44px]">
-                  <SelectValue placeholder="All industries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All industries</SelectItem>
-                  {uniqueIndustries.map((industry) => (
-                    <SelectItem key={industry} value={industry}>
-                      {industry}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Start Date Filter */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Start Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal min-h-[44px]",
-                      !startDate && "text-muted-foreground"
-                    )}
-                    data-testid="button-start-date"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* End Date Filter */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">End Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal min-h-[44px]",
-                      !endDate && "text-muted-foreground"
-                    )}
-                    data-testid="button-end-date"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, "PP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={setEndDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-
-          {/* Clear Filters Button */}
-          {hasActiveFilters && (
-            <div className="mt-4 flex justify-end">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="min-h-[44px]"
-                data-testid="button-clear-filters"
-              >
-                <X className="mr-2 h-4 w-4" />
-                Clear Filters
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Results Count */}
-      {hasActiveFilters && filteredData.length > 0 && (
-        <div className="text-sm text-muted-foreground">
-          Showing {filteredData.length} of {allHistoryData.length} analyses
-        </div>
-      )}
-
-      {/* No Results After Filtering */}
-      {filteredData.length === 0 && hasActiveFilters && (
+      {/* Filter Controls (hide in embedded mode) */}
+      {!embedded && (
         <Card className="border-none shadow-sm">
-          <CardContent className="flex flex-col items-center justify-center py-12 px-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-muted-foreground mb-3" />
-            <h3 className="text-lg font-semibold mb-2">No Matches Found</h3>
-            <p className="text-muted-foreground max-w-md mb-4">
-              No analysis history matches your current filters. Try adjusting your filter criteria.
-            </p>
-            <Button variant="outline" onClick={clearFilters} data-testid="button-clear-filters-empty">
-              Clear Filters
-            </Button>
+          <CardHeader>
+            <CardTitle className="text-lg font-medium flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Filter History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Role Filter */}
+              <div className="space-y-2">
+                <Label>Target Role</Label>
+                <Select value={selectedRole} onValueChange={setSelectedRole}>
+                  <SelectTrigger className="min-h-[44px]">
+                    <SelectValue placeholder="All roles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All roles</SelectItem>
+                    {uniqueRoles.map((role) => (
+                      <SelectItem key={role} value={role}>{role}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Industry Filter */}
+              <div className="space-y-2">
+                <Label>Target Industry</Label>
+                <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
+                  <SelectTrigger className="min-h-[44px]">
+                    <SelectValue placeholder="All industries" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All industries</SelectItem>
+                    {uniqueIndustries.map((industry) => (
+                      <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Start Date */}
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* End Date */}
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "PP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {hasActiveFilters && (
+              <div className="mt-4 flex justify-end">
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="mr-2 h-4 w-4" />
+                  Clear Filters
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
 
-      {/* Analysis Cards Grid */}
-      {filteredData.length > 0 && (
+      {/* Analysis Cards */}
+      {historyData.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredData.map((analysis) => (
-            <Card
-              key={analysis.id}
-              className="border shadow-sm hover:shadow-md transition-shadow"
-              data-testid={`card-analysis-${analysis.id}`}
-            >
+          {historyData.map((analysis) => (
+            <Card key={analysis.id} className="border shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base font-semibold truncate" title={analysis.fileName}>
-                      <FileText className="inline-block w-4 h-4 mr-2 flex-shrink-0" />
-                      {analysis.fileName}
-                    </CardTitle>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(analysis.createdAt), "PPP")}
-                    </p>
-                  </div>
-                </div>
+                <CardTitle className="text-base font-semibold truncate flex items-center gap-2">
+                  <FileText className="w-4 h-4" /> {analysis.fileName}
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">{format(new Date(analysis.createdAt), "PPP")}</p>
               </CardHeader>
-
               <CardContent className="space-y-4">
-                {/* Overall RMS Score */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">RMS Score</span>
-                    <span
-                      className={cn("text-2xl font-bold", getScoreColor(analysis.rmsScore))}
-                      data-testid={`text-rms-score-${analysis.id}`}
-                    >
-                      {analysis.rmsScore}
-                    </span>
-                  </div>
-                  <Progress
-                    value={analysis.rmsScore}
-                    className="h-2"
-                    data-testid={`progress-rms-${analysis.id}`}
-                  />
-                  <div className="h-1 rounded-full overflow-hidden bg-muted">
-                    <div
-                      className={cn("h-full transition-all", getScoreBgColor(analysis.rmsScore))}
-                      style={{ width: `${analysis.rmsScore}%` }}
-                    />
-                  </div>
+                <div>
+                  <p className="text-sm font-medium">RMS Score</p>
+                  <p className={cn("text-2xl font-bold", getScoreColor(analysis.rmsScore))}>
+                    {analysis.rmsScore}
+                  </p>
+                  <Progress value={analysis.rmsScore} className="h-2" />
                 </div>
 
-                {/* Sub-scores Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  {analysis.skillsScore !== undefined && (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Hash className="w-3 h-3" />
-                        <span>Skills</span>
-                      </div>
-                      <div className={cn("text-lg font-semibold", getScoreColor(analysis.skillsScore))}
-                        data-testid={`text-skills-score-${analysis.id}`}>
-                        {analysis.skillsScore}
-                      </div>
-                    </div>
-                  )}
-
-                  {analysis.experienceScore !== undefined && (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Briefcase className="w-3 h-3" />
-                        <span>Experience</span>
-                      </div>
-                      <div className={cn("text-lg font-semibold", getScoreColor(analysis.experienceScore))}
-                        data-testid={`text-experience-score-${analysis.id}`}>
-                        {analysis.experienceScore}
-                      </div>
-                    </div>
-                  )}
-
-                  {analysis.keywordsScore !== undefined && (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <TrendingUp className="w-3 h-3" />
-                        <span>Keywords</span>
-                      </div>
-                      <div className={cn("text-lg font-semibold", getScoreColor(analysis.keywordsScore))}
-                        data-testid={`text-keywords-score-${analysis.id}`}>
-                        {analysis.keywordsScore}
-                      </div>
-                    </div>
-                  )}
-
-                  {analysis.educationScore !== undefined && (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <GraduationCap className="w-3 h-3" />
-                        <span>Education</span>
-                      </div>
-                      <div className={cn("text-lg font-semibold", getScoreColor(analysis.educationScore))}
-                        data-testid={`text-education-score-${analysis.id}`}>
-                        {analysis.educationScore}
-                      </div>
-                    </div>
-                  )}
-
-                  {analysis.certificationsScore !== undefined && (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Award className="w-3 h-3" />
-                        <span>Certifications</span>
-                      </div>
-                      <div className={cn("text-lg font-semibold", getScoreColor(analysis.certificationsScore))}
-                        data-testid={`text-certifications-score-${analysis.id}`}>
-                        {analysis.certificationsScore}
-                      </div>
-                    </div>
-                  )}
+                <div className="flex flex-wrap gap-2">
+                  {analysis.targetRole && <Badge variant="secondary">{analysis.targetRole}</Badge>}
+                  {analysis.targetIndustry && <Badge variant="secondary">{analysis.targetIndustry}</Badge>}
+                  {analysis.targetCompanies?.map((c, i) => (
+                    <Badge key={i} variant="outline">{c}</Badge>
+                  ))}
                 </div>
-
-                {/* Target Role, Industry, Companies as Badges */}
-                <div className="space-y-2">
-                  {analysis.targetRole && (
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Target className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                      <Badge variant="secondary" className="text-xs" data-testid={`badge-role-${analysis.id}`}>
-                        {analysis.targetRole}
-                      </Badge>
-                    </div>
-                  )}
-
-                  {analysis.targetIndustry && (
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Building2 className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                      <Badge variant="secondary" className="text-xs" data-testid={`badge-industry-${analysis.id}`}>
-                        {analysis.targetIndustry}
-                      </Badge>
-                    </div>
-                  )}
-
-                  {analysis.targetCompanies && analysis.targetCompanies.length > 0 && (
-                    <div className="flex items-start gap-2 flex-wrap">
-                      <Building2 className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-1" />
-                      <div className="flex flex-wrap gap-1">
-                        {analysis.targetCompanies.map((company, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="outline"
-                            className="text-xs"
-                            data-testid={`badge-company-${analysis.id}-${idx}`}
-                          >
-                            {company}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Expandable Gaps and Insights */}
-                {(analysis.gaps || analysis.overallInsights) && (
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="details" className="border-none">
-                      <AccordionTrigger
-                        className="text-sm font-medium hover:no-underline py-2"
-                        data-testid={`button-expand-details-${analysis.id}`}
-                      >
-                        View Gaps & Insights
-                      </AccordionTrigger>
-                      <AccordionContent className="space-y-4 pt-2">
-                        {/* Gaps */}
-                        {analysis.gaps && analysis.gaps.length > 0 && (
-                          <div className="space-y-2">
-                            <h4 className="text-sm font-semibold flex items-center gap-2">
-                              <AlertTriangle className="w-4 h-4" />
-                              Identified Gaps
-                            </h4>
-                            <div className="space-y-2">
-                              {analysis.gaps.slice(0, 3).map((gap, idx) => (
-                                <div
-                                  key={idx}
-                                  className="p-3 bg-muted/50 rounded-md space-y-1"
-                                  data-testid={`gap-item-${analysis.id}-${idx}`}
-                                >
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <Badge
-                                      className={cn("text-xs", getPriorityColor(gap.priority))}
-                                      data-testid={`badge-priority-${analysis.id}-${idx}`}
-                                    >
-                                      {gap.priority}
-                                    </Badge>
-                                    <span className="text-xs font-medium">{gap.category}</span>
-                                  </div>
-                                  <p className="text-xs text-muted-foreground">{gap.issue}</p>
-                                  {gap.impact && (
-                                    <p className="text-xs">
-                                      <span className="font-medium">Impact:</span> {gap.impact}
-                                    </p>
-                                  )}
-                                </div>
-                              ))}
-                              {analysis.gaps.length > 3 && (
-                                <p className="text-xs text-muted-foreground text-center">
-                                  +{analysis.gaps.length - 3} more gaps
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Overall Insights */}
-                        {analysis.overallInsights && (
-                          <div className="space-y-2">
-                            <h4 className="text-sm font-semibold">Overall Insights</h4>
-                            {analysis.overallInsights.summary && (
-                              <p className="text-xs text-muted-foreground">
-                                {analysis.overallInsights.summary}
-                              </p>
-                            )}
-                            {analysis.overallInsights.strengths &&
-                              analysis.overallInsights.strengths.length > 0 && (
-                                <div>
-                                  <p className="text-xs font-medium text-green-600 dark:text-green-500">
-                                    Strengths:
-                                  </p>
-                                  <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
-                                    {analysis.overallInsights.strengths.slice(0, 2).map((strength, idx) => (
-                                      <li key={idx}>{strength}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                            {analysis.overallInsights.improvements &&
-                              analysis.overallInsights.improvements.length > 0 && (
-                                <div>
-                                  <p className="text-xs font-medium text-yellow-600 dark:text-yellow-500">
-                                    Areas for Improvement:
-                                  </p>
-                                  <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
-                                    {analysis.overallInsights.improvements.slice(0, 2).map((improvement, idx) => (
-                                      <li key={idx}>{improvement}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-                          </div>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                )}
               </CardContent>
             </Card>
           ))}
@@ -597,3 +307,4 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     </div>
   );
 }
+
