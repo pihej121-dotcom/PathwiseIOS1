@@ -241,7 +241,11 @@ export class DatabaseStorage implements IStorage {
       ...(analysis.certificationsScore !== undefined && { certificationsScore: analysis.certificationsScore }),
       ...(analysis.gaps !== undefined && { gaps: analysis.gaps }),
       ...(analysis.overallInsights !== undefined && { overallInsights: analysis.overallInsights }),
-      ...(analysis.sectionAnalysis !== undefined && { sectionAnalysis: analysis.sectionAnalysis })
+      ...(analysis.sectionAnalysis !== undefined && { sectionAnalysis: analysis.sectionAnalysis }),
+      ...(analysis.targetRole !== undefined && { targetRole: analysis.targetRole }),
+      ...(analysis.targetIndustry !== undefined && { targetIndustry: analysis.targetIndustry }),
+      ...(analysis.targetCompanies !== undefined && { targetCompanies: analysis.targetCompanies }),
+      ...(analysis.analysisHash !== undefined && { analysisHash: analysis.analysisHash })
     };
 
     // Only update if we have valid fields
