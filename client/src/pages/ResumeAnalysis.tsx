@@ -100,7 +100,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
         title: "Resume analyzed successfully!",
         description: "Your resume has been analyzed. Check the scores and recommendations below.",
       });
-      setIsAnalyzing(false);
       setResumeText("");
       setTargetRole("");
       setTargetIndustry("");
@@ -112,7 +111,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
         description: error.message,
         variant: "destructive",
       });
-      setIsAnalyzing(false);
     },
   });
 
@@ -146,6 +144,12 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
     }
     
     setIsAnalyzing(true);
+    
+    // Set a 60-second timer to hide loading screen
+    setTimeout(() => {
+      setIsAnalyzing(false);
+    }, 60000);
+    
     analyzeMutation.mutate({
       resumeText: resumeText.trim(),
       targetRole: targetRole.trim(),
