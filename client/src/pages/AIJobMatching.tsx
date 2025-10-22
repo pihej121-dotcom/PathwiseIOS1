@@ -140,7 +140,6 @@ export default function AIJobMatching() {
         <LoadingExperience 
           isLoading={tailorResumeMutation.isPending} 
           operation="jobs"
-          showMiniGame={true}
         />
         
         {/* Search Filters */}

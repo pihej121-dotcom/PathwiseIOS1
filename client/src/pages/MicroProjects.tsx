@@ -198,7 +198,6 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
       <LoadingExperience 
         isLoading={generateProjects.isPending} 
         operation="projects"
-        showMiniGame={true}
       />
       
       <div className="flex justify-end mb-4">

@@ -94,14 +94,18 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
       });
       return res.json();
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
-      toast({
-        title: "Resume analyzed successfully!",
-        description: "Your resume has been analyzed. Check the scores and recommendations below.",
-      });
-      setIsAnalyzing(false);
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
+      
+      setTimeout(() => {
+        setIsAnalyzing(false);
+        toast({
+          title: "Resume analyzed successfully!",
+          description: "Your resume has been analyzed. Check the scores and recommendations below.",
+        });
+      }, 500);
+      
       setResumeText("");
       setTargetRole("");
       setTargetIndustry("");
@@ -198,9 +202,8 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const content = (
     <>
       <LoadingExperience 
-        isLoading={analyzeMutation.isPending} 
+        isLoading={isAnalyzing} 
         operation="resume"
-        showMiniGame={true}
       />
       
       <div className="flex justify-end mb-4">

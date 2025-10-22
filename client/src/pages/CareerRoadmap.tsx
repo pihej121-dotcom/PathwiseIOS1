@@ -279,7 +279,6 @@ export default function CareerRoadmap({ embedded = false }: { embedded?: boolean
       <LoadingExperience 
         isLoading={generateRoadmapMutation.isPending} 
         operation="roadmap"
-        showMiniGame={true}
       />
       
       <div className="flex justify-end mb-4">

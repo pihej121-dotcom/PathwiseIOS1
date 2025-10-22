@@ -141,7 +141,6 @@ export function InterviewPrep({ embedded = false }: { embedded?: boolean } = {})
       <LoadingExperience 
         isLoading={generateQuestionsMutation.isPending} 
         operation="interview"
-        showMiniGame={true}
       />
       
       <div className="flex justify-end mb-4">
