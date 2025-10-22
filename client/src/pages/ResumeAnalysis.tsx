@@ -150,25 +150,29 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   });
 
   // Validate score before stopping loader
-  useEffect(() => {
-    const validScore = activeResume?.rmsScore && activeResume.rmsScore > 0;
-    if (mutationCompleted.current && validScore && !isActiveResumeFetching && !analyzeMutation.isPending) {
-      // Clear the fallback timeout
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-      
+    onSuccess: (data) => {
+    queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
+  
+    setResumeText("");
+    setTargetRole("");
+    setTargetIndustry("");
+    setTargetCompanies("");
+  
+    // Start a manual 90s timer to stop the loader
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  
+    timeoutRef.current = setTimeout(() => {
       setIsAnalyzing(false);
       toast({
-        title: "Resume analyzed successfully!",
-        description: "Your resume has been analyzed. Check the scores and recommendations below.",
+        title: "Analysis complete",
+        description:
+          "If results don’t appear immediately, refresh in a few seconds to load your updated résumé analysis.",
+        variant: "default",
       });
-      
-      // Reset mutation completed flag
-      mutationCompleted.current = false;
-    }
-  }, [activeResume, isActiveResumeFetching, analyzeMutation.isPending, toast]);
+    }, 90000); // 90 seconds
+  },
+
 
   // Cleanup timeout on unmount
   useEffect(() => {
