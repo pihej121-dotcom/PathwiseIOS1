@@ -119,14 +119,19 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   // Auto-hide loading when mutation completes AND refetch finishes
   useEffect(() => {
     if (mutationCompleted.current && !isActiveResumeFetching && !analyzeMutation.isPending) {
-      setIsAnalyzing(false);
-      mutationCompleted.current = false;
-      toast({
-        title: "Resume analyzed successfully!",
-        description: "Your resume has been analyzed. Check the scores and recommendations below.",
-      });
+      const timeout = setTimeout(() => {
+        setIsAnalyzing(false);
+        mutationCompleted.current = false;
+        toast({
+          title: "Resume analyzed successfully!",
+          description: "Your resume has been analyzed. Check the scores and recommendations below.",
+        });
+      }, 1500); // show loading at least 1.5 seconds
+  
+      return () => clearTimeout(timeout);
     }
   }, [isActiveResumeFetching, analyzeMutation.isPending, toast]);
+
 
   const handleFileTextExtracted = (text: string, fileName: string) => {
     setResumeText(text);
