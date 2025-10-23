@@ -1,6 +1,4 @@
-import { Resend } from 'resend';
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+import { getUncachableResendClient } from './resend-client';
 
 export interface EmailVerificationData {
   email: string;
@@ -37,6 +35,14 @@ export interface PasswordResetData {
   userName: string;
 }
 
+export interface AdminWelcomeData {
+  email: string;
+  password: string;
+  institutionName: string;
+  studentLimit: number;
+  licenseEndDate: string;
+}
+
 export class EmailService {
   private getBaseUrl(): string {
     // Detect Railway environment
@@ -51,15 +57,12 @@ export class EmailService {
   }
 
   async sendEmailVerification(data: EmailVerificationData): Promise<boolean> {
-    if (!resend) {
-      console.warn('Email service not configured - RESEND_API_KEY is missing');
-      return false;
-    }
     try {
+      const { client, fromEmail } = await getUncachableResendClient();
       const verificationUrl = `${this.getBaseUrl()}/verify-email?token=${data.token}`;
       
-      await resend.emails.send({
-        from: 'Pathwise <noreply@pathwiseinstitutions.org>',
+      await client.emails.send({
+        from: fromEmail,
         to: data.email,
         subject: `Verify your email for ${data.institutionName}`,
         html: `
@@ -119,15 +122,12 @@ export class EmailService {
   }
 
   async sendInvitation(data: InvitationEmailData): Promise<boolean> {
-    if (!resend) {
-      console.warn('Email service not configured - RESEND_API_KEY is missing');
-      return false;
-    }
     try {
+      const { client, fromEmail } = await getUncachableResendClient();
       const invitationUrl = `${this.getBaseUrl()}/register?token=${data.token}`;
       
-      const result = await resend.emails.send({
-        from: 'Pathwise <noreply@pathwiseinstitutions.org>',
+      const result = await client.emails.send({
+        from: fromEmail,
         to: data.email,
         subject: `You're invited to join ${data.institutionName} on Pathwise`,
         html: `
@@ -196,13 +196,10 @@ export class EmailService {
   }
 
   async sendLicenseUsageNotification(data: LicenseNotificationData): Promise<boolean> {
-    if (!resend) {
-      console.warn('Email service not configured - RESEND_API_KEY is missing');
-      return false;
-    }
     try {
-      await resend.emails.send({
-        from: 'Pathwise <noreply@pathwiseinstitutions.org>',
+      const { client, fromEmail } = await getUncachableResendClient();
+      await client.emails.send({
+        from: fromEmail,
         to: data.adminEmail,
         subject: `License Usage Alert: ${data.usagePercentage}% of seats used at ${data.institutionName}`,
         html: `
@@ -264,13 +261,10 @@ export class EmailService {
   }
 
   async sendContactForm(data: ContactFormData): Promise<boolean> {
-    if (!resend) {
-      console.warn('Email service not configured - RESEND_API_KEY is missing');
-      return false;
-    }
     try {
-      await resend.emails.send({
-        from: 'Pathwise Contact Form <noreply@pathwiseinstitutions.org>',
+      const { client, fromEmail } = await getUncachableResendClient();
+      await client.emails.send({
+        from: fromEmail,
         to: 'patrick@pathwiseinstitutions.org',
         replyTo: data.email,
         subject: `Contact Form: ${data.subject}`,
@@ -330,15 +324,12 @@ export class EmailService {
   }
 
   async sendPasswordReset(data: PasswordResetData): Promise<boolean> {
-    if (!resend) {
-      console.warn('Email service not configured - RESEND_API_KEY is missing');
-      return false;
-    }
     try {
+      const { client, fromEmail } = await getUncachableResendClient();
       const resetUrl = `${this.getBaseUrl()}/reset-password?token=${data.token}`;
       
-      await resend.emails.send({
-        from: 'Pathwise <noreply@pathwiseinstitutions.org>',
+      await client.emails.send({
+        from: fromEmail,
         to: data.email,
         subject: 'Reset Your Pathwise Password',
         html: `
@@ -396,6 +387,98 @@ export class EmailService {
       return true;
     } catch (error) {
       console.error('Failed to send password reset email:', error);
+      return false;
+    }
+  }
+
+  async sendAdminWelcome(data: AdminWelcomeData): Promise<boolean> {
+    try {
+      const { client, fromEmail } = await getUncachableResendClient();
+      const loginUrl = `${this.getBaseUrl()}/login`;
+      
+      await client.emails.send({
+        from: fromEmail,
+        to: data.email,
+        subject: `Welcome to Pathwise - Your Institution Admin Account`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Welcome to Pathwise</title>
+            </head>
+            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 30px; text-align: center; margin-bottom: 30px;">
+                <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Pathwise!</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">${data.institutionName}</p>
+              </div>
+              
+              <div style="background: #f8f9fa; border-radius: 8px; padding: 25px; margin-bottom: 25px;">
+                <h2 style="color: #2d3748; margin-top: 0;">Your Admin Account is Ready</h2>
+                <p style="color: #4a5568; margin-bottom: 20px;">
+                  Your institution has been successfully onboarded to Pathwise! You can now log in and start inviting students to your platform.
+                </p>
+                
+                <div style="background: white; border-radius: 6px; padding: 20px; margin: 25px 0; border: 1px solid #e2e8f0;">
+                  <h3 style="margin-top: 0; color: #2d3748; font-size: 16px;">Login Credentials</h3>
+                  <div style="margin: 15px 0;">
+                    <strong style="color: #4a5568;">Email:</strong>
+                    <p style="margin: 5px 0; color: #2d3748; font-family: monospace; background: #f7fafc; padding: 8px; border-radius: 4px;">${data.email}</p>
+                  </div>
+                  <div style="margin: 15px 0;">
+                    <strong style="color: #4a5568;">Temporary Password:</strong>
+                    <p style="margin: 5px 0; color: #2d3748; font-family: monospace; background: #f7fafc; padding: 8px; border-radius: 4px;">${data.password}</p>
+                  </div>
+                  <p style="color: #e53e3e; font-size: 13px; margin-top: 15px;">
+                    ⚠️ Please change your password after your first login for security.
+                  </p>
+                </div>
+                
+                <div style="background: white; border-radius: 6px; padding: 20px; margin: 25px 0; border: 1px solid #e2e8f0;">
+                  <h3 style="margin-top: 0; color: #2d3748; font-size: 16px;">License Details</h3>
+                  <div style="margin: 10px 0; display: flex; justify-content: space-between;">
+                    <span style="color: #4a5568;">Student Seats:</span>
+                    <span style="font-weight: 600; color: #2d3748;">${data.studentLimit}</span>
+                  </div>
+                  <div style="margin: 10px 0; display: flex; justify-content: space-between;">
+                    <span style="color: #4a5568;">License Valid Until:</span>
+                    <span style="font-weight: 600; color: #2d3748;">${data.licenseEndDate}</span>
+                  </div>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${loginUrl}" 
+                     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                            color: white; 
+                            text-decoration: none; 
+                            padding: 15px 30px; 
+                            border-radius: 8px; 
+                            font-weight: 600; 
+                            display: inline-block;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    Login to Dashboard
+                  </a>
+                </div>
+                
+                <p style="color: #718096; font-size: 14px; margin-top: 25px;">
+                  If the button doesn't work, copy and paste this link into your browser:<br>
+                  <span style="word-break: break-all; color: #4299e1;">${loginUrl}</span>
+                </p>
+              </div>
+              
+              <div style="text-align: center; color: #a0aec0; font-size: 12px;">
+                <p>Need help getting started? Contact our support team.</p>
+                <p>&copy; 2025 Pathwise Institution Edition. All rights reserved.</p>
+              </div>
+            </body>
+          </html>
+        `,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to send admin welcome email:', error);
       return false;
     }
   }
