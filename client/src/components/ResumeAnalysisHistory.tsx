@@ -19,9 +19,7 @@ import {
   FileText,
   Calendar as CalendarIcon,
   X,
-  AlertTriangle,
   Target,
-  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
@@ -30,11 +28,6 @@ interface ResumeAnalysisHistoryItem {
   id: string;
   fileName: string;
   rmsScore: number;
-  skillsScore?: number;
-  experienceScore?: number;
-  keywordsScore?: number;
-  educationScore?: number;
-  certificationsScore?: number;
   gaps?: Array<{
     category: string;
     priority: string;
@@ -48,7 +41,14 @@ interface ResumeAnalysisHistoryItem {
     improvements?: string[];
     summary?: string;
   };
-  sectionAnalysis?: Record<string, any>;
+  sectionAnalysis?: Record<
+    string,
+    {
+      score?: number;
+      strengths?: string[];
+      gaps?: string[];
+    }
+  >;
   targetRole?: string;
   targetIndustry?: string;
   targetCompanies?: string[];
@@ -65,7 +65,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
 
-  // --- Build query string safely ---
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (selectedRole) params.append("targetRole", selectedRole);
@@ -76,7 +75,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     return qs ? `?${qs}` : "";
   }, [selectedRole, selectedIndustry, startDate, endDate]);
 
-  // --- Fetch filtered / full data ---
   const { data: historyData = [], isLoading } = useQuery<ResumeAnalysisHistoryItem[]>({
     queryKey: [
       "/api/resume-analysis-history",
@@ -91,13 +89,11 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     },
   });
 
-  // --- Fetch all for dropdowns only when not embedded ---
   const { data: allHistoryData = [] } = useQuery<ResumeAnalysisHistoryItem[]>({
     queryKey: ["/api/resume-analysis-history"],
     enabled: !embedded,
   });
 
-  // --- Extract filter options ---
   const { uniqueRoles, uniqueIndustries } = useMemo(() => {
     const roles = new Set<string>();
     const industries = new Set<string>();
@@ -113,7 +109,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
 
   const hasActiveFilters = selectedRole || selectedIndustry || startDate || endDate;
 
-  // --- Utility function ---
   const getPriorityColor = (priority: string) => {
     switch (priority?.toLowerCase()) {
       case "high":
@@ -134,7 +129,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     setEndDate(undefined);
   };
 
-  // --- Loading skeleton ---
   if (isLoading) {
     return (
       <div className={cn(!embedded && "space-y-6")}>
@@ -147,7 +141,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     );
   }
 
-  // --- Empty State ---
   const noData =
     (!historyData || historyData.length === 0) &&
     (!hasActiveFilters) &&
@@ -168,10 +161,8 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     );
   }
 
-  // --- Render UI ---
   return (
     <div className={cn(!embedded && "space-y-6")}>
-      {/* Filter Controls (hide in embedded mode) */}
       {!embedded && (
         <Card className="border-none shadow-sm">
           <CardHeader>
@@ -182,7 +173,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Role Filter */}
               <div className="space-y-2">
                 <Label>Target Role</Label>
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
@@ -200,7 +190,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
                 </Select>
               </div>
 
-              {/* Industry Filter */}
               <div className="space-y-2">
                 <Label>Target Industry</Label>
                 <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
@@ -218,7 +207,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
                 </Select>
               </div>
 
-              {/* Start Date */}
               <div className="space-y-2">
                 <Label>Start Date</Label>
                 <Popover>
@@ -234,7 +222,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
                 </Popover>
               </div>
 
-              {/* End Date */}
               <div className="space-y-2">
                 <Label>End Date</Label>
                 <Popover>
@@ -263,7 +250,6 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
         </Card>
       )}
 
-      {/* Analysis Cards */}
       {historyData.length > 0 && (
         <div
           className={cn(
@@ -277,109 +263,109 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
               key={analysis.id}
               className="border shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl bg-white/90 dark:bg-gray-900/70 backdrop-blur-md"
             >
-              <CardHeader className="pb-2 md:pb-3">
-                <CardTitle className="text-lg md:text-xl font-semibold truncate flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-500" />
-                  {analysis.fileName}
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg md:text-xl font-semibold flex flex-col gap-1">
+                  <span>{analysis.targetRole || "Unspecified Role"}</span>
+                  <span className="text-muted-foreground text-sm">
+                    {analysis.targetIndustry || "Industry"}{" "}
+                    {analysis.targetCompanies?.length ? (
+                      <>
+                        •{" "}
+                        {analysis.targetCompanies
+                          .slice(0, 2)
+                          .join(", ")}
+                      </>
+                    ) : null}
+                  </span>
                 </CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">
                   {format(new Date(analysis.createdAt), "MMMM do, yyyy")}
                 </p>
               </CardHeader>
 
-              <CardContent className="space-y-5 p-5 md:p-6 min-h-[420px] flex flex-col justify-between">
-                {(analysis.overallInsights || analysis.gaps) ? (
+              <CardContent className="space-y-5 p-6 min-h-[420px] flex flex-col justify-between">
+                {(analysis.overallInsights || analysis.sectionAnalysis) ? (
                   <>
-                    {/* Strengths */}
-                    {analysis.overallInsights?.strengths?.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-base font-semibold text-green-600 dark:text-green-400">
-                          💪 Strengths
-                        </p>
-                        <ul className="text-sm md:text-base text-muted-foreground list-disc list-inside space-y-1.5">
-                          {analysis.overallInsights.strengths.slice(0, 3).map((s, i) => (
-                            <li key={i}>{s}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Improvements */}
-                    {analysis.overallInsights?.improvements?.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-base font-semibold text-yellow-600 dark:text-yellow-400">
-                          ⚡ Areas for Improvement
-                        </p>
-                        <ul className="text-sm md:text-base text-muted-foreground list-disc list-inside space-y-1.5">
-                          {analysis.overallInsights.improvements.slice(0, 3).map((i, j) => (
-                            <li key={j}>{i}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Gaps */}
-                    {analysis.gaps?.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-base font-semibold text-red-600 dark:text-red-400">
-                          🚧 Key Gaps
-                        </p>
-                        {analysis.gaps.slice(0, 2).map((gap, idx) => (
-                          <div
-                            key={idx}
-                            className="p-4 bg-muted/40 rounded-xl text-sm md:text-base border border-muted-foreground/10 shadow-inner"
-                          >
-                            <p className="font-medium text-foreground">{gap.category}</p>
-                            <p className="text-muted-foreground">{gap.issue}</p>
-                            <p className="text-xs italic mt-1">
-                              Priority:{" "}
-                              <span
-                                className={cn(
-                                  "font-semibold uppercase px-2 py-0.5 rounded",
-                                  getPriorityColor(gap.priority)
-                                )}
-                              >
-                                {gap.priority}
-                              </span>
+                    {/* --- Overall Insights --- */}
+                    {analysis.overallInsights && (
+                      <div className="space-y-4">
+                        {analysis.overallInsights.strengths?.length > 0 && (
+                          <div>
+                            <p className="text-base font-semibold text-green-600 dark:text-green-400">
+                              💪 Strengths
                             </p>
+                            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                              {analysis.overallInsights.strengths.map((s, i) => (
+                                <li key={i}>{s}</li>
+                              ))}
+                            </ul>
                           </div>
-                        ))}
+                        )}
+
+                        {analysis.overallInsights.improvements?.length > 0 && (
+                          <div>
+                            <p className="text-base font-semibold text-yellow-600 dark:text-yellow-400">
+                              ⚡ Areas for Improvement
+                            </p>
+                            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                              {analysis.overallInsights.improvements.map((i, j) => (
+                                <li key={j}>{i}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {analysis.overallInsights.summary && (
+                          <p className="italic text-sm text-muted-foreground border-t border-muted-foreground/10 pt-3">
+                            “{analysis.overallInsights.summary}”
+                          </p>
+                        )}
                       </div>
                     )}
 
-                    {/* Summary */}
-                    {analysis.overallInsights?.summary && (
-                      <div className="pt-3 mt-2 border-t border-muted-foreground/10">
-                        <p className="text-sm italic text-muted-foreground leading-snug">
-                          “{analysis.overallInsights.summary}”
+                    {/* --- Section Analysis --- */}
+                    {analysis.sectionAnalysis && (
+                      <div className="space-y-3">
+                        <p className="text-base font-semibold text-blue-600 dark:text-blue-400">
+                          🧩 Section Insights
                         </p>
+                        {Object.entries(analysis.sectionAnalysis).map(
+                          ([section, details], idx) => (
+                            <div
+                              key={idx}
+                              className="p-3 bg-muted/40 rounded-lg border border-muted-foreground/10"
+                            >
+                              <p className="font-medium">{section}</p>
+                              {details?.score && (
+                                <p className="text-sm text-muted-foreground">
+                                  Score: {details.score}
+                                </p>
+                              )}
+                              {details?.strengths?.length > 0 && (
+                                <ul className="list-disc list-inside text-xs text-green-600 mt-1">
+                                  {details.strengths.slice(0, 2).map((s, i) => (
+                                    <li key={i}>{s}</li>
+                                  ))}
+                                </ul>
+                              )}
+                              {details?.gaps?.length > 0 && (
+                                <ul className="list-disc list-inside text-xs text-red-600 mt-1">
+                                  {details.gaps.slice(0, 2).map((g, i) => (
+                                    <li key={i}>{g}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          )
+                        )}
                       </div>
                     )}
                   </>
                 ) : (
                   <p className="text-sm text-muted-foreground italic">
-                    No detailed insights recorded for this analysis.
+                    No detailed insights available for this analysis.
                   </p>
                 )}
-
-                {/* Footer tags */}
-                <div className="flex flex-wrap gap-2 pt-5 mt-auto border-t border-muted-foreground/10">
-                  {analysis.targetRole && (
-                    <Badge variant="secondary" className="text-sm py-1 px-3">
-                      {analysis.targetRole}
-                    </Badge>
-                  )}
-                  {analysis.targetIndustry && (
-                    <Badge variant="secondary" className="text-sm py-1 px-3">
-                      {analysis.targetIndustry}
-                    </Badge>
-                  )}
-                  {analysis.targetCompanies?.map((c, i) => (
-                    <Badge key={i} variant="outline" className="text-sm py-1 px-3">
-                      {c}
-                    </Badge>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           ))}
@@ -388,4 +374,3 @@ export function ResumeAnalysisHistory({ embedded = false }: ResumeAnalysisHistor
     </div>
   );
 }
-
