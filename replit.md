@@ -8,16 +8,25 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Super Admin Dashboard Simplification (October 2025)
+- Simplified super admin dashboard to single-page interface (removed tabs)
+- Direct admin account creation with auto-generated passwords (no invitation tokens)
+- Integrated Resend connector for sending welcome emails with login credentials
+- Added institution delete functionality (soft delete with cascade)
+- Admin onboarding flow: Create institution → Auto-create admin account → Send credentials via email
+- Dashboard displays: institution name, admin email, license seats, expiration date, active users
+- Super admins can now add and remove institutions from a single view
+
 ## Multi-Tenant Institution Support (October 2025)
-- Added `institution_admin` role to user schema for institutional license management
+- Added `institution_admin` and `super_admin` roles to user schema for institutional license management
 - Created super admin dashboard at `/admin/dashboard` for institution onboarding
-- Implemented institution onboarding API with Resend email invitations
+- Implemented institution onboarding API with Resend email welcome messages
 - Added role-based routing: super_admin → `/admin/dashboard`, institution_admin → `/institution/dashboard`, student → `/dashboard`
 - Bootstrap script (`scripts/bootstrapSuperAdmin.ts`) for creating super admin via environment variables
 - Institution admin dashboard placeholder at `/institution/dashboard` (full features pending)
 
 ## Configuration Requirements
-- **RESEND_API_KEY**: Must be manually configured in environment variables for institution invitation emails
+- **Resend Integration**: Now using Replit's Resend connector (connection-based, auto-managed API keys)
 - **Super Admin Bootstrap**: Set `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`, and `BOOTSTRAP_SUPERADMIN_SECRET` environment variables, then run `tsx scripts/bootstrapSuperAdmin.ts`
 
 # System Architecture
