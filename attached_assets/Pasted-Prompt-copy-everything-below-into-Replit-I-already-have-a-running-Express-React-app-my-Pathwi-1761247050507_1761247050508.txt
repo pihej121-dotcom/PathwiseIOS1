@@ -1,0 +1,65 @@
+Prompt (copy everything below into Replit):
+
+I already have a running Express + React app (my Pathwise career platform).
+Do not replace it or start a new Next.js project.
+Instead, extend my current backend to include secure authentication and role-based access using Drizzle ORM + PostgreSQL.
+
+Here’s what to do step-by-step:
+
+Database (Drizzle ORM)
+
+Create or extend a users table with:
+id (uuid primary key), email (text, unique), passwordHash (text),
+role (enum: "student" | "institution_admin" | "super_admin"), createdAt (timestamp default now()).
+
+Update the Drizzle config to connect to the existing Postgres instance.
+
+Auth Routes
+
+Add a new Express router file routes/auth.js (or .ts if using TypeScript).
+
+Implement a POST /api/auth/login route that:
+
+Accepts { email, password }.
+
+Verifies the user with bcrypt (bcrypt.compare).
+
+On success, returns a signed JWT { id, email, role } using process.env.JWT_SECRET.
+
+If invalid, return 401.
+
+Middleware
+
+Create requireAuth middleware that checks for a valid Authorization: Bearer <token> header.
+
+Create requireSuperAdmin middleware that verifies the token and role === "super_admin".
+
+Bootstrap Script
+
+Add /scripts/bootstrapSuperAdmin.js that:
+
+Reads BOOTSTRAP_SUPERADMIN_SECRET, SUPERADMIN_EMAIL, and SUPERADMIN_PASSWORD from environment variables.
+
+Hashes the password with bcrypt and inserts a new user if no super_admin exists.
+
+Logs “✅ Super admin created” or “⚠️ Already exists”.
+
+Frontend Integration
+
+Add a simple React login form (/login route) that posts to /api/auth/login.
+
+On successful login, store the JWT in localStorage and redirect by role:
+
+super_admin → /admin/dashboard
+
+institution_admin → /institution/dashboard
+
+student → /student/dashboard
+
+Testing
+
+After running the bootstrap script once, log in with SUPERADMIN_EMAIL + SUPERADMIN_PASSWORD.
+
+Confirm you can access /admin/dashboard only when your JWT role = super_admin.
+
+Do not change my existing frontend styling, landing page, or routes outside the new /login and dashboard redirects.

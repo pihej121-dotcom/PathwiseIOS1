@@ -1,0 +1,102 @@
+Purpose
+
+Only Pathwise internal team (super_admin) can:
+
+Log into a private dashboard
+
+Onboard new institutions
+
+Set their license parameters (student limit, license duration)
+
+Send a Resend email invite with a registration token
+
+Monitor all institutions and their metrics
+
+💾 Data Model
+
+Tables involved:
+
+users → existing structure, with roles: student, institution_admin, super_admin
+
+institutions → name, adminEmail, studentLimit, licenseStart, licenseEnd, registrationToken, tokenExpiresAt, createdBy, isActive
+
+🧩 Dashboard Features (for super_admin)
+
+View list of all institutions and their status (active, pending setup, expired)
+
+Button: “Onboard New Institution” → opens modal:
+
+Name
+
+Admin Email
+
+Number of students
+
+License duration (start → end)
+
+Click “Create & Send Invite” →
+
+Backend generates token
+
+Sends Resend email to admin
+
+Adds pending institution to table
+
+Option to resend invite, deactivate institution, or view institution metrics
+
+⚙️ Replit AI Prompts for Phase 1
+
+Prompt 1: Create the Institutions Schema
+
+Create a Drizzle ORM schema for an institutions table with the following fields:
+
+id (uuid primary key)
+
+name (text)
+
+adminEmail (text)
+
+studentLimit (integer)
+
+licenseStart (timestamp, default now)
+
+licenseEnd (timestamp)
+
+registrationToken (text, required)
+
+tokenExpiresAt (timestamp, required)
+
+createdBy (text, super_admin email)
+
+isActive (boolean, default true)
+
+Use Drizzle conventions and link this table to the existing users table through adminEmail.
+
+Prompt 2: Super Admin Dashboard (React + Next.js)
+
+Build a SuperAdminDashboard page (Next.js + shadcn + Tailwind) that lists all institutions from /api/admin/institutions.
+Include columns for: Institution Name, Admin Email, Student Limit, License Duration, Status, Actions.
+Add a button “Onboard Institution” → opens a modal form (name, admin email, student limit, license start/end).
+On submit, call /api/admin/onboard-institution.
+Use toasts for success/failure.
+
+Prompt 3: Onboarding API with Resend Integration
+
+Build an Express endpoint /api/admin/onboard-institution:
+
+Requires requireSuperAdmin middleware.
+
+Accepts name, adminEmail, studentLimit, licenseEnd, createdBy.
+
+Generates registrationToken (uuid).
+
+Sets tokenExpiresAt = 7 days from now.
+
+Inserts into DB.
+
+Uses Resend to send an email to adminEmail with:
+“You’ve been invited to register your Institution on Pathwise. Click below to finish setup: https://pathwise.nyc/register/institution?token={token}”
+
+Returns success JSON.
+
+Include an email template file in /emails/InstitutionInvite.tsx with a clean Pathwise brand style.
