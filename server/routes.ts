@@ -593,39 +593,43 @@ if (existingUser && !existingUser.isActive) {
         isActive: true,
       });
       
-      const invitationToken = generateToken();
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      // Generate a random password for the admin
+      const tempPassword = crypto.randomBytes(16).toString('base64').slice(0, 12);
+      const hashedPassword = await hashPassword(tempPassword);
       
-      const invitation = await storage.createInvitation({
-        institutionId: institution.id,
+      // Create the admin user account directly
+      const adminUser = await storage.createUser({
         email: adminEmail,
-        role: "institution_admin",
-        invitedBy: req.user!.id,
-        token: invitationToken,
-        status: "pending",
-        expiresAt,
+        password: hashedPassword,
+        firstName: "Admin",
+        lastName: "User",
+        role: "admin",
+        institutionId: institution.id,
+        isVerified: true,
+        isActive: true,
+        subscriptionTier: "institutional",
       });
       
-      const emailSent = await emailService.sendInvitation({
+      // Send welcome email with credentials
+      const emailSent = await emailService.sendAdminWelcome({
         email: adminEmail,
-        token: invitationToken,
+        password: tempPassword,
         institutionName: name,
-        inviterName: `${req.user!.firstName} ${req.user!.lastName}`,
-        role: "institution_admin"
+        studentLimit,
+        licenseEndDate: new Date(licenseEnd).toLocaleDateString(),
       });
       
       if (!emailSent) {
-        console.warn("Failed to send invitation email, but institution was created");
+        console.warn("Failed to send welcome email, but institution and admin account were created");
       }
       
       res.json({
         message: "Institution onboarded successfully",
         institution,
         license,
-        invitation: {
+        admin: {
           email: adminEmail,
-          token: invitationToken,
-          expiresAt
+          id: adminUser.id
         },
         emailSent
       });
