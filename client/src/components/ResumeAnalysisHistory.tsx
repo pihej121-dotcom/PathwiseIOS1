@@ -10,12 +10,14 @@ import { apiRequest } from "@/lib/queryClient";
 
 interface ResumeAnalysisHistoryItem {
   id: string;
+  resume_id: string; // 👈 add this line
   fileName: string;
   overallInsights?: {
     strengths?: string[];
     improvements?: string[];
     summary?: string;
   };
+  
   sectionAnalysis?: Record<
     string,
     {
@@ -55,7 +57,7 @@ export function ResumeAnalysisHistory({
 
   const filteredData = useMemo(() => {
     if (!filteredId) return historyData;
-    return historyData.filter((item) => item.id === filteredId);
+    return historyData.filter((item) => item.resume_id === filteredId);
   }, [historyData, filteredId]);
 
   if (isLoading) {
