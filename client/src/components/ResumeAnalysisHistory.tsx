@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,7 +54,6 @@ export function ResumeAnalysisHistory({
 }: ResumeAnalysisHistoryProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filteredId, setFilteredId] = useState<string | null>(null);
-
   const [selectedRole, setSelectedRole] = useState<string | "all">("all");
   const [selectedIndustry, setSelectedIndustry] = useState<string | "all">("all");
 
@@ -75,11 +74,9 @@ export function ResumeAnalysisHistory({
     },
   });
 
-  // --- Extract unique filters from data ---
+  // Extract unique role & industry options
   const availableRoles = useMemo(() => {
-    const roles = historyData
-      .map((h) => h.targetRole)
-      .filter(Boolean) as string[];
+    const roles = historyData.map((h) => h.targetRole).filter(Boolean) as string[];
     return Array.from(new Set(roles));
   }, [historyData]);
 
@@ -90,7 +87,7 @@ export function ResumeAnalysisHistory({
     return Array.from(new Set(industries));
   }, [historyData]);
 
-  // --- Apply filtering logic ---
+  // Filter logic
   const filteredData = useMemo(() => {
     let data = historyData;
     if (filteredId) data = data.filter((item) => item.resume_id === filteredId);
@@ -105,7 +102,44 @@ export function ResumeAnalysisHistory({
     setExpandedId(expandedId === id ? null : id);
   };
 
-  // --- Loading state ---
+  // Smooth expand/collapse using scrollHeight
+  const ExpandableContent = ({
+    isExpanded,
+    children,
+  }: {
+    isExpanded: boolean;
+    children: React.ReactNode;
+  }) => {
+    const ref = useRef<HTMLDivElement>(null);
+    const [height, setHeight] = useState("0px");
+
+    useEffect(() => {
+      if (ref.current) {
+        if (isExpanded) {
+          const fullHeight = ref.current.scrollHeight + "px";
+          setHeight(fullHeight);
+        } else {
+          setHeight("0px");
+        }
+      }
+    }, [isExpanded, ref.current]);
+
+    return (
+      <div
+        ref={ref}
+        style={{
+          height,
+          transition: "height 0.5s ease, opacity 0.4s ease",
+          opacity: isExpanded ? 1 : 0,
+          overflow: "hidden",
+        }}
+      >
+        {children}
+      </div>
+    );
+  };
+
+  // Loading state
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-6">
@@ -116,7 +150,7 @@ export function ResumeAnalysisHistory({
     );
   }
 
-  // --- Empty state ---
+  // Empty state
   if (!filteredData.length) {
     return (
       <Card className="border-none shadow-sm">
@@ -131,7 +165,7 @@ export function ResumeAnalysisHistory({
     );
   }
 
-  // --- Main render ---
+  // Render
   return (
     <div className={cn("space-y-6")}>
       {/* Header */}
@@ -152,7 +186,6 @@ export function ResumeAnalysisHistory({
             </span>
           </div>
 
-          {/* Role Filter */}
           <Select value={selectedRole} onValueChange={setSelectedRole}>
             <SelectTrigger className="w-[160px] h-8 text-sm">
               <SelectValue placeholder="Role" />
@@ -167,7 +200,6 @@ export function ResumeAnalysisHistory({
             </SelectContent>
           </Select>
 
-          {/* Industry Filter */}
           <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
             <SelectTrigger className="w-[160px] h-8 text-sm">
               <SelectValue placeholder="Industry" />
@@ -229,18 +261,11 @@ export function ResumeAnalysisHistory({
                 </p>
               </CardHeader>
 
-              {/* Expandable Content */}
-              <div
-                className={cn(
-                  "transition-all overflow-hidden duration-500 ease-in-out",
-                  isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
-                )}
-              >
+              <ExpandableContent isExpanded={isExpanded}>
                 <CardContent className="p-5 space-y-6">
                   {/* Overall Insights */}
                   {analysis.overallInsights && (
                     <div className="space-y-4">
-                      {/* Strengths */}
                       {analysis.overallInsights.strengths?.length ? (
                         <div>
                           <p className="text-sm font-semibold text-green-600 mb-1">
@@ -259,7 +284,6 @@ export function ResumeAnalysisHistory({
                         </div>
                       ) : null}
 
-                      {/* Improvements */}
                       {analysis.overallInsights.improvements?.length ? (
                         <div>
                           <p className="text-sm font-semibold text-yellow-600 mb-1">
@@ -278,7 +302,6 @@ export function ResumeAnalysisHistory({
                         </div>
                       ) : null}
 
-                      {/* Summary */}
                       {analysis.overallInsights.summary && (
                         <p className="italic text-sm text-muted-foreground border-t border-border/20 pt-2 leading-relaxed">
                           “{analysis.overallInsights.summary}”
@@ -294,29 +317,28 @@ export function ResumeAnalysisHistory({
                         Section Insights
                       </p>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 auto-rows-auto">
                         {Object.entries(analysis.sectionAnalysis).map(
                           ([section, details], idx) => (
                             <div
                               key={idx}
-                              className="rounded-xl border border-border/30 bg-muted/20 p-4 hover:bg-muted/30 transition-colors duration-200"
+                              className="rounded-xl border border-border/30 bg-muted/20 p-4 hover:bg-muted/30 transition-colors duration-200 h-auto"
                             >
-                              <div className="flex justify-between items-center mb-1">
+                              <div className="flex justify-between items-center mb-1 flex-wrap">
                                 <p className="text-base font-semibold text-foreground">
                                   {section.charAt(0).toUpperCase() +
                                     section.slice(1)}
                                 </p>
                                 {details?.score !== undefined && (
-                                  <span className="text-xs font-medium text-muted-foreground">
+                                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
                                     Score: {details.score}
                                   </span>
                                 )}
                               </div>
 
-                              <div className="space-y-2 mt-2">
-                                {/* Strengths */}
+                              <div className="mt-2 space-y-3">
                                 {details?.strengths?.length ? (
-                                  <div>
+                                  <div className="break-words">
                                     <p className="text-sm font-semibold text-green-600 mb-1">
                                       Strengths
                                     </p>
@@ -324,7 +346,7 @@ export function ResumeAnalysisHistory({
                                       {details.strengths.map((s, i) => (
                                         <li
                                           key={i}
-                                          className="pl-1 text-green-700 dark:text-green-400"
+                                          className="pl-1 text-green-700 dark:text-green-400 break-normal"
                                         >
                                           {s}
                                         </li>
@@ -333,9 +355,8 @@ export function ResumeAnalysisHistory({
                                   </div>
                                 ) : null}
 
-                                {/* Gaps */}
                                 {details?.gaps?.length ? (
-                                  <div>
+                                  <div className="break-words">
                                     <p className="text-sm font-semibold text-red-600 mb-1">
                                       Gaps
                                     </p>
@@ -343,7 +364,7 @@ export function ResumeAnalysisHistory({
                                       {details.gaps.map((g, i) => (
                                         <li
                                           key={i}
-                                          className="pl-1 text-red-700 dark:text-red-400"
+                                          className="pl-1 text-red-700 dark:text-red-400 break-normal"
                                         >
                                           {g}
                                         </li>
@@ -359,7 +380,7 @@ export function ResumeAnalysisHistory({
                     </div>
                   )}
                 </CardContent>
-              </div>
+              </ExpandableContent>
             </Card>
           );
         })}
@@ -367,5 +388,6 @@ export function ResumeAnalysisHistory({
     </div>
   );
 }
+
 
 
