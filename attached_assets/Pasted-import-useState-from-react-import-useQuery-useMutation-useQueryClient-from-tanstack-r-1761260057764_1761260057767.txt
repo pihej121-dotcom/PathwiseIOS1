@@ -49,13 +49,21 @@ import {
   Users, 
   UserPlus, 
   Crown, 
+  Calendar, 
   CheckCircle, 
   Clock, 
   XCircle,
+  AlertTriangle,
+  Percent,
   Trash2,
   Ban,
+  Settings,
   Mail,
+  Shield,
+  Building,
+  Globe,
   Upload,
+  Palette,
   FileUp
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
@@ -75,6 +83,14 @@ export default function AdminDashboard() {
   const [bulkEmails, setBulkEmails] = useState("");
   const [bulkRole, setBulkRole] = useState("student");
   const [isBulkInviteDialogOpen, setIsBulkInviteDialogOpen] = useState(false);
+  
+  // Domain allowlist state
+  const [allowedDomain, setAllowedDomain] = useState("");
+  const [isAddDomainDialogOpen, setIsAddDomainDialogOpen] = useState(false);
+  
+  // License management state
+  const [seatCap, setSeatCap] = useState<number>(0);
+  const [isEditLicenseDialogOpen, setIsEditLicenseDialogOpen] = useState(false);
   
   // User management state
   const [userToTerminate, setUserToTerminate] = useState<string | null>(null);
@@ -97,6 +113,10 @@ export default function AdminDashboard() {
     enabled: !!user?.institutionId && (user?.role === "admin" || user?.role === "super_admin"),
   });
   
+  const { data: licenseData } = useQuery({
+    queryKey: [`/api/institutions/${user?.institutionId}/license`],
+    enabled: !!user?.institutionId && (user?.role === "admin" || user?.role === "super_admin"),
+  });
 
   // Single invite mutation
   const inviteUserMutation = useMutation({
@@ -144,6 +164,71 @@ export default function AdminDashboard() {
     },
   });
   
+  // Add domain allowlist mutation
+  const addDomainMutation = useMutation({
+    mutationFn: async (domain: string) => {
+      return apiRequest("POST", `/api/institutions/${user!.institutionId}/domains`, { domain });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Domain added",
+        description: "Users with this email domain can now self-register.",
+      });
+      setAllowedDomain("");
+      setIsAddDomainDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}`] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to add domain",
+        description: error.message || "There was an error adding the domain.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Remove domain mutation
+  const removeDomainMutation = useMutation({
+    mutationFn: async (domain: string) => {
+      return apiRequest("DELETE", `/api/institutions/${user!.institutionId}/domains/${encodeURIComponent(domain)}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Domain removed",
+        description: "This email domain can no longer self-register.",
+      });
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}`] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to remove domain",
+        description: error.message || "There was an error removing the domain.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Update license mutation
+  const updateLicenseMutation = useMutation({
+    mutationFn: async (licenseData: any) => {
+      return apiRequest("PUT", `/api/institutions/${user!.institutionId}/license`, licenseData);
+    },
+    onSuccess: () => {
+      toast({
+        title: "License updated",
+        description: "License settings have been successfully updated.",
+      });
+      setIsEditLicenseDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}/license`] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to update license",
+        description: error.message || "There was an error updating the license.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Terminate user mutation
   const terminateUserMutation = useMutation({
@@ -233,12 +318,16 @@ export default function AdminDashboard() {
 
   const users = (usersData as any)?.users || [];
   const invitations = (invitationsData as any)?.invitations || [];
+  const license = (licenseData as any)?.license;
+  const seatInfo = (licenseData as any)?.seatInfo;
   const institution = (institutionData as any)?.institution;
 
   // Determine default tab based on URL
   const getDefaultTab = () => {
     if (location.includes('/admin/invitations')) return 'invitations';
     if (location.includes('/admin/users')) return 'users';
+    if (location.includes('/admin/license')) return 'license';
+    if (location.includes('/admin/settings')) return 'access';
     return 'overview';
   };
 
@@ -263,6 +352,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAddDomain = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (allowedDomain.trim()) {
+      addDomainMutation.mutate(allowedDomain.trim());
+    }
+  };
+
+  const handleUpdateLicense = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (seatCap > 0) {
+      updateLicenseMutation.mutate({ seatCap });
+    }
+  };
 
   const handleTerminateUser = (userId: string) => {
     setUserToTerminate(userId);
@@ -303,8 +405,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* License Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Users</CardTitle>
@@ -337,15 +439,39 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Accounts</CardTitle>
+              <CardTitle className="text-sm font-medium">License Usage</CardTitle>
               <Crown className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold" data-testid="total-accounts">
-                {users.length}
+              <div className="text-2xl font-bold" data-testid="license-usage">
+                {seatInfo?.usedSeats || 0} / {seatInfo?.totalSeats || 0}
+              </div>
+              <div className="mt-2">
+                <Progress 
+                  value={seatInfo?.totalSeats ? (seatInfo.usedSeats / seatInfo.totalSeats) * 100 : 0} 
+                  className="h-2"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {seatInfo?.totalSeats ? Math.round(((seatInfo.usedSeats / seatInfo.totalSeats) * 100)) : 0}% used
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">License Status</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg font-bold" data-testid="license-status">
+                {license?.type === 'site' ? 'Site License' : 'Per-Student'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {users.filter((u: any) => !u.isVerified).length} pending verification
+                {license?.expiresAt 
+                  ? `Expires ${new Date(license.expiresAt).toLocaleDateString()}`
+                  : "No expiration"
+                }
               </p>
             </CardContent>
           </Card>
@@ -353,10 +479,12 @@ export default function AdminDashboard() {
 
         {/* Main Tabs */}
         <Tabs defaultValue={getDefaultTab()} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
             <TabsTrigger value="invitations" data-testid="tab-invitations">Invitations</TabsTrigger>
             <TabsTrigger value="users" data-testid="tab-users">Users</TabsTrigger>
+            <TabsTrigger value="license" data-testid="tab-license">License</TabsTrigger>
+            <TabsTrigger value="access" data-testid="tab-access">Access Control</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -422,6 +550,10 @@ export default function AdminDashboard() {
                     </DialogContent>
                   </Dialog>
                   
+                  <Button variant="outline" className="w-full" data-testid="manage-license-overview-button">
+                    <Crown className="h-4 w-4 mr-2" />
+                    Manage License
+                  </Button>
                 </CardContent>
               </Card>
 
@@ -449,6 +581,25 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
+            {/* Alerts */}
+            {seatInfo?.totalSeats && (seatInfo.usedSeats / seatInfo.totalSeats) > 0.8 && (
+              <Card className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center space-x-3">
+                    <AlertTriangle className="w-6 h-6 text-amber-600" />
+                    <div>
+                      <h3 className="font-semibold text-amber-800 dark:text-amber-200">
+                        High License Usage
+                      </h3>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        You're using {Math.round((seatInfo.usedSeats / seatInfo.totalSeats) * 100)}% of your licensed seats. 
+                        Consider upgrading your license if you need additional capacity.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Invitations Tab */}
@@ -752,6 +903,222 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* License Tab */}
+          <TabsContent value="license" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Crown className="h-5 w-5" />
+                    <span>Current License</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>License Type:</span>
+                      <span className="font-medium capitalize">{license?.type || "Unknown"}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Total Seats:</span>
+                      <span className="font-medium">{seatInfo?.totalSeats || 0}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Used Seats:</span>
+                      <span className="font-medium">{seatInfo?.usedSeats || 0}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Available Seats:</span>
+                      <span className="font-medium">{(seatInfo?.totalSeats || 0) - (seatInfo?.usedSeats || 0)}</span>
+                    </div>
+                    {license?.expiresAt && (
+                      <div className="flex justify-between text-sm">
+                        <span>Expires:</span>
+                        <span className="font-medium">{new Date(license.expiresAt).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {seatInfo?.totalSeats && (seatInfo.usedSeats / seatInfo.totalSeats) > 0.8 && (
+                    <div className="flex items-center space-x-2 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      <span className="text-sm text-amber-800 dark:text-amber-200">
+                        Seat usage is above 80%. Consider upgrading your license.
+                      </span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5" />
+                    <span>License Settings</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Dialog open={isEditLicenseDialogOpen} onOpenChange={setIsEditLicenseDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full" data-testid="edit-license-button">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Modify License Settings
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit License Settings</DialogTitle>
+                        <DialogDescription>
+                          Modify seat capacity and license configuration
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleUpdateLicense} className="space-y-4">
+                        <div>
+                          <Label htmlFor="seatCap">Seat Capacity</Label>
+                          <Input
+                            id="seatCap"
+                            type="number"
+                            value={seatCap || seatInfo?.totalSeats || 0}
+                            onChange={(e) => setSeatCap(Number(e.target.value))}
+                            min="1"
+                            required
+                            data-testid="seat-cap-input"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Current: {seatInfo?.totalSeats || 0} seats
+                          </p>
+                        </div>
+                        <Button 
+                          type="submit" 
+                          className="w-full"
+                          disabled={updateLicenseMutation.isPending}
+                          data-testid="update-license-button"
+                        >
+                          {updateLicenseMutation.isPending ? "Updating..." : "Update License"}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Access Control Tab */}
+          <TabsContent value="access" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Globe className="h-5 w-5" />
+                    <span>Domain Allowlist</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Allow users with specific email domains to self-register
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Dialog open={isAddDomainDialogOpen} onOpenChange={setIsAddDomainDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full" data-testid="add-domain-button">
+                        <Globe className="h-4 w-4 mr-2" />
+                        Add Allowed Domain
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add Allowed Domain</DialogTitle>
+                        <DialogDescription>
+                          Users with this email domain can self-register
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleAddDomain} className="space-y-4">
+                        <div>
+                          <Label htmlFor="allowedDomain">Email Domain</Label>
+                          <Input
+                            id="allowedDomain"
+                            type="text"
+                            value={allowedDomain}
+                            onChange={(e) => setAllowedDomain(e.target.value)}
+                            placeholder="university.edu"
+                            required
+                            data-testid="domain-input"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Don't include the @ symbol
+                          </p>
+                        </div>
+                        <Button 
+                          type="submit" 
+                          className="w-full"
+                          disabled={addDomainMutation.isPending}
+                          data-testid="add-domain-submit"
+                        >
+                          {addDomainMutation.isPending ? "Adding..." : "Add Domain"}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">Allowed Domains:</h4>
+                    {institution?.allowedDomains?.length ? (
+                      <div className="space-y-2">
+                        {institution.allowedDomains.map((domain: string) => (
+                          <div key={domain} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                            <span className="text-sm font-mono" data-testid={`domain-${domain}`}>
+                              @{domain}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeDomainMutation.mutate(domain)}
+                              disabled={removeDomainMutation.isPending}
+                              data-testid={`remove-domain-${domain}`}
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No allowed domains configured</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5" />
+                    <span>SSO Configuration</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Configure single sign-on authentication options
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">OIDC/SAML SSO</span>
+                      <Badge variant="secondary">Coming Soon</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">SSO-Only Mode</span>
+                      <Badge variant="secondary">Coming Soon</Badge>
+                    </div>
+                  </div>
+                  
+                  <Button variant="outline" className="w-full" disabled data-testid="configure-sso-button">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Configure SSO
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
 
