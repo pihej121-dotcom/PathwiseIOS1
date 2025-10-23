@@ -1011,7 +1011,28 @@ if (existingUser && !existingUser.isActive) {
       if (endDate) filters.endDate = new Date(endDate as string);
 
       const history = await storage.getUserResumeAnalysisHistory(req.user!.id, filters);
-      res.json(history);
+            res.json(
+        history.map((h: any) => ({
+          id: h.id,
+          resumeId: h.resume_id, // ✅ critical for linking chart ↔ history
+          fileName: h.file_name,
+          rmsScore: h.rms_score,
+          skillsScore: h.skills_score,
+          experienceScore: h.experience_score,
+          keywordsScore: h.keywords_score,
+          educationScore: h.education_score,
+          certificationsScore: h.certifications_score,
+          gaps: h.gaps,
+          overallInsights: h.overall_insights,
+          sectionAnalysis: h.section_analysis,
+          targetRole: h.target_role,
+          targetIndustry: h.target_industry,
+          targetCompanies: h.target_companies,
+          analysisHash: h.analysis_hash,
+          createdAt: h.created_at,
+        }))
+      );
+
     } catch (error) {
       console.error("Get resume analysis history error:", error);
       res.status(500).json({ error: "Failed to get resume analysis history" });
