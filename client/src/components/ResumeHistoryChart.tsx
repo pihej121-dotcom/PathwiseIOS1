@@ -1,30 +1,37 @@
 import { useState } from "react";
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Area,
   AreaChart,
-  ReferenceLine,
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, TrendingUp, TrendingDown, Minus, BarChart3, Sparkles } from "lucide-react";
+import {
+  FileText,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  BarChart3,
+  Sparkles,
+} from "lucide-react";
 import { format } from "date-fns";
 import type { Resume } from "@shared/schema";
 
 interface ResumeHistoryChartProps {
   resumes: Resume[];
   activeResumeId?: string;
+  onSelectResume?: (resumeId: string) => void; // 👈 added
 }
 
 interface ChartDataPoint {
+  id: string;
   date: string;
   displayDate: string;
   fileName: string;
@@ -37,13 +44,18 @@ interface ChartDataPoint {
   isActive: boolean;
 }
 
-export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryChartProps) {
+export function ResumeHistoryChart({
+  resumes,
+  activeResumeId,
+  onSelectResume,
+}: ResumeHistoryChartProps) {
   const [showSectionScores, setShowSectionScores] = useState(false);
 
   // Transform resume data for the chart
   const chartData: ChartDataPoint[] = resumes
-    .filter(resume => resume.rmsScore !== null)
-    .map(resume => ({
+    .filter((resume) => resume.rmsScore !== null)
+    .map((resume) => ({
+      id: resume.id, // 👈 needed for click detection
       date: new Date(resume.createdAt).toISOString(),
       displayDate: format(new Date(resume.createdAt), "MMM d, h:mm a"),
       fileName: resume.fileName,
@@ -57,6 +69,7 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
     }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  // --- Empty State ---
   if (chartData.length === 0) {
     return (
       <Card className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-0 shadow-lg">
@@ -74,19 +87,28 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
               <FileText className="h-10 w-10 text-blue-500" />
             </div>
             <h3 className="text-lg font-semibold mb-2">No Data Yet</h3>
-            <p className="text-base mb-1">Upload and analyze a resume to see your progress over time</p>
-            <p className="text-sm">Track improvements across different resume versions</p>
+            <p className="text-base mb-1">
+              Upload and analyze a resume to see your progress over time
+            </p>
+            <p className="text-sm">
+              Track improvements across different resume versions
+            </p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
+  // --- Derived Stats ---
   const latestScore = chartData[chartData.length - 1]?.rmsScore || 0;
-  const previousScore = chartData.length > 1 ? chartData[chartData.length - 2]?.rmsScore || 0 : latestScore;
+  const previousScore =
+    chartData.length > 1
+      ? chartData[chartData.length - 2]?.rmsScore || 0
+      : latestScore;
   const scoreChange = latestScore - previousScore;
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  // --- Tooltip ---
+  const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -96,8 +118,12 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
               <FileText className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-gray-900 dark:text-gray-100 text-base">{data.fileName}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{data.displayDate}</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-100 text-base">
+                {data.fileName}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {data.displayDate}
+              </p>
             </div>
             {data.isActive && (
               <Badge className="bg-gradient-to-r from-green-400 to-blue-500 text-white text-xs px-3 py-1 animate-pulse">
@@ -105,7 +131,7 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
               </Badge>
             )}
           </div>
-          
+
           <div className="space-y-4">
             <div className="bg-gradient-to-r from-blue-500/10 to-purple-600/10 backdrop-blur-sm rounded-xl p-4 border border-blue-200/20">
               <div className="flex items-center justify-between">
@@ -118,39 +144,36 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
                 </span>
               </div>
             </div>
-            
+
             {showSectionScores && (
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/40 rounded-xl p-3 border border-purple-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Skills</span>
-                    <span className="text-lg font-bold text-purple-600 dark:text-purple-400">{data.skillsScore}</span>
+                {[
+                  ["Skills", data.skillsScore, "#8B5CF6"],
+                  ["Experience", data.experienceScore, "#10B981"],
+                  ["Keywords", data.keywordsScore, "#F59E0B"],
+                  ["Education", data.educationScore, "#EF4444"],
+                  ["Certifications", data.certificationsScore, "#06B6D4"],
+                ].map(([label, score, color], i) => (
+                  <div
+                    key={i}
+                    className="bg-gradient-to-br from-white/70 to-gray-50 dark:from-gray-800/20 dark:to-gray-900/40 rounded-xl p-3 border border-border/20"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span
+                        className="text-xs font-semibold"
+                        style={{ color: color as string }}
+                      >
+                        {label}
+                      </span>
+                      <span
+                        className="text-lg font-bold"
+                        style={{ color: color as string }}
+                      >
+                        {score}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/40 rounded-xl p-3 border border-green-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-green-700 dark:text-green-300">Experience</span>
-                    <span className="text-lg font-bold text-green-600 dark:text-green-400">{data.experienceScore}</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-900/40 rounded-xl p-3 border border-yellow-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-yellow-700 dark:text-yellow-300">Keywords</span>
-                    <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{data.keywordsScore}</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-red-50 to-pink-100 dark:from-red-900/20 dark:to-pink-900/40 rounded-xl p-3 border border-red-200/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-red-700 dark:text-red-300">Education</span>
-                    <span className="text-lg font-bold text-red-600 dark:text-red-400">{data.educationScore}</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/20 dark:to-blue-900/40 rounded-xl p-3 border border-cyan-200/30 col-span-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-cyan-700 dark:text-cyan-300">Certifications</span>
-                    <span className="text-lg font-bold text-cyan-600 dark:text-cyan-400">{data.certificationsScore}</span>
-                  </div>
-                </div>
+                ))}
               </div>
             )}
           </div>
@@ -160,50 +183,23 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
     return null;
   };
 
-  // Custom Dot Component with enhanced styling and larger size for mobile
+  // --- Custom Dots ---
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     return (
       <g>
-        {/* Outer glow */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={18}
-          fill="url(#dotGlow)"
-          opacity={0.3}
-          className="animate-pulse"
-        />
-        {/* Main dot */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={10}
-          fill="url(#dotGradient)"
-          stroke="#ffffff"
-          strokeWidth={3}
-          className="drop-shadow-lg"
-        />
-        {/* Center highlight */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={4}
-          fill="#ffffff"
-          opacity={0.9}
-        />
-        {/* Active indicator */}
+        <circle cx={cx} cy={cy} r={10} fill="url(#dotGradient)" stroke="#fff" strokeWidth={3} />
         {payload.isActive && (
           <circle
             cx={cx}
             cy={cy}
-            r={15}
+            r={16}
             fill="none"
             stroke="url(#activeGradient)"
-            strokeWidth={2.5}
+            strokeWidth={3}
             strokeDasharray="4 4"
             className="animate-spin"
-            style={{ animationDuration: '3s' }}
+            style={{ animationDuration: "4s" }}
           />
         )}
       </g>
@@ -227,165 +223,104 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
               </p>
             </div>
           </CardTitle>
-          
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-            {/* Enhanced Latest Score Display */}
-            <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl px-6 sm:px-8 py-4 sm:py-6 text-white shadow-2xl relative overflow-hidden">
-              {/* Animated background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent animate-pulse"></div>
-              <div className="relative text-center">
-                <div className="text-xs font-medium opacity-90 mb-2 flex items-center justify-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  Latest Score
-                </div>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-3xl sm:text-4xl font-bold">{latestScore}</span>
-                  <span className="text-base sm:text-lg opacity-75">/100</span>
-                </div>
-                {scoreChange !== 0 && (
-                  <div className={`flex items-center justify-center gap-1 mt-3 px-3 py-2 rounded-full text-sm font-semibold backdrop-blur-sm ${
-                    scoreChange > 0 
-                      ? 'bg-green-400/20 text-green-100 border border-green-400/30' 
-                      : scoreChange < 0 
-                      ? 'bg-red-400/20 text-red-100 border border-red-400/30' 
-                      : 'bg-gray-400/20 text-gray-100 border border-gray-400/30'
-                  }`}>
-                    {scoreChange > 0 ? (
-                      <TrendingUp className="h-4 w-4" />
-                    ) : scoreChange < 0 ? (
-                      <TrendingDown className="h-4 w-4" />
-                    ) : (
-                      <Minus className="h-4 w-4" />
-                    )}
-                    <span>{scoreChange > 0 ? '+' : ''}{scoreChange}</span>
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* Enhanced Toggle Button */}
-            <Button
-              variant={showSectionScores ? "default" : "outline"}
-              size="lg"
-              onClick={() => setShowSectionScores(!showSectionScores)}
-              data-testid="toggle-section-scores"
-              className={`w-full sm:w-auto ${showSectionScores 
-                ? "bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white shadow-xl border-0 px-6 py-3" 
-                : "border-2 border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-950 px-6 py-3 shadow-lg backdrop-blur-sm"
-              }`}
-            >
-              {showSectionScores ? (
-                <>
-                  <TrendingDown className="h-5 w-5 mr-2" />
-                  Hide Details
-                </>
-              ) : (
-                <>
-                  <BarChart3 className="h-5 w-5 mr-2" />
-                  Show Details
-                </>
-              )}
-            </Button>
-          </div>
+          {/* Toggle Button */}
+          <Button
+            variant={showSectionScores ? "default" : "outline"}
+            size="lg"
+            onClick={() => setShowSectionScores(!showSectionScores)}
+            className={`w-full sm:w-auto ${
+              showSectionScores
+                ? "bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-xl border-0"
+                : "border-2 border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-950"
+            }`}
+          >
+            {showSectionScores ? (
+              <>
+                <TrendingDown className="h-5 w-5 mr-2" />
+                Hide Details
+              </>
+            ) : (
+              <>
+                <BarChart3 className="h-5 w-5 mr-2" />
+                Show Details
+              </>
+            )}
+          </Button>
         </div>
       </CardHeader>
-      
+
       <CardContent>
         <div className="bg-gradient-to-br from-white/80 to-blue-50/50 dark:from-gray-900/80 dark:to-gray-800/50 rounded-2xl p-8 shadow-inner border border-white/20 dark:border-gray-700/20 backdrop-blur-sm">
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart 
-                data={chartData} 
+              <AreaChart
+                data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                onClick={(state) => {
+                  // 👇 New: Click → send resumeId
+                  if (!state?.activeLabel || !state?.activePayload?.length) return;
+                  const clickedPoint = state.activePayload[0]?.payload;
+                  if (clickedPoint && onSelectResume) onSelectResume(clickedPoint.id);
+                }}
               >
                 <defs>
-                  {/* Enhanced gradients */}
                   <linearGradient id="mainGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.4}/>
-                    <stop offset="30%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                    <stop offset="70%" stopColor="#6366F1" stopOpacity={0.2}/>
-                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.05}/>
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.4} />
+                    <stop offset="30%" stopColor="#8B5CF6" stopOpacity={0.3} />
+                    <stop offset="70%" stopColor="#6366F1" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.05} />
                   </linearGradient>
-                  
-                  <linearGradient id="strokeGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#3B82F6"/>
-                    <stop offset="50%" stopColor="#8B5CF6"/>
-                    <stop offset="100%" stopColor="#6366F1"/>
-                  </linearGradient>
-                  
                   <linearGradient id="dotGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#60A5FA"/>
-                    <stop offset="50%" stopColor="#3B82F6"/>
-                    <stop offset="100%" stopColor="#1D4ED8"/>
+                    <stop offset="0%" stopColor="#60A5FA" />
+                    <stop offset="100%" stopColor="#1D4ED8" />
                   </linearGradient>
-                  
-                  <radialGradient id="dotGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.6}/>
-                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0}/>
-                  </radialGradient>
-                  
                   <linearGradient id="activeGradient" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#10B981"/>
-                    <stop offset="100%" stopColor="#059669"/>
+                    <stop offset="0%" stopColor="#10B981" />
+                    <stop offset="100%" stopColor="#059669" />
                   </linearGradient>
                 </defs>
-                
-                <CartesianGrid 
-                  strokeDasharray="2 4" 
-                  stroke="#E5E7EB" 
-                  className="opacity-20" 
-                />
-                
-                <XAxis 
+
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.2} />
+                <XAxis
                   dataKey="displayDate"
-                  tick={{ fontSize: 14, fill: '#6B7280', fontWeight: 500 }}
+                  tick={{ fontSize: 13, fill: "#6B7280" }}
                   angle={-35}
                   textAnchor="end"
                   height={70}
-                  stroke="#9CA3AF"
-                  strokeWidth={1.5}
                 />
-                
-                <YAxis 
+                <YAxis
                   domain={[0, 100]}
-                  tick={{ fontSize: 14, fill: '#6B7280', fontWeight: 500 }}
-                  label={{ 
-                    value: 'Score', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { textAnchor: 'middle', fill: '#6B7280', fontSize: '15px', fontWeight: '500' }
+                  tick={{ fontSize: 13, fill: "#6B7280" }}
+                  label={{
+                    value: "Score",
+                    angle: -90,
+                    position: "insideLeft",
+                    style: { fill: "#6B7280" },
                   }}
-                  stroke="#9CA3AF"
-                  strokeWidth={1.5}
                 />
-                
                 <Tooltip content={<CustomTooltip />} />
-                
-                {/* Reference line for target score */}
-                <ReferenceLine 
-                  y={80} 
-                  stroke="#10B981" 
-                  strokeDasharray="5 5" 
+                <ReferenceLine
+                  y={80}
+                  stroke="#10B981"
+                  strokeDasharray="5 5"
                   strokeOpacity={0.6}
-                  label={{ value: "Target: 80", position: "topRight", fill: "#10B981", fontSize: 12 }}
+                  label={{
+                    value: "Target: 80",
+                    position: "topRight",
+                    fill: "#10B981",
+                    fontSize: 12,
+                  }}
                 />
-                
-                {/* Main area with gradient fill */}
                 <Area
                   type="monotone"
                   dataKey="rmsScore"
-                  stroke="url(#strokeGradient)"
+                  stroke="url(#dotGradient)"
                   strokeWidth={4}
                   fill="url(#mainGradient)"
                   dot={<CustomDot />}
-                  activeDot={{ 
-                    r: 0 // Hide default active dot since we use custom
-                  }}
-                  name="Overall Score"
-                  className="drop-shadow-lg"
+                  activeDot={{ r: 0 }}
                 />
-                
-                {/* Section scores with enhanced styling */}
                 {showSectionScores && (
                   <>
                     <Line
@@ -393,79 +328,56 @@ export function ResumeHistoryChart({ resumes, activeResumeId }: ResumeHistoryCha
                       dataKey="skillsScore"
                       stroke="#8B5CF6"
                       strokeWidth={3}
-                      dot={{ fill: "#8B5CF6", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#8B5CF6", strokeWidth: 3, fill: "#FFFFFF" }}
+                      dot={{ fill: "#8B5CF6", r: 6 }}
                       name="Skills"
                       strokeDasharray="6 3"
-                      opacity={0.8}
                     />
                     <Line
                       type="monotone"
                       dataKey="experienceScore"
                       stroke="#10B981"
                       strokeWidth={3}
-                      dot={{ fill: "#10B981", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#10B981", strokeWidth: 3, fill: "#FFFFFF" }}
+                      dot={{ fill: "#10B981", r: 6 }}
                       name="Experience"
                       strokeDasharray="6 3"
-                      opacity={0.8}
                     />
                     <Line
                       type="monotone"
                       dataKey="keywordsScore"
                       stroke="#F59E0B"
                       strokeWidth={3}
-                      dot={{ fill: "#F59E0B", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#F59E0B", strokeWidth: 3, fill: "#FFFFFF" }}
+                      dot={{ fill: "#F59E0B", r: 6 }}
                       name="Keywords"
                       strokeDasharray="6 3"
-                      opacity={0.8}
                     />
                     <Line
                       type="monotone"
                       dataKey="educationScore"
                       stroke="#EF4444"
                       strokeWidth={3}
-                      dot={{ fill: "#EF4444", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#EF4444", strokeWidth: 3, fill: "#FFFFFF" }}
+                      dot={{ fill: "#EF4444", r: 6 }}
                       name="Education"
                       strokeDasharray="6 3"
-                      opacity={0.8}
                     />
                     <Line
                       type="monotone"
                       dataKey="certificationsScore"
                       stroke="#06B6D4"
                       strokeWidth={3}
-                      dot={{ fill: "#06B6D4", strokeWidth: 2, r: 6, stroke: "#FFFFFF", className: "drop-shadow-md" }}
-                      activeDot={{ r: 9, stroke: "#06B6D4", strokeWidth: 3, fill: "#FFFFFF" }}
+                      dot={{ fill: "#06B6D4", r: 6 }}
                       name="Certifications"
                       strokeDasharray="6 3"
-                      opacity={0.8}
                     />
                   </>
                 )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          
-          {chartData.length > 1 && (
-            <div className="mt-8 text-center">
-              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-50/80 to-indigo-100/80 dark:from-blue-950/30 dark:to-indigo-950/50 rounded-full px-6 py-3 border border-blue-200/30 dark:border-blue-700/30 backdrop-blur-sm shadow-lg">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full">
-                  <FileText className="h-4 w-4 text-white" />
-                </div>
-                <span className="text-sm bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent font-semibold">
-                  Tracking progress across {chartData.length} resume versions
-                </span>
-                <Sparkles className="h-4 w-4 text-blue-500 animate-pulse" />
-              </div>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
   );
 }
+
 
 
