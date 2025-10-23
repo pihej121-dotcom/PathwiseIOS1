@@ -48,6 +48,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [selectedResumeId, setSelectedResumeId] = useState<string | undefined>();
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
@@ -616,12 +617,16 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
           <ResumeHistoryChart 
             resumes={resumes as any[]}
             activeResumeId={(activeResume as any)?.id}
+            onSelectResume={(id) => setSelectedResumeId(id)} // 👈 Add this line
           />
         )}
 
         {/* Resume Analysis History */}
         <div className="mt-8">
-          <ResumeAnalysisHistory embedded={true} />
+          <ResumeAnalysisHistory 
+            embedded={true}
+            selectedResumeId={selectedResumeId} // 👈 Add this line
+          />
         </div>
       </div>
     </>
