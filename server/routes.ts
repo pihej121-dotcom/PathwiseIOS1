@@ -865,6 +865,70 @@ if (existingUser && !existingUser.isActive) {
     }
   });
   
+  // Get detailed student information (admin only)
+  app.get("/api/institutions/:institutionId/users/:userId/details", authenticate, async (req: AuthRequest, res) => {
+    try {
+      if (req.user!.role !== "admin" && req.user!.role !== "super_admin") {
+        return res.status(403).json({ error: "Only admins can view student details" });
+      }
+      
+      if (req.user!.role === "admin" && req.user!.institutionId !== req.params.institutionId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const user = await storage.getUser(req.params.userId);
+      if (!user || user.institutionId !== req.params.institutionId) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Get user's latest active resume
+      const resumes = await storage.getUserResumes(req.params.userId);
+      const activeResume = resumes.find(r => r.isActive);
+      
+      res.json({
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          school: user.school,
+          major: user.major,
+          gradYear: user.gradYear,
+          targetRole: user.targetRole,
+          industries: user.industries,
+          targetCompanies: user.targetCompanies,
+          location: user.location,
+          remoteOk: user.remoteOk,
+          isVerified: user.isVerified,
+          isActive: user.isActive,
+          lastActiveAt: user.lastActiveAt,
+          createdAt: user.createdAt
+        },
+        resume: activeResume ? {
+          id: activeResume.id,
+          fileName: activeResume.fileName,
+          rmsScore: activeResume.rmsScore,
+          skillsScore: activeResume.skillsScore,
+          experienceScore: activeResume.experienceScore,
+          keywordsScore: activeResume.keywordsScore,
+          educationScore: activeResume.educationScore,
+          certificationsScore: activeResume.certificationsScore,
+          overallInsights: activeResume.overallInsights,
+          sectionAnalysis: activeResume.sectionAnalysis,
+          gaps: activeResume.gaps,
+          targetRole: activeResume.targetRole,
+          targetIndustry: activeResume.targetIndustry,
+          targetCompanies: activeResume.targetCompanies,
+          createdAt: activeResume.createdAt
+        } : null
+      });
+    } catch (error: any) {
+      console.error("Error fetching student details:", error);
+      res.status(500).json({ error: "Failed to fetch student details" });
+    }
+  });
+  
   // Terminate user (admin only)
   app.delete("/api/institutions/:id/users/:userId", authenticate, async (req: AuthRequest, res) => {
     try {
