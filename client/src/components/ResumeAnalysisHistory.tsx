@@ -3,10 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { FileText, History, ChevronDown, ChevronUp, Filter } from "lucide-react";
+import {
+  FileText,
+  History,
+  ChevronDown,
+  ChevronUp,
+  Filter,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 interface ResumeAnalysisHistoryItem {
   id: string;
@@ -53,7 +65,9 @@ export function ResumeAnalysisHistory({
     }
   }, [selectedResumeId]);
 
-  const { data: historyData = [], isLoading } = useQuery<ResumeAnalysisHistoryItem[]>({
+  const { data: historyData = [], isLoading } = useQuery<
+    ResumeAnalysisHistoryItem[]
+  >({
     queryKey: ["/api/resume-analysis-history"],
     queryFn: async () => {
       const response = await apiRequest("GET", `/api/resume-analysis-history`);
@@ -63,12 +77,16 @@ export function ResumeAnalysisHistory({
 
   // --- Extract unique filters from data ---
   const availableRoles = useMemo(() => {
-    const roles = historyData.map((h) => h.targetRole).filter(Boolean) as string[];
+    const roles = historyData
+      .map((h) => h.targetRole)
+      .filter(Boolean) as string[];
     return Array.from(new Set(roles));
   }, [historyData]);
 
   const availableIndustries = useMemo(() => {
-    const industries = historyData.map((h) => h.targetIndustry).filter(Boolean) as string[];
+    const industries = historyData
+      .map((h) => h.targetIndustry)
+      .filter(Boolean) as string[];
     return Array.from(new Set(industries));
   }, [historyData]);
 
@@ -76,8 +94,10 @@ export function ResumeAnalysisHistory({
   const filteredData = useMemo(() => {
     let data = historyData;
     if (filteredId) data = data.filter((item) => item.resume_id === filteredId);
-    if (selectedRole !== "all") data = data.filter((item) => item.targetRole === selectedRole);
-    if (selectedIndustry !== "all") data = data.filter((item) => item.targetIndustry === selectedIndustry);
+    if (selectedRole !== "all")
+      data = data.filter((item) => item.targetRole === selectedRole);
+    if (selectedIndustry !== "all")
+      data = data.filter((item) => item.targetIndustry === selectedIndustry);
     return data;
   }, [historyData, filteredId, selectedRole, selectedIndustry]);
 
@@ -118,14 +138,18 @@ export function ResumeAnalysisHistory({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
           <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <h2 className="text-lg font-semibold text-foreground">Past Resume Analyses</h2>
+          <h2 className="text-lg font-semibold text-foreground">
+            Past Resume Analyses
+          </h2>
         </div>
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3 items-center">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground font-medium">Filter by:</span>
+            <span className="text-sm text-muted-foreground font-medium">
+              Filter by:
+            </span>
           </div>
 
           {/* Role Filter */}
@@ -163,7 +187,9 @@ export function ResumeAnalysisHistory({
       {/* Cards */}
       <div
         className={cn(
-          embedded ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 md:grid-cols-2 gap-8"
+          embedded
+            ? "grid grid-cols-1 gap-6"
+            : "grid grid-cols-1 md:grid-cols-2 gap-8"
         )}
       >
         {filteredData.map((analysis) => {
@@ -210,38 +236,51 @@ export function ResumeAnalysisHistory({
                   isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
                 )}
               >
-                <CardContent className="p-5 space-y-5">
+                <CardContent className="p-5 space-y-6">
                   {/* Overall Insights */}
                   {analysis.overallInsights && (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
+                      {/* Strengths */}
                       {analysis.overallInsights.strengths?.length ? (
                         <div>
-                          <p className="text-sm font-medium text-green-600 mb-1">
+                          <p className="text-sm font-semibold text-green-600 mb-1">
                             Strengths
                           </p>
-                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                          <ul className="list-disc list-inside text-sm leading-relaxed text-muted-foreground space-y-1 ml-1">
                             {analysis.overallInsights.strengths.map((s, i) => (
-                              <li key={i}>{s}</li>
+                              <li
+                                key={i}
+                                className="pl-1 text-green-700 dark:text-green-400"
+                              >
+                                {s}
+                              </li>
                             ))}
                           </ul>
                         </div>
                       ) : null}
 
+                      {/* Improvements */}
                       {analysis.overallInsights.improvements?.length ? (
                         <div>
-                          <p className="text-sm font-medium text-yellow-600 mb-1">
-                            Improvements
+                          <p className="text-sm font-semibold text-yellow-600 mb-1">
+                            Gaps
                           </p>
-                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                          <ul className="list-disc list-inside text-sm leading-relaxed text-muted-foreground space-y-1 ml-1">
                             {analysis.overallInsights.improvements.map((i, j) => (
-                              <li key={j}>{i}</li>
+                              <li
+                                key={j}
+                                className="pl-1 text-yellow-700 dark:text-yellow-400"
+                              >
+                                {i}
+                              </li>
                             ))}
                           </ul>
                         </div>
                       ) : null}
 
+                      {/* Summary */}
                       {analysis.overallInsights.summary && (
-                        <p className="italic text-sm text-muted-foreground border-t border-border/20 pt-2">
+                        <p className="italic text-sm text-muted-foreground border-t border-border/20 pt-2 leading-relaxed">
                           “{analysis.overallInsights.summary}”
                         </p>
                       )}
@@ -250,39 +289,69 @@ export function ResumeAnalysisHistory({
 
                   {/* Section Analysis */}
                   {analysis.sectionAnalysis && (
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-blue-600">
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-blue-600 mb-1">
                         Section Insights
                       </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {Object.entries(analysis.sectionAnalysis).map(
                           ([section, details], idx) => (
                             <div
                               key={idx}
-                              className="rounded-lg border border-border/30 bg-muted/30 p-3"
+                              className="rounded-xl border border-border/30 bg-muted/20 p-4 hover:bg-muted/30 transition-colors duration-200"
                             >
-                              <p className="text-sm font-semibold text-foreground">
-                                {section.charAt(0).toUpperCase() + section.slice(1)}
-                              </p>
-                              {details?.score && (
-                                <p className="text-xs text-muted-foreground mb-1">
-                                  Score: {details.score}
+                              <div className="flex justify-between items-center mb-1">
+                                <p className="text-base font-semibold text-foreground">
+                                  {section.charAt(0).toUpperCase() +
+                                    section.slice(1)}
                                 </p>
-                              )}
-                              {details?.strengths?.length ? (
-                                <ul className="text-xs text-green-600 list-disc list-inside">
-                                  {details.strengths.slice(0, 2).map((s, i) => (
-                                    <li key={i}>{s}</li>
-                                  ))}
-                                </ul>
-                              ) : null}
-                              {details?.gaps?.length ? (
-                                <ul className="text-xs text-red-600 list-disc list-inside mt-1">
-                                  {details.gaps.slice(0, 2).map((g, i) => (
-                                    <li key={i}>{g}</li>
-                                  ))}
-                                </ul>
-                              ) : null}
+                                {details?.score !== undefined && (
+                                  <span className="text-xs font-medium text-muted-foreground">
+                                    Score: {details.score}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="space-y-2 mt-2">
+                                {/* Strengths */}
+                                {details?.strengths?.length ? (
+                                  <div>
+                                    <p className="text-sm font-semibold text-green-600 mb-1">
+                                      Strengths
+                                    </p>
+                                    <ul className="list-disc list-inside text-sm leading-relaxed text-muted-foreground space-y-1 ml-1">
+                                      {details.strengths.map((s, i) => (
+                                        <li
+                                          key={i}
+                                          className="pl-1 text-green-700 dark:text-green-400"
+                                        >
+                                          {s}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                ) : null}
+
+                                {/* Gaps */}
+                                {details?.gaps?.length ? (
+                                  <div>
+                                    <p className="text-sm font-semibold text-red-600 mb-1">
+                                      Gaps
+                                    </p>
+                                    <ul className="list-disc list-inside text-sm leading-relaxed text-muted-foreground space-y-1 ml-1">
+                                      {details.gaps.map((g, i) => (
+                                        <li
+                                          key={i}
+                                          className="pl-1 text-red-700 dark:text-red-400"
+                                        >
+                                          {g}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                ) : null}
+                              </div>
                             </div>
                           )
                         )}
