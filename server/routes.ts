@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { authenticate, requireAdmin, requirePaidFeatures, hashPassword, verifyPassword, createSession, logout, generateToken, type AuthRequest } from "./auth";
+import { authenticate, requireAdmin, requireSuperAdmin, requirePaidFeatures, hashPassword, verifyPassword, createSession, logout, generateToken, type AuthRequest } from "./auth";
 import { aiService } from "./ai";
 import { jobsService } from "./jobs";
 import { beyondJobsService } from "./beyond-jobs";
@@ -522,6 +522,120 @@ if (existingUser && !existingUser.isActive) {
     } catch (error) {
       console.error("Error checking environment variables:", error);
       res.status(500).json({ error: "Failed to check environment variables" });
+    }
+  });
+
+  // SUPER ADMIN ROUTES
+  
+  // List all institutions (super admin only)
+  app.get("/api/admin/institutions", authenticate, requireSuperAdmin, async (req: AuthRequest, res) => {
+    try {
+      const institutions = await storage.listInstitutions();
+      
+      const institutionsWithDetails = await Promise.all(
+        institutions.map(async (inst) => {
+          const license = await storage.getInstitutionLicense(inst.id);
+          const users = await storage.getInstitutionUsers(inst.id, true);
+          const seatInfo = license ? await storage.checkSeatAvailability(inst.id) : null;
+          
+          return {
+            ...inst,
+            license: license ? {
+              ...license,
+              seatInfo
+            } : null,
+            activeUsers: users.length
+          };
+        })
+      );
+      
+      res.json(institutionsWithDetails);
+    } catch (error: any) {
+      console.error("Error listing institutions:", error);
+      res.status(500).json({ error: "Failed to list institutions" });
+    }
+  });
+  
+  // Onboard new institution with admin invitation (super admin only)
+  app.post("/api/admin/onboard-institution", authenticate, requireSuperAdmin, async (req: AuthRequest, res) => {
+    try {
+      const onboardSchema = z.object({
+        name: z.string().min(1),
+        adminEmail: z.string().email(),
+        studentLimit: z.number().int().positive(),
+        licenseStart: z.string(),
+        licenseEnd: z.string(),
+      });
+      
+      const { name, adminEmail, studentLimit, licenseStart, licenseEnd } = onboardSchema.parse(req.body);
+      
+      const existingUser = await storage.getUserByEmail(adminEmail);
+      if (existingUser) {
+        return res.status(400).json({ error: "A user with this email already exists" });
+      }
+      
+      const institution = await storage.createInstitution({
+        name,
+        contactEmail: adminEmail,
+        contactName: "Admin",
+        isActive: true,
+      });
+      
+      const license = await storage.createLicense({
+        institutionId: institution.id,
+        licenseType: "per_student",
+        licensedSeats: studentLimit,
+        usedSeats: 0,
+        startDate: new Date(licenseStart),
+        endDate: new Date(licenseEnd),
+        brandingEnabled: false,
+        supportLevel: "standard",
+        isActive: true,
+      });
+      
+      const invitationToken = generateToken();
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      
+      const invitation = await storage.createInvitation({
+        institutionId: institution.id,
+        email: adminEmail,
+        role: "institution_admin",
+        invitedBy: req.user!.id,
+        token: invitationToken,
+        status: "pending",
+        expiresAt,
+      });
+      
+      const emailSent = await emailService.sendInvitation({
+        email: adminEmail,
+        token: invitationToken,
+        institutionName: name,
+        inviterName: `${req.user!.firstName} ${req.user!.lastName}`,
+        role: "institution_admin"
+      });
+      
+      if (!emailSent) {
+        console.warn("Failed to send invitation email, but institution was created");
+      }
+      
+      res.json({
+        message: "Institution onboarded successfully",
+        institution,
+        license,
+        invitation: {
+          email: adminEmail,
+          token: invitationToken,
+          expiresAt
+        },
+        emailSent
+      });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ error: validationError.toString() });
+      }
+      console.error("Error onboarding institution:", error);
+      res.status(500).json({ error: "Failed to onboard institution" });
     }
   });
 
