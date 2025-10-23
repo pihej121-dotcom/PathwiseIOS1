@@ -556,6 +556,24 @@ if (existingUser && !existingUser.isActive) {
     }
   });
   
+  // Delete institution (super admin only)
+  app.delete("/api/admin/institutions/:id", authenticate, requireSuperAdmin, async (req: AuthRequest, res) => {
+    try {
+      const institution = await storage.getInstitution(req.params.id);
+      if (!institution) {
+        return res.status(404).json({ error: "Institution not found" });
+      }
+      
+      // Delete institution (cascade will handle users, licenses, etc.)
+      await storage.deleteInstitution(req.params.id);
+      
+      res.json({ message: "Institution deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting institution:", error);
+      res.status(500).json({ error: "Failed to delete institution" });
+    }
+  });
+
   // Onboard new institution with admin invitation (super admin only)
   app.post("/api/admin/onboard-institution", authenticate, requireSuperAdmin, async (req: AuthRequest, res) => {
     try {

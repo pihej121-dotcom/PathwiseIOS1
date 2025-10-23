@@ -94,6 +94,7 @@ export interface IStorage {
   getInstitutionByDomain(domain: string): Promise<Institution | undefined>;
   updateInstitution(id: string, updates: Partial<InsertInstitution>): Promise<Institution>;
   listInstitutions(): Promise<Institution[]>;
+  deleteInstitution(id: string): Promise<void>;
   
   // Licenses
   createLicense(license: InsertLicense): Promise<License>;
@@ -612,6 +613,10 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(institutions)
       .orderBy(desc(institutions.createdAt));
+  }
+  
+  async deleteInstitution(id: string): Promise<void> {
+    await db.delete(institutions).where(eq(institutions.id, id));
   }
   
   async createLicense(license: InsertLicense): Promise<License> {

@@ -4,10 +4,20 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Building2, Users, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Building2, Users, Calendar, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 interface Institution {
@@ -35,6 +45,7 @@ export default function SuperAdminDashboard() {
   const { user, logout } = useAuth();
   const { toast } = useToast();
   const [isOnboardDialogOpen, setIsOnboardDialogOpen] = useState(false);
+  const [deleteInstitutionId, setDeleteInstitutionId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     adminEmail: "",
@@ -55,7 +66,7 @@ export default function SuperAdminDashboard() {
     onSuccess: (data) => {
       toast({
         title: "Institution onboarded successfully!",
-        description: `An invitation email has been sent to ${data.invitation.email}`,
+        description: `Admin account created for ${data.admin.email}. Welcome email sent with login credentials.`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/institutions"] });
       setIsOnboardDialogOpen(false);
@@ -76,9 +87,35 @@ export default function SuperAdminDashboard() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (institutionId: string) => {
+      const res = await apiRequest("DELETE", `/api/admin/institutions/${institutionId}`, {});
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Institution deleted",
+        description: "The institution and all associated data have been removed.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/institutions"] });
+      setDeleteInstitutionId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to delete institution",
+        description: error.message || "An error occurred",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onboardMutation.mutate(formData);
+  };
+
+  const handleDelete = (institutionId: string) => {
+    deleteMutation.mutate(institutionId);
   };
 
   return (
@@ -88,7 +125,7 @@ export default function SuperAdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Super Admin Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Manage institutions and licenses</p>
+              <p className="text-sm text-muted-foreground">Manage institutions and admins</p>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">{user?.email}</span>
@@ -104,20 +141,20 @@ export default function SuperAdminDashboard() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-3xl font-bold text-foreground">Institutions</h2>
-            <p className="text-muted-foreground mt-1">Manage institution onboarding and licensing</p>
+            <p className="text-muted-foreground mt-1">Add and manage institutions</p>
           </div>
           <Dialog open={isOnboardDialogOpen} onOpenChange={setIsOnboardDialogOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-onboard-institution">
+              <Button data-testid="button-add-institution">
                 <Plus className="mr-2 h-4 w-4" />
-                Onboard Institution
+                Add Institution
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle>Onboard New Institution</DialogTitle>
+                <DialogTitle>Add New Institution</DialogTitle>
                 <DialogDescription>
-                  Create a new institution and send an invitation to the admin.
+                  Create a new institution and automatically send the admin their login credentials via email.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit}>
@@ -134,7 +171,7 @@ export default function SuperAdminDashboard() {
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="adminEmail">Admin Email</Label>
+                    <Label htmlFor="adminEmail">Admin Email Address</Label>
                     <Input
                       id="adminEmail"
                       type="email"
@@ -159,7 +196,7 @@ export default function SuperAdminDashboard() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="licenseStart">License Start</Label>
+                      <Label htmlFor="licenseStart">License Start Date</Label>
                       <Input
                         id="licenseStart"
                         type="date"
@@ -170,7 +207,7 @@ export default function SuperAdminDashboard() {
                       />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="licenseEnd">License End</Label>
+                      <Label htmlFor="licenseEnd">License End Date</Label>
                       <Input
                         id="licenseEnd"
                         type="date"
@@ -186,8 +223,8 @@ export default function SuperAdminDashboard() {
                   <Button type="button" variant="outline" onClick={() => setIsOnboardDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={onboardMutation.isPending} data-testid="button-send-invite">
-                    {onboardMutation.isPending ? "Creating..." : "Create & Send Invite"}
+                  <Button type="submit" disabled={onboardMutation.isPending} data-testid="button-create-institution">
+                    {onboardMutation.isPending ? "Creating..." : "Create Institution"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -243,6 +280,18 @@ export default function SuperAdminDashboard() {
                     ) : (
                       <p className="text-sm text-muted-foreground">No active license</p>
                     )}
+                    <div className="pt-3 border-t">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => setDeleteInstitutionId(institution.id)}
+                        data-testid={`button-delete-${institution.id}`}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Remove Institution
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -254,16 +303,37 @@ export default function SuperAdminDashboard() {
               <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No institutions yet</h3>
               <p className="text-muted-foreground mb-4">
-                Get started by onboarding your first institution
+                Get started by adding your first institution
               </p>
               <Button onClick={() => setIsOnboardDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
-                Onboard Institution
+                Add Institution
               </Button>
             </CardContent>
           </Card>
         )}
       </div>
+
+      <AlertDialog open={deleteInstitutionId !== null} onOpenChange={(open) => !open && setDeleteInstitutionId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the institution, all associated users, licenses, and data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteInstitutionId && handleDelete(deleteInstitutionId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete Institution"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
