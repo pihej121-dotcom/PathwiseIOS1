@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { FileText, History, ChevronDown, ChevronUp } from "lucide-react";
+import { FileText, History, ChevronDown, ChevronUp, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 interface ResumeAnalysisHistoryItem {
   id: string;
@@ -42,6 +43,9 @@ export function ResumeAnalysisHistory({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filteredId, setFilteredId] = useState<string | null>(null);
 
+  const [selectedRole, setSelectedRole] = useState<string | "all">("all");
+  const [selectedIndustry, setSelectedIndustry] = useState<string | "all">("all");
+
   useEffect(() => {
     if (selectedResumeId) {
       setFilteredId(selectedResumeId);
@@ -57,16 +61,31 @@ export function ResumeAnalysisHistory({
     },
   });
 
+  // --- Extract unique filters from data ---
+  const availableRoles = useMemo(() => {
+    const roles = historyData.map((h) => h.targetRole).filter(Boolean) as string[];
+    return Array.from(new Set(roles));
+  }, [historyData]);
+
+  const availableIndustries = useMemo(() => {
+    const industries = historyData.map((h) => h.targetIndustry).filter(Boolean) as string[];
+    return Array.from(new Set(industries));
+  }, [historyData]);
+
+  // --- Apply filtering logic ---
   const filteredData = useMemo(() => {
-    if (!filteredId) return historyData;
-    return historyData.filter((item) => item.resume_id === filteredId);
-  }, [historyData, filteredId]);
+    let data = historyData;
+    if (filteredId) data = data.filter((item) => item.resume_id === filteredId);
+    if (selectedRole !== "all") data = data.filter((item) => item.targetRole === selectedRole);
+    if (selectedIndustry !== "all") data = data.filter((item) => item.targetIndustry === selectedIndustry);
+    return data;
+  }, [historyData, filteredId, selectedRole, selectedIndustry]);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  // 🔹 Loading state
+  // --- Loading state ---
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-6">
@@ -77,7 +96,7 @@ export function ResumeAnalysisHistory({
     );
   }
 
-  // 🔹 Empty state
+  // --- Empty state ---
   if (!filteredData.length) {
     return (
       <Card className="border-none shadow-sm">
@@ -92,14 +111,56 @@ export function ResumeAnalysisHistory({
     );
   }
 
-  // 🔹 Render history cards
+  // --- Main render ---
   return (
     <div className={cn("space-y-6")}>
-      <div className="flex items-center gap-3 mb-4">
-        <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        <h2 className="text-lg font-semibold text-foreground">Past Resume Analyses</h2>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3">
+          <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-lg font-semibold text-foreground">Past Resume Analyses</h2>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground font-medium">Filter by:</span>
+          </div>
+
+          {/* Role Filter */}
+          <Select value={selectedRole} onValueChange={setSelectedRole}>
+            <SelectTrigger className="w-[160px] h-8 text-sm">
+              <SelectValue placeholder="Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              {availableRoles.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {role}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Industry Filter */}
+          <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
+            <SelectTrigger className="w-[160px] h-8 text-sm">
+              <SelectValue placeholder="Industry" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Industries</SelectItem>
+              {availableIndustries.map((ind) => (
+                <SelectItem key={ind} value={ind}>
+                  {ind}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
+      {/* Cards */}
       <div
         className={cn(
           embedded ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 md:grid-cols-2 gap-8"
@@ -142,7 +203,7 @@ export function ResumeAnalysisHistory({
                 </p>
               </CardHeader>
 
-              {/* Expandable content */}
+              {/* Expandable Content */}
               <div
                 className={cn(
                   "transition-all overflow-hidden duration-500 ease-in-out",
