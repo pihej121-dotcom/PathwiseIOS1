@@ -6,6 +6,20 @@ Pathwise Institution Edition is a comprehensive career development platform desi
 
 Preferred communication style: Simple, everyday language.
 
+# Recent Changes
+
+## Multi-Tenant Institution Support (October 2025)
+- Added `institution_admin` role to user schema for institutional license management
+- Created super admin dashboard at `/admin/dashboard` for institution onboarding
+- Implemented institution onboarding API with Resend email invitations
+- Added role-based routing: super_admin → `/admin/dashboard`, institution_admin → `/institution/dashboard`, student → `/dashboard`
+- Bootstrap script (`scripts/bootstrapSuperAdmin.ts`) for creating super admin via environment variables
+- Institution admin dashboard placeholder at `/institution/dashboard` (full features pending)
+
+## Configuration Requirements
+- **RESEND_API_KEY**: Must be manually configured in environment variables for institution invitation emails
+- **Super Admin Bootstrap**: Set `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`, and `BOOTSTRAP_SUPERADMIN_SECRET` environment variables, then run `tsx scripts/bootstrapSuperAdmin.ts`
+
 # System Architecture
 
 ## Frontend Architecture
@@ -35,9 +49,14 @@ Preferred communication style: Simple, everyday language.
 - **Upload Interface**: Uppy.js.
 
 ## Authentication & Authorization
-- **Registration**: Invite-only or domain allowlist with email verification.
-- **Roles**: Student and admin with distinct permission levels.
-- **Sessions**: Secure session management with token refresh.
+- **Registration**: Invite-only with email-based invitation tokens (7-day expiration).
+- **Roles**: Multi-tier role system:
+  - `super_admin`: Pathwise internal team for institution onboarding and license management
+  - `institution_admin`: Manages institution users, sends student invitations, monitors license usage
+  - `admin`: Legacy role for backward compatibility
+  - `student`: End-users accessing career development features
+- **Bootstrap**: Super admin users are created via environment variables (`SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`, `BOOTSTRAP_SUPERADMIN_SECRET`)
+- **Sessions**: Secure session management with JWT tokens and bcrypt password hashing.
 - **Optional**: SSO (OIDC/SAML) and LTI 1.3 integration.
 
 ## Security Features
@@ -46,7 +65,10 @@ Preferred communication style: Simple, everyday language.
 - **File Security**: Pre-signed URLs for S3.
 - **Input Validation**: Zod schemas.
 
-## Monetization
+## Monetization & Licensing
+- **Multi-Tenant SaaS Model**: Institutional licensing with seat-based pricing
+- **License Management**: Super admins configure licenses with start/end dates and student seat limits
+- **Institution Onboarding**: Automated invitation flow where super admins create institutions and send email invitations to institution admins via Resend
 - **Resume Analysis Paywall**: Restricts sub-score details and improvement recommendations for free users, requiring a Pro subscription ($10/month) via Stripe checkout. Landing page displays three-tier subscription plans (Institutional, Free, Pro).
 
 ## Mobile Integration
