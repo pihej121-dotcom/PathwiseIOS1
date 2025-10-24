@@ -1333,6 +1333,121 @@ Provide a concise, actionable summary (max 500 words) that an institutional admi
     }
   });
 
+  // Generate group insights for all students in an institution
+  app.post("/api/institutions/:institutionId/generate-group-insights", authenticate, async (req: AuthRequest, res) => {
+    try {
+      if (req.user!.role !== "admin" && req.user!.role !== "super_admin" && req.user!.role !== "institution_admin") {
+        return res.status(403).json({ error: "Only admins can generate group insights" });
+      }
+      
+      if ((req.user!.role === "admin" || req.user!.role === "institution_admin") && req.user!.institutionId !== req.params.institutionId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Get all students in the institution
+      const students = await storage.getInstitutionUsers(req.params.institutionId, true);
+      
+      if (students.length === 0) {
+        return res.status(400).json({ error: "No students found in this institution" });
+      }
+      
+      // Get the most recent resume analysis for each student
+      const studentInsights = await Promise.all(
+        students.map(async (student) => {
+          const history = await storage.getUserResumeAnalysisHistory(student.id);
+          
+          if (history.length === 0) {
+            return null;
+          }
+          
+          // Get the most recent analysis
+          const mostRecent = history[0];
+          
+          return {
+            studentName: `${student.firstName} ${student.lastName}`,
+            studentEmail: student.email,
+            targetRole: mostRecent.targetRole,
+            targetIndustry: mostRecent.targetIndustry,
+            rmsScore: mostRecent.rmsScore,
+            skillsScore: mostRecent.skillsScore,
+            experienceScore: mostRecent.experienceScore,
+            keywordsScore: mostRecent.keywordsScore,
+            educationScore: mostRecent.educationScore,
+            strengths: mostRecent.overallInsights?.strengths || [],
+            improvements: mostRecent.overallInsights?.improvements || [],
+            sectionAnalysis: mostRecent.sectionAnalysis,
+            analyzedAt: mostRecent.createdAt
+          };
+        })
+      );
+      
+      // Filter out students with no resume analyses
+      const validInsights = studentInsights.filter(insight => insight !== null);
+      
+      if (validInsights.length === 0) {
+        return res.status(400).json({ error: "No students have resume analyses yet" });
+      }
+      
+      // Generate group insights using OpenAI
+      const groupPrompt = `You are an expert career counselor and institutional advisor analyzing resume data across ${validInsights.length} students from the same institution. Based on the following student resume analyses, provide comprehensive group insights that will help the institution support their students more effectively.
+
+CRITICAL REQUIREMENTS:
+1. Identify COLLECTIVE STRENGTHS across all students (what are they doing well as a group?)
+2. Identify COLLECTIVE WEAKNESSES and gaps (what areas need improvement across the student body?)
+3. Provide ACTIONABLE RECOMMENDATIONS for students (what should they focus on improving?)
+4. Identify CAREER GOALS AND TRENDS (what industries, roles, and career paths are students pursuing?)
+5. Provide INSTITUTIONAL RECOMMENDATIONS:
+   - Which resources to invest in (software, tools, platforms)
+   - Which courses or workshops to offer
+   - Which guest speakers or professionals to invite (specific fields/topics)
+   - Which certifications or training programs to prioritize
+   - How to better support students' career development
+
+Student Data:
+${JSON.stringify(validInsights, null, 2)}
+
+Provide a comprehensive analysis (max 800 words) organized into clear sections:
+1. Overall Group Performance Summary
+2. Collective Strengths (what students are doing well)
+3. Common Gaps and Weaknesses (areas needing improvement)
+4. Career Goals and Industry Trends
+5. Recommendations for Students
+6. Strategic Recommendations for Institution
+
+Make your recommendations specific, actionable, and data-driven based on the actual student data provided.`;
+
+      const OpenAI = (await import("openai")).default;
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const openaiResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert institutional career advisor providing strategic insights to help educational institutions support their students' career development more effectively."
+          },
+          {
+            role: "user",
+            content: groupPrompt
+          }
+        ],
+        max_completion_tokens: 2000
+      });
+      
+      const groupInsights = openaiResponse.choices[0].message.content || "Unable to generate group insights";
+      
+      res.json({ 
+        insights: groupInsights,
+        generatedAt: new Date().toISOString(),
+        studentsAnalyzed: validInsights.length,
+        totalStudents: students.length
+      });
+    } catch (error: any) {
+      console.error("Error generating group insights:", error);
+      res.status(500).json({ error: "Failed to generate group insights" });
+    }
+  });
+
   // Career roadmap routes
   app.post("/api/roadmaps/generate", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {

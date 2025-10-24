@@ -34,6 +34,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { 
@@ -56,7 +58,10 @@ import {
   Ban,
   Mail,
   Upload,
-  FileUp
+  FileUp,
+  Sparkles,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { UserAnalysisDialog } from "@/components/UserAnalysisDialog";
@@ -86,6 +91,14 @@ export default function AdminDashboard() {
     id: string;
     name: string;
     email: string;
+  } | null>(null);
+  
+  // Group insights state
+  const [groupInsights, setGroupInsights] = useState<{
+    insights: string;
+    generatedAt: string;
+    studentsAnalyzed: number;
+    totalStudents: number;
   } | null>(null);
 
   // Fetch institution overview data
@@ -212,6 +225,28 @@ export default function AdminDashboard() {
       toast({
         title: "Failed to send verification email",
         description: error.message || "There was an error sending the verification email.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Generate group insights mutation
+  const generateGroupInsightsMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/institutions/${user!.institutionId}/generate-group-insights`, {});
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setGroupInsights(data);
+      toast({
+        title: "Group Insights Generated",
+        description: `Analysis complete for ${data.studentsAnalyzed} students.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Generate Group Insights",
+        description: error.message || "An error occurred while generating group insights.",
         variant: "destructive",
       });
     },
@@ -456,6 +491,72 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Group Insights Section */}
+            <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    AI-Generated Group Insights
+                  </CardTitle>
+                  <Button
+                    onClick={() => generateGroupInsightsMutation.mutate()}
+                    disabled={generateGroupInsightsMutation.isPending}
+                    size="sm"
+                    className="gap-2"
+                    data-testid="generate-group-insights-button"
+                  >
+                    {generateGroupInsightsMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        Generate Group Insights
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <CardDescription>
+                  Analyze all students' resume data to identify trends, gaps, and strategic recommendations for your institution
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {groupInsights ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed" data-testid="group-insights-content">
+                      {groupInsights.insights}
+                    </p>
+                    <div className="flex items-center justify-between pt-3 border-t border-border/20">
+                      <p className="text-xs text-muted-foreground italic">
+                        Generated on {new Date(groupInsights.generatedAt).toLocaleString()}
+                      </p>
+                      <Badge variant="secondary" data-testid="students-analyzed-count">
+                        {groupInsights.studentsAnalyzed} of {groupInsights.totalStudents} students analyzed
+                      </Badge>
+                    </div>
+                  </div>
+                ) : generateGroupInsightsMutation.isPending ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                  </div>
+                ) : (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Click "Generate Group Insights" to create an AI-powered analysis of all students' resume data. This will provide institutional recommendations, identify collective strengths and gaps, and suggest resources to invest in.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
 
           </TabsContent>
 
