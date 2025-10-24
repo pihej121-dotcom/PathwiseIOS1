@@ -56,13 +56,7 @@ import {
   Ban,
   Mail,
   Upload,
-  FileUp,
-  Eye,
-  TrendingUp,
-  Target,
-  Building2,
-  Calendar,
-  AlertCircle
+  FileUp
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -85,7 +79,6 @@ export default function AdminDashboard() {
   // User management state
   const [userToTerminate, setUserToTerminate] = useState<string | null>(null);
   const [userToResendVerification, setUserToResendVerification] = useState<string | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Fetch institution overview data
   const { data: institutionData, isLoading } = useQuery({
@@ -102,13 +95,6 @@ export default function AdminDashboard() {
   const { data: invitationsData } = useQuery({
     queryKey: [`/api/institutions/${user?.institutionId}/invitations`],
     enabled: !!user?.institutionId && (user?.role === "admin" || user?.role === "super_admin"),
-  });
-  
-  // Fetch detailed student information
-  const { data: studentDetails, isLoading: isLoadingStudentDetails, error: studentDetailsError } = useQuery({
-    queryKey: [`/api/institutions/${user?.institutionId}/users/${selectedUserId}/details`],
-    enabled: !!selectedUserId && !!user?.institutionId,
-    retry: 1,
   });
   
 
@@ -738,16 +724,6 @@ export default function AdminDashboard() {
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
-                            {userData.role === "student" && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setSelectedUserId(userData.id)}
-                                data-testid={`view-details-${userData.id}`}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            )}
                             {!userData.isVerified && (
                               <Button
                                 variant="outline"
@@ -832,264 +808,6 @@ export default function AdminDashboard() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
-        {/* Student Details Dialog */}
-        <Dialog open={!!selectedUserId} onOpenChange={(open) => !open && setSelectedUserId(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-2xl">Student Details</DialogTitle>
-              <DialogDescription>
-                Comprehensive view of student profile and resume analysis
-              </DialogDescription>
-            </DialogHeader>
-
-            {isLoadingStudentDetails ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : studentDetailsError ? (
-              <div className="py-12 text-center">
-                <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
-                <h3 className="font-semibold mb-2">Failed to Load Student Details</h3>
-                <p className="text-sm text-muted-foreground">
-                  {(studentDetailsError as any)?.message || "An error occurred while fetching student information."}
-                </p>
-                <Button 
-                  onClick={() => setSelectedUserId(null)} 
-                  variant="outline" 
-                  className="mt-4"
-                  data-testid="close-error-dialog"
-                >
-                  Close
-                </Button>
-              </div>
-            ) : studentDetails && (studentDetails as any).user ? (
-              <div className="space-y-6">
-                {/* Student Profile */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Users className="h-5 w-5" />
-                      <span>Profile Information</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-muted-foreground">Name</Label>
-                      <p className="font-medium" data-testid="detail-student-name">
-                        {(studentDetails as any).user?.firstName || "N/A"} {(studentDetails as any).user?.lastName || ""}
-                      </p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Email</Label>
-                      <p className="font-medium" data-testid="detail-student-email">{(studentDetails as any).user.email}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">School</Label>
-                      <p className="font-medium" data-testid="detail-student-school">{(studentDetails as any).user.school || "N/A"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Major</Label>
-                      <p className="font-medium" data-testid="detail-student-major">{(studentDetails as any).user.major || "N/A"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Graduation Year</Label>
-                      <p className="font-medium" data-testid="detail-student-grad-year">{(studentDetails as any).user.gradYear || "N/A"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Location</Label>
-                      <p className="font-medium" data-testid="detail-student-location">{(studentDetails as any).user.location || "N/A"}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Career Targets */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Target className="h-5 w-5" />
-                      <span>Career Targets</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label className="text-muted-foreground flex items-center space-x-1">
-                        <Target className="h-4 w-4" />
-                        <span>Target Role</span>
-                      </Label>
-                      <p className="font-medium text-lg" data-testid="detail-target-role">
-                        {(studentDetails as any).resume?.targetRole || (studentDetails as any).user.targetRole || "Not specified"}
-                      </p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground flex items-center space-x-1">
-                        <TrendingUp className="h-4 w-4" />
-                        <span>Target Industry</span>
-                      </Label>
-                      <p className="font-medium" data-testid="detail-target-industry">
-                        {(studentDetails as any).resume?.targetIndustry || 
-                         ((studentDetails as any).user.industries && (studentDetails as any).user.industries.length > 0 
-                           ? (studentDetails as any).user.industries.join(", ") 
-                           : "Not specified")}
-                      </p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground flex items-center space-x-1">
-                        <Building2 className="h-4 w-4" />
-                        <span>Target Companies</span>
-                      </Label>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {((studentDetails as any).resume?.targetCompanies || (studentDetails as any).user.targetCompanies || []).length > 0 ? (
-                          ((studentDetails as any).resume?.targetCompanies || (studentDetails as any).user.targetCompanies || []).map((company: string, idx: number) => (
-                            <Badge key={idx} variant="secondary" data-testid={`detail-company-${idx}`}>
-                              {company}
-                            </Badge>
-                          ))
-                        ) : (
-                          <p className="text-sm text-muted-foreground">Not specified</p>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Resume Analysis */}
-                {(studentDetails as any).resume ? (
-                  <>
-                    {/* RMS Score Overview */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <TrendingUp className="h-5 w-5" />
-                            <span>Resume Analysis Score</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground" data-testid="detail-analysis-date">
-                              {new Date((studentDetails as any).resume.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="text-center py-4">
-                            <div className="text-5xl font-bold text-primary" data-testid="detail-rms-score">
-                              {(studentDetails as any).resume.rmsScore || 0}
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">RMS Score (out of 100)</p>
-                          </div>
-
-                          {/* Subsection Scores */}
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t">
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <Label className="text-sm">Skills</Label>
-                                <span className="font-semibold" data-testid="detail-skills-score">
-                                  {(studentDetails as any).resume.skillsScore || 0}
-                                </span>
-                              </div>
-                              <Progress value={(studentDetails as any).resume.skillsScore || 0} className="h-2" />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <Label className="text-sm">Experience</Label>
-                                <span className="font-semibold" data-testid="detail-experience-score">
-                                  {(studentDetails as any).resume.experienceScore || 0}
-                                </span>
-                              </div>
-                              <Progress value={(studentDetails as any).resume.experienceScore || 0} className="h-2" />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <Label className="text-sm">Keywords</Label>
-                                <span className="font-semibold" data-testid="detail-keywords-score">
-                                  {(studentDetails as any).resume.keywordsScore || 0}
-                                </span>
-                              </div>
-                              <Progress value={(studentDetails as any).resume.keywordsScore || 0} className="h-2" />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <Label className="text-sm">Education</Label>
-                                <span className="font-semibold" data-testid="detail-education-score">
-                                  {(studentDetails as any).resume.educationScore || 0}
-                                </span>
-                              </div>
-                              <Progress value={(studentDetails as any).resume.educationScore || 0} className="h-2" />
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <Label className="text-sm">Certifications</Label>
-                                <span className="font-semibold" data-testid="detail-certifications-score">
-                                  {(studentDetails as any).resume.certificationsScore || 0}
-                                </span>
-                              </div>
-                              <Progress value={(studentDetails as any).resume.certificationsScore || 0} className="h-2" />
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* AI Insights */}
-                    {(studentDetails as any).resume.overallInsights && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center space-x-2">
-                            <AlertCircle className="h-5 w-5" />
-                            <span>AI Insights</span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="prose prose-sm max-w-none dark:prose-invert">
-                            <div className="bg-muted/50 p-4 rounded-lg" data-testid="detail-overall-insights">
-                              {typeof (studentDetails as any).resume.overallInsights === 'string' 
-                                ? (studentDetails as any).resume.overallInsights
-                                : JSON.stringify((studentDetails as any).resume.overallInsights, null, 2)}
-                            </div>
-                          </div>
-
-                          {(studentDetails as any).resume.sectionAnalysis && (
-                            <div className="space-y-3">
-                              <Label className="font-semibold">Section Analysis</Label>
-                              <div className="bg-muted/30 p-4 rounded-lg max-h-96 overflow-y-auto" data-testid="detail-section-analysis">
-                                <pre className="text-sm whitespace-pre-wrap">
-                                  {typeof (studentDetails as any).resume.sectionAnalysis === 'string'
-                                    ? (studentDetails as any).resume.sectionAnalysis
-                                    : JSON.stringify((studentDetails as any).resume.sectionAnalysis, null, 2)}
-                                </pre>
-                              </div>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    )}
-                  </>
-                ) : (
-                  <Card>
-                    <CardContent className="py-12 text-center">
-                      <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <h3 className="font-semibold mb-2">No Resume Analysis</h3>
-                      <p className="text-sm text-muted-foreground">
-                        This student has not uploaded or analyzed a resume yet.
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            ) : (
-              <div className="py-12 text-center">
-                <p className="text-muted-foreground">Failed to load student details</p>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
       </div>
     </Layout>
   );
