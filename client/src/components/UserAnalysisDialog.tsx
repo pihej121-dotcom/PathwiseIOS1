@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -9,19 +9,24 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { format } from "date-fns";
 import {
   FileText,
   ChevronDown,
   ChevronUp,
-  User,
   Mail,
   Building,
   GraduationCap,
   Target,
+  Sparkles,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserAnalysisDialogProps {
   open: boolean;
@@ -70,6 +75,8 @@ export function UserAnalysisDialog({
   userEmail,
 }: UserAnalysisDialogProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: historyData = [], isLoading } = useQuery<
     ResumeAnalysisHistoryItem[]
@@ -77,6 +84,46 @@ export function UserAnalysisDialog({
     queryKey: [`/api/institutions/${institutionId}/users/${userId}/resume-analysis-history`],
     enabled: open,
   });
+
+  const generateSummaryMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest(
+        "POST",
+        `/api/institutions/${institutionId}/users/${userId}/generate-summary`,
+        {}
+      );
+      return res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "AI Summary Generated",
+        description: "The student summary has been generated successfully.",
+      });
+      // Refetch to get updated data
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/institutions/${institutionId}/users/${userId}/resume-analysis-history`] 
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Generate Summary",
+        description: error.message || "An error occurred while generating the summary.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const [aiSummary, setAiSummary] = useState<{
+    summary: string;
+    generatedAt: string;
+  } | null>(null);
+
+  // Update AI summary when mutation succeeds
+  useEffect(() => {
+    if (generateSummaryMutation.data) {
+      setAiSummary(generateSummaryMutation.data);
+    }
+  }, [generateSummaryMutation.data]);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -133,6 +180,63 @@ export function UserAnalysisDialog({
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
+          {/* AI Summary Section */}
+          {historyData.length > 0 && (
+            <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    AI-Generated Student Summary
+                  </CardTitle>
+                  <Button
+                    onClick={() => generateSummaryMutation.mutate()}
+                    disabled={generateSummaryMutation.isPending}
+                    size="sm"
+                    className="gap-2"
+                    data-testid="generate-summary-button"
+                  >
+                    {generateSummaryMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        Generate Summary
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {aiSummary ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                      {aiSummary.summary}
+                    </p>
+                    <p className="text-xs text-muted-foreground italic">
+                      Generated on {format(new Date(aiSummary.generatedAt), "PPp")}
+                    </p>
+                  </div>
+                ) : generateSummaryMutation.isPending ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                ) : (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Click "Generate Summary" to create an AI-powered analysis of this student's resume development progress and career readiness.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          )}
           {isLoading ? (
             <div className="grid grid-cols-1 gap-6">
               {[...Array(2)].map((_, i) => (
