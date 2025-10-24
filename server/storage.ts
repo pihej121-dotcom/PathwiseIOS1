@@ -28,6 +28,7 @@ export interface IStorage {
   getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<InsertUser>): Promise<User>;
+  updateUserSummary(userId: string, summary: string): Promise<User>;
   deleteUser(userId: string): Promise<void>;
   
   // Sessions
@@ -186,6 +187,19 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ ...updates, updatedAt: sql`now()` })
       .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserSummary(userId: string, summary: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        aiSummary: summary, 
+        aiSummaryGeneratedAt: sql`now()`,
+        updatedAt: sql`now()` 
+      })
+      .where(eq(users.id, userId))
       .returning();
     return user;
   }

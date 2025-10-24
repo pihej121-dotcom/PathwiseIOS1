@@ -1242,6 +1242,91 @@ if (existingUser && !existingUser.isActive) {
     }
   });
 
+  // Generate AI summary of student insights
+  app.post("/api/institutions/:institutionId/users/:userId/generate-summary", authenticate, async (req: AuthRequest, res) => {
+    try {
+      if (req.user!.role !== "admin" && req.user!.role !== "super_admin" && req.user!.role !== "institution_admin") {
+        return res.status(403).json({ error: "Only admins can generate student summaries" });
+      }
+      
+      if ((req.user!.role === "admin" || req.user!.role === "institution_admin") && req.user!.institutionId !== req.params.institutionId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const user = await storage.getUser(req.params.userId);
+      if (!user || user.institutionId !== req.params.institutionId) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      
+      // Fetch all resume analysis history for this student
+      const history = await storage.getUserResumeAnalysisHistory(req.params.userId);
+      
+      if (history.length === 0) {
+        return res.status(400).json({ error: "No resume analysis history available for this student" });
+      }
+      
+      // Prepare data for AI summarization
+      const analysisData = history.map(h => ({
+        date: h.createdAt,
+        targetRole: h.targetRole,
+        rmsScore: h.rmsScore,
+        strengths: h.overallInsights?.strengths || [],
+        improvements: h.overallInsights?.improvements || [],
+        sectionAnalysis: h.sectionAnalysis
+      }));
+      
+      // Generate AI summary using OpenAI
+      // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+      const summaryPrompt = `You are an expert career counselor analyzing a student's resume development journey. Based on the following resume analyses conducted over time, provide a comprehensive summary that highlights:
+
+1. Overall progress and trends in their resume quality
+2. Consistent strengths across all analyses
+3. Areas that need continued improvement
+4. Key recommendations for their career development
+
+Student name: ${user.firstName} ${user.lastName}
+Total analyses: ${history.length}
+
+Analysis data:
+${JSON.stringify(analysisData, null, 2)}
+
+Provide a concise, actionable summary (max 500 words) that an institutional administrator can use to guide this student.`;
+
+      // Using OpenAI directly since aiService doesn't expose callOpenAI
+      // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+      const OpenAI = (await import("openai")).default;
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const openaiResponse = await openai.chat.completions.create({
+        model: "gpt-5",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert career counselor providing insights to institutional administrators about student career development."
+          },
+          {
+            role: "user",
+            content: summaryPrompt
+          }
+        ],
+        max_completion_tokens: 1500
+      });
+      
+      const summary = openaiResponse.choices[0].message.content || "Unable to generate summary";
+      
+      // Store the summary in the database
+      await storage.updateUserSummary(req.params.userId, summary);
+      
+      res.json({ 
+        summary,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error("Error generating AI summary:", error);
+      res.status(500).json({ error: "Failed to generate summary" });
+    }
+  });
+
   // Career roadmap routes
   app.post("/api/roadmaps/generate", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
