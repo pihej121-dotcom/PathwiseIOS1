@@ -6,8 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Table, 
   TableBody, 
@@ -51,17 +49,16 @@ import {
   Users, 
   UserPlus, 
   Crown, 
-  CheckCircle, 
-  Clock, 
   XCircle,
-  Trash2,
   Ban,
   Mail,
   Upload,
   FileUp,
   Sparkles,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Trash2,
+  Clock
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { UserAnalysisDialog } from "@/components/UserAnalysisDialog";
@@ -109,18 +106,18 @@ export default function AdminDashboard() {
     enabled: !!user?.institutionId && (user?.role === "admin" || user?.role === "super_admin"),
   });
   
-  // Fetch users and invitations separately for better performance
+  // Fetch users
   const { data: usersData } = useQuery({
     queryKey: [`/api/institutions/${user?.institutionId}/users`],
     enabled: !!user?.institutionId && (user?.role === "admin" || user?.role === "super_admin"),
   });
   
+  // Fetch invitations
   const { data: invitationsData } = useQuery({
     queryKey: [`/api/institutions/${user?.institutionId}/invitations`],
     enabled: !!user?.institutionId && (user?.role === "admin" || user?.role === "super_admin"),
   });
   
-
   // Single invite mutation
   const inviteUserMutation = useMutation({
     mutationFn: async ({ email, role }: { email: string; role: string }) => {
@@ -133,6 +130,8 @@ export default function AdminDashboard() {
       });
       setInviteEmail("");
       setIsInviteDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}/users`] });
       queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}/invitations`] });
     },
     onError: (error: any) => {
@@ -156,6 +155,8 @@ export default function AdminDashboard() {
       });
       setBulkEmails("");
       setIsBulkInviteDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}/users`] });
       queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}/invitations`] });
     },
     onError: (error: any) => {
@@ -167,7 +168,6 @@ export default function AdminDashboard() {
     },
   });
   
-
   // Terminate user mutation
   const terminateUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -179,6 +179,7 @@ export default function AdminDashboard() {
         description: "The user account has been deactivated and access revoked.",
       });
       setUserToTerminate(null);
+      queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/institutions/${user?.institutionId}/users`] });
     },
     onError: (error: any) => {
@@ -279,13 +280,7 @@ export default function AdminDashboard() {
   const users = (usersData as any)?.users || [];
   const invitations = (invitationsData as any)?.invitations || [];
   const institution = (institutionData as any)?.institution;
-
-  // Determine default tab based on URL
-  const getDefaultTab = () => {
-    if (location.includes('/admin/invitations')) return 'invitations';
-    if (location.includes('/admin/users')) return 'users';
-    return 'overview';
-  };
+  const license = institution?.license;
 
   const handleInviteSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -307,7 +302,6 @@ export default function AdminDashboard() {
       }
     }
   };
-
 
   const handleTerminateUser = (userId: string) => {
     setUserToTerminate(userId);
@@ -343,43 +337,14 @@ export default function AdminDashboard() {
               Institutional Management
             </h1>
             <p className="text-muted-foreground">
-              Access control, licensing, and user lifecycle management for {institution?.name || 'your institution'}
+              Manage users, licenses, and invitations for {institution?.name || 'your institution'}
             </p>
           </div>
         </div>
 
-        {/* Overview Cards */}
+        {/* Stats and Invitation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Students</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" data-testid="active-users">
-                {users.filter((u: any) => u.isActive).length}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {users.length} total accounts
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Invitations</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" data-testid="pending-invitations">
-                {invitations.filter((inv: any) => inv.status === "pending").length}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Awaiting registration
-              </p>
-            </CardContent>
-          </Card>
-
+          {/* Total Accounts Card */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Accounts</CardTitle>
@@ -387,418 +352,375 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold" data-testid="total-accounts">
-                {users.length}
+                {license?.usedSeats || users.length}/{license?.licensedSeats || '∞'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {users.filter((u: any) => !u.isVerified).length} pending verification
+                {license?.licensedSeats ? `${license.licensedSeats - (license.usedSeats || users.length)} seats available` : 'Unlimited seats'}
               </p>
+            </CardContent>
+          </Card>
+
+          {/* Single Invitation Card */}
+          <Card className="border-primary/20 hover:border-primary/40 transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Single Invitation</CardTitle>
+              <Mail className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full" size="sm" data-testid="single-invite-button">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Invite User
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Invite New User</DialogTitle>
+                    <DialogDescription>
+                      Send an email invitation to join your institution
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleInviteSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="inviteEmail">Email Address</Label>
+                      <Input
+                        id="inviteEmail"
+                        type="email"
+                        value={inviteEmail}
+                        onChange={(e) => setInviteEmail(e.target.value)}
+                        placeholder="user@university.edu"
+                        required
+                        data-testid="invite-email-input"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="inviteRole">Role</Label>
+                      <Select value={inviteRole} onValueChange={setInviteRole}>
+                        <SelectTrigger data-testid="invite-role-select">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="student">Student</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={inviteUserMutation.isPending}
+                      data-testid="send-invitation-button"
+                    >
+                      {inviteUserMutation.isPending ? "Sending..." : "Send Invitation"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
+
+          {/* Bulk Invitations Card */}
+          <Card className="border-primary/20 hover:border-primary/40 transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Bulk Invitations</CardTitle>
+              <FileUp className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <Dialog open={isBulkInviteDialogOpen} onOpenChange={setIsBulkInviteDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full" size="sm" data-testid="bulk-invite-button">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Bulk Invite
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Bulk Invite Users</DialogTitle>
+                    <DialogDescription>
+                      Enter email addresses separated by commas or new lines
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleBulkInviteSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="bulkEmails">Email Addresses</Label>
+                      <Textarea
+                        id="bulkEmails"
+                        value={bulkEmails}
+                        onChange={(e) => setBulkEmails(e.target.value)}
+                        placeholder="user1@university.edu&#10;user2@university.edu&#10;user3@university.edu"
+                        rows={6}
+                        required
+                        data-testid="bulk-emails-input"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        One email per line or separated by commas
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="bulkRole">Role for All Users</Label>
+                      <Select value={bulkRole} onValueChange={setBulkRole}>
+                        <SelectTrigger data-testid="bulk-role-select">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="student">Student</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={bulkInviteUsersMutation.isPending}
+                      data-testid="send-bulk-invitations-button"
+                    >
+                      {bulkInviteUsersMutation.isPending ? "Sending..." : "Send Bulk Invitations"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         </div>
 
-        {/* Main Tabs */}
-        <Tabs defaultValue={getDefaultTab()} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
-            <TabsTrigger value="invitations" data-testid="tab-invitations">Invitations</TabsTrigger>
-            <TabsTrigger value="users" data-testid="tab-users">Users</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
-            {/* Group Insights Section */}
-            <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    AI-Generated Group Insights
-                  </CardTitle>
-                  <Button
-                    onClick={() => generateGroupInsightsMutation.mutate()}
-                    disabled={generateGroupInsightsMutation.isPending}
-                    size="sm"
-                    className="gap-2"
-                    data-testid="generate-group-insights-button"
-                  >
-                    {generateGroupInsightsMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Generate Group Insights
-                      </>
-                    )}
-                  </Button>
-                </div>
-                <CardDescription>
-                  Analyze all students' resume data to identify trends, gaps, and strategic recommendations for your institution
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {groupInsights ? (
-                  <div className="space-y-3">
-                    <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground" data-testid="group-insights-content">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {groupInsights.insights}
-                      </ReactMarkdown>
-                    </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-border/20">
-                      <p className="text-xs text-muted-foreground italic">
-                        Generated on {new Date(groupInsights.generatedAt).toLocaleString()}
-                      </p>
-                      <Badge variant="secondary" data-testid="students-analyzed-count">
-                        {groupInsights.studentsAnalyzed} of {groupInsights.totalStudents} students analyzed
-                      </Badge>
-                    </div>
-                  </div>
-                ) : generateGroupInsightsMutation.isPending ? (
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                  </div>
+        {/* AI-Generated Group Insights */}
+        <Card className="border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                AI-Generated Group Insights
+              </CardTitle>
+              <Button
+                onClick={() => generateGroupInsightsMutation.mutate()}
+                disabled={generateGroupInsightsMutation.isPending}
+                size="sm"
+                className="gap-2"
+                data-testid="generate-group-insights-button"
+              >
+                {generateGroupInsightsMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
                 ) : (
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Click "Generate Group Insights" to create an AI-powered analysis of all students' resume data. This will provide institutional recommendations, identify collective strengths and gaps, and suggest resources to invest in.
-                    </AlertDescription>
-                  </Alert>
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Generate Insights
+                  </>
                 )}
-              </CardContent>
-            </Card>
-
-          </TabsContent>
-
-          {/* Invitations Tab */}
-          <TabsContent value="invitations" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Single Invite */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Mail className="h-5 w-5" />
-                    <span>Single Invitation</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Send an email invitation to one user
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="w-full" data-testid="single-invite-button">
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Send Single Invitation
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Invite New User</DialogTitle>
-                        <DialogDescription>
-                          Send an email invitation to join your institution
-                        </DialogDescription>
-                      </DialogHeader>
-                      <form onSubmit={handleInviteSubmit} className="space-y-4">
-                        <div>
-                          <Label htmlFor="inviteEmail">Email Address</Label>
-                          <Input
-                            id="inviteEmail"
-                            type="email"
-                            value={inviteEmail}
-                            onChange={(e) => setInviteEmail(e.target.value)}
-                            placeholder="user@university.edu"
-                            required
-                            data-testid="invite-email-input"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="inviteRole">Role</Label>
-                          <Select value={inviteRole} onValueChange={setInviteRole}>
-                            <SelectTrigger data-testid="invite-role-select">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="student">Student</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button 
-                          type="submit" 
-                          className="w-full"
-                          disabled={inviteUserMutation.isPending}
-                          data-testid="send-invitation-button"
-                        >
-                          {inviteUserMutation.isPending ? "Sending..." : "Send Invitation"}
-                        </Button>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
-
-              {/* Bulk Invite */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <FileUp className="h-5 w-5" />
-                    <span>Bulk Invitations</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Send invitations to multiple users via CSV format
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Dialog open={isBulkInviteDialogOpen} onOpenChange={setIsBulkInviteDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" className="w-full" data-testid="bulk-invite-button">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Bulk Invite Users
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-lg">
-                      <DialogHeader>
-                        <DialogTitle>Bulk Invite Users</DialogTitle>
-                        <DialogDescription>
-                          Enter email addresses separated by commas or new lines
-                        </DialogDescription>
-                      </DialogHeader>
-                      <form onSubmit={handleBulkInviteSubmit} className="space-y-4">
-                        <div>
-                          <Label htmlFor="bulkEmails">Email Addresses</Label>
-                          <Textarea
-                            id="bulkEmails"
-                            value={bulkEmails}
-                            onChange={(e) => setBulkEmails(e.target.value)}
-                            placeholder="user1@university.edu&#10;user2@university.edu&#10;user3@university.edu"
-                            rows={6}
-                            required
-                            data-testid="bulk-emails-input"
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            One email per line or separated by commas
-                          </p>
-                        </div>
-                        <div>
-                          <Label htmlFor="bulkRole">Role for All Users</Label>
-                          <Select value={bulkRole} onValueChange={setBulkRole}>
-                            <SelectTrigger data-testid="bulk-role-select">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="student">Student</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button 
-                          type="submit" 
-                          className="w-full"
-                          disabled={bulkInviteUsersMutation.isPending}
-                          data-testid="send-bulk-invitations-button"
-                        >
-                          {bulkInviteUsersMutation.isPending ? "Sending..." : "Send Bulk Invitations"}
-                        </Button>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
+              </Button>
             </div>
-
-            {/* Pending Invitations */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Pending Invitations</span>
-                  <Badge variant="secondary" data-testid="invitations-count">
-                    {invitations.filter((inv: any) => inv.status === "pending").length} pending
+            <CardDescription>
+              Analyze all students' resume data to identify trends, gaps, and strategic recommendations
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {groupInsights ? (
+              <div className="space-y-3">
+                <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground" data-testid="group-insights-content">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {groupInsights.insights}
+                  </ReactMarkdown>
+                </div>
+                <div className="flex items-center justify-between pt-3 border-t border-border/20">
+                  <p className="text-xs text-muted-foreground italic">
+                    Generated on {new Date(groupInsights.generatedAt).toLocaleString()}
+                  </p>
+                  <Badge variant="secondary" data-testid="students-analyzed-count">
+                    {groupInsights.studentsAnalyzed} of {groupInsights.totalStudents} students analyzed
                   </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Invited</TableHead>
-                      <TableHead>Expires</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {invitations
-                      .filter((invitation: any) => invitation.status === "pending")
-                      .map((invitation: any) => (
-                        <TableRow key={invitation.id}>
-                          <TableCell data-testid={`invitation-email-${invitation.id}`}>
-                            {invitation.email}
-                          </TableCell>
-                          <TableCell>
-                            <Badge 
-                              variant={invitation.role === "admin" ? "default" : "secondary"}
-                              data-testid={`invitation-role-${invitation.id}`}
-                            >
-                              {invitation.role}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" data-testid={`invitation-status-${invitation.id}`}>
-                              Pending
-                            </Badge>
-                          </TableCell>
-                          <TableCell data-testid={`invitation-created-${invitation.id}`}>
-                            {new Date(invitation.createdAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell data-testid={`invitation-expires-${invitation.id}`}>
-                            {new Date(invitation.expiresAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleCancelInvitation(invitation.id)}
-                              disabled={cancelInvitationMutation.isPending}
-                              data-testid={`cancel-invitation-${invitation.id}`}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </div>
+              </div>
+            ) : generateGroupInsightsMutation.isPending ? (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+              </div>
+            ) : (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Click "Generate Insights" to create an AI-powered analysis of all students' resume data. This will provide institutional recommendations and identify collective strengths and gaps.
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
 
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Student Management</span>
-                  <Badge variant="secondary" data-testid="users-count">
-                    {users.length} total students
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Verified</TableHead>
-                      <TableHead>Last Activity</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((userData: any) => (
-                      <TableRow 
-                        key={userData.id}
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => {
-                          setSelectedUser({
-                            id: userData.id,
-                            name: `${userData.firstName} ${userData.lastName}`,
-                            email: userData.email,
-                          });
-                        }}
-                        data-testid={`user-row-${userData.id}`}
+        {/* Student Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Student Management</span>
+              <Badge variant="secondary" data-testid="users-count">
+                {users.length} total students
+              </Badge>
+            </CardTitle>
+            <CardDescription>
+              Manage student accounts and access
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((userData: any) => (
+                  <TableRow 
+                    key={userData.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => {
+                      setSelectedUser({
+                        id: userData.id,
+                        name: `${userData.firstName} ${userData.lastName}`,
+                        email: userData.email,
+                      });
+                    }}
+                    data-testid={`user-row-${userData.id}`}
+                  >
+                    <TableCell>
+                      <div>
+                        <div className="font-medium" data-testid={`user-name-${userData.id}`}>
+                          {userData.firstName} {userData.lastName}
+                        </div>
+                        <div className="text-sm text-muted-foreground" data-testid={`user-email-${userData.id}`}>
+                          {userData.email}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={userData.role === "admin" ? "default" : "secondary"}
+                        data-testid={`user-role-${userData.id}`}
                       >
-                        <TableCell>
-                          <div>
-                            <div className="font-medium" data-testid={`user-name-${userData.id}`}>
-                              {userData.firstName} {userData.lastName}
-                            </div>
-                            <div className="text-sm text-muted-foreground" data-testid={`user-email-${userData.id}`}>
-                              {userData.email}
-                            </div>
-                          </div>
+                        {userData.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={userData.isActive ? "default" : "destructive"}
+                        data-testid={`user-status-${userData.id}`}
+                      >
+                        {userData.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex space-x-2">
+                        {!userData.isVerified && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleResendVerification(userData.id);
+                            }}
+                            data-testid={`resend-verification-${userData.id}`}
+                          >
+                            <Mail className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {userData.id !== user?.id && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTerminateUser(userData.id);
+                            }}
+                            data-testid={`terminate-user-${userData.id}`}
+                          >
+                            <Ban className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* Pending Invitations */}
+        {invitations.filter((inv: any) => inv.status === "pending").length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-muted-foreground" />
+                  <span>Pending Invitations</span>
+                </div>
+                <Badge variant="secondary" data-testid="pending-invitations-count">
+                  {invitations.filter((inv: any) => inv.status === "pending").length} pending
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Manage outstanding email invitations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Invited</TableHead>
+                    <TableHead>Expires</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invitations
+                    .filter((invitation: any) => invitation.status === "pending")
+                    .map((invitation: any) => (
+                      <TableRow key={invitation.id}>
+                        <TableCell data-testid={`invitation-email-${invitation.id}`}>
+                          {invitation.email}
                         </TableCell>
                         <TableCell>
                           <Badge 
-                            variant={userData.role === "admin" ? "default" : "secondary"}
-                            data-testid={`user-role-${userData.id}`}
+                            variant={invitation.role === "admin" ? "default" : "secondary"}
+                            data-testid={`invitation-role-${invitation.id}`}
                           >
-                            {userData.role}
+                            {invitation.role}
                           </Badge>
+                        </TableCell>
+                        <TableCell data-testid={`invitation-created-${invitation.id}`}>
+                          {new Date(invitation.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell data-testid={`invitation-expires-${invitation.id}`}>
+                          {new Date(invitation.expiresAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <Badge 
-                            variant={userData.isActive ? "default" : "destructive"}
-                            data-testid={`user-status-${userData.id}`}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleCancelInvitation(invitation.id)}
+                            disabled={cancelInvitationMutation.isPending}
+                            data-testid={`cancel-invitation-${invitation.id}`}
                           >
-                            {userData.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={userData.isVerified ? "default" : "secondary"}
-                            data-testid={`user-verified-${userData.id}`}
-                          >
-                            {userData.isVerified ? "Verified" : "Pending"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell data-testid={`user-last-activity-${userData.id}`}>
-                          {userData.lastActivityAt 
-                            ? new Date(userData.lastActivityAt).toLocaleDateString()
-                            : "Never"
-                          }
-                        </TableCell>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <div className="flex space-x-2">
-                            {!userData.isVerified && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleResendVerification(userData.id);
-                                }}
-                                data-testid={`resend-verification-${userData.id}`}
-                              >
-                                <Mail className="h-4 w-4" />
-                              </Button>
-                            )}
-                            {userData.id !== user?.id && (
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleTerminateUser(userData.id);
-                                }}
-                                data-testid={`terminate-user-${userData.id}`}
-                              >
-                                <Ban className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Confirmation Dialogs */}
-        
         {/* Terminate User Dialog */}
         <AlertDialog open={!!userToTerminate} onOpenChange={() => setUserToTerminate(null)}>
           <AlertDialogContent>
