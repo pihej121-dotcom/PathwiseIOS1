@@ -186,10 +186,7 @@ export default function AIJobMatching() {
         {jobMatches?.jobs && (
           <div className="space-y-4">
             {jobMatches.totalCount > 0 && (
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                  {jobMatches.totalCount} jobs found
-                </h3>
+              <div className="flex items-center justify-end">
                 <div className="text-sm text-muted-foreground">
                   Page {jobMatches.page} of {Math.ceil(jobMatches.totalCount / jobMatches.limit)}
                 </div>
@@ -439,16 +436,12 @@ export default function AIJobMatching() {
                 )}
 
                 {/* Actions */}
-                <div className="flex justify-end space-x-3 pt-4 border-t border-border">
+                <div className="flex justify-end pt-4 border-t border-border">
                   <Button
                     variant="outline"
                     onClick={() => setTailorModalOpen(false)}
                   >
                     Close
-                  </Button>
-                  <Button data-testid="button-download-tailored">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Download Resume
                   </Button>
                 </div>
               </div>

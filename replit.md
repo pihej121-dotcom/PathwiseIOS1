@@ -8,6 +8,20 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## UI Cleanup and Simplification (October 2025)
+- Removed "Download Resume" button from AI Copilot Tailored Resumes modal for cleaner UX
+- Removed job search results count display (e.g., "350 jobs found") while keeping pagination navigation
+
+## Admin Dashboard Redesign (October 2025)
+- Redesigned institution admin dashboard with minimalistic single-page layout (removed Overview/Invitations tabs)
+- Navigation components now display institution name instead of admin personal name
+- Reorganized dashboard: Added Single/Bulk Invitation cards, moved AI Group Insights to main view
+- Updated Total Accounts display to show "used/licensed" format (e.g., "3/50 students")
+- Streamlined Student Management table (removed Last Activity and Verified columns)
+- Added Pending Invitations section with cancel invitation functionality
+- Restored resend verification emails for unverified users
+- All mutations properly invalidate queries for real-time seat count updates
+
 ## Super Admin Dashboard Simplification (October 2025)
 - Simplified super admin dashboard to single-page interface (removed tabs)
 - Direct admin account creation with auto-generated passwords (no invitation tokens)
