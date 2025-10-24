@@ -105,9 +105,10 @@ export default function AdminDashboard() {
   });
   
   // Fetch detailed student information
-  const { data: studentDetails, isLoading: isLoadingStudentDetails } = useQuery({
+  const { data: studentDetails, isLoading: isLoadingStudentDetails, error: studentDetailsError } = useQuery({
     queryKey: [`/api/institutions/${user?.institutionId}/users/${selectedUserId}/details`],
     enabled: !!selectedUserId && !!user?.institutionId,
+    retry: 1,
   });
   
 
@@ -846,7 +847,23 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
-            ) : studentDetails ? (
+            ) : studentDetailsError ? (
+              <div className="py-12 text-center">
+                <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+                <h3 className="font-semibold mb-2">Failed to Load Student Details</h3>
+                <p className="text-sm text-muted-foreground">
+                  {(studentDetailsError as any)?.message || "An error occurred while fetching student information."}
+                </p>
+                <Button 
+                  onClick={() => setSelectedUserId(null)} 
+                  variant="outline" 
+                  className="mt-4"
+                  data-testid="close-error-dialog"
+                >
+                  Close
+                </Button>
+              </div>
+            ) : studentDetails && (studentDetails as any).user ? (
               <div className="space-y-6">
                 {/* Student Profile */}
                 <Card>
@@ -860,7 +877,7 @@ export default function AdminDashboard() {
                     <div>
                       <Label className="text-muted-foreground">Name</Label>
                       <p className="font-medium" data-testid="detail-student-name">
-                        {(studentDetails as any).user.firstName} {(studentDetails as any).user.lastName}
+                        {(studentDetails as any).user?.firstName || "N/A"} {(studentDetails as any).user?.lastName || ""}
                       </p>
                     </div>
                     <div>
