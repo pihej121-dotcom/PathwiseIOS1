@@ -1221,11 +1221,11 @@ if (existingUser && !existingUser.isActive) {
   // Get resume analysis history for a specific user (admin only)
   app.get("/api/institutions/:institutionId/users/:userId/resume-analysis-history", authenticate, async (req: AuthRequest, res) => {
     try {
-      if (req.user!.role !== "admin" && req.user!.role !== "super_admin") {
+      if (req.user!.role !== "admin" && req.user!.role !== "super_admin" && req.user!.role !== "institution_admin") {
         return res.status(403).json({ error: "Only admins can view user analysis history" });
       }
       
-      if (req.user!.role === "admin" && req.user!.institutionId !== req.params.institutionId) {
+      if ((req.user!.role === "admin" || req.user!.role === "institution_admin") && req.user!.institutionId !== req.params.institutionId) {
         return res.status(403).json({ error: "Access denied" });
       }
       
@@ -1235,7 +1235,13 @@ if (existingUser && !existingUser.isActive) {
       }
       
       const history = await storage.getUserResumeAnalysisHistory(req.params.userId);
-      res.json(history);
+      
+      // Include AI summary in response
+      res.json({
+        history,
+        aiSummary: user.aiSummary,
+        aiSummaryGeneratedAt: user.aiSummaryGeneratedAt
+      });
     } catch (error: any) {
       console.error("Error fetching user analysis history:", error);
       res.status(500).json({ error: "Failed to fetch user analysis history" });

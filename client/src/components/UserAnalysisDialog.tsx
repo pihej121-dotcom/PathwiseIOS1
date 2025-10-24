@@ -66,6 +66,12 @@ interface ResumeAnalysisHistoryItem {
   createdAt: string;
 }
 
+interface HistoryResponse {
+  history: ResumeAnalysisHistoryItem[];
+  aiSummary?: string | null;
+  aiSummaryGeneratedAt?: string | null;
+}
+
 export function UserAnalysisDialog({
   open,
   onOpenChange,
@@ -78,12 +84,14 @@ export function UserAnalysisDialog({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: historyData = [], isLoading } = useQuery<
-    ResumeAnalysisHistoryItem[]
-  >({
+  const { data: historyResponse, isLoading } = useQuery<HistoryResponse>({
     queryKey: [`/api/institutions/${institutionId}/users/${userId}/resume-analysis-history`],
     enabled: open,
   });
+
+  const historyData = historyResponse?.history || [];
+  const persistedSummary = historyResponse?.aiSummary;
+  const persistedSummaryDate = historyResponse?.aiSummaryGeneratedAt;
 
   const generateSummaryMutation = useMutation({
     mutationFn: async () => {
@@ -113,17 +121,12 @@ export function UserAnalysisDialog({
     },
   });
 
-  const [aiSummary, setAiSummary] = useState<{
-    summary: string;
-    generatedAt: string;
-  } | null>(null);
-
-  // Update AI summary when mutation succeeds
-  useEffect(() => {
-    if (generateSummaryMutation.data) {
-      setAiSummary(generateSummaryMutation.data);
-    }
-  }, [generateSummaryMutation.data]);
+  // Use persisted summary if available, otherwise use freshly generated one
+  const aiSummary = generateSummaryMutation.data || 
+    (persistedSummary && persistedSummaryDate ? {
+      summary: persistedSummary,
+      generatedAt: persistedSummaryDate
+    } : null);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
