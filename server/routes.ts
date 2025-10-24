@@ -1218,6 +1218,30 @@ if (existingUser && !existingUser.isActive) {
     }
   });
 
+  // Get resume analysis history for a specific user (admin only)
+  app.get("/api/institutions/:institutionId/users/:userId/resume-analysis-history", authenticate, async (req: AuthRequest, res) => {
+    try {
+      if (req.user!.role !== "admin" && req.user!.role !== "super_admin") {
+        return res.status(403).json({ error: "Only admins can view user analysis history" });
+      }
+      
+      if (req.user!.role === "admin" && req.user!.institutionId !== req.params.institutionId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const user = await storage.getUser(req.params.userId);
+      if (!user || user.institutionId !== req.params.institutionId) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const history = await storage.getUserResumeAnalysisHistory(req.params.userId);
+      res.json(history);
+    } catch (error: any) {
+      console.error("Error fetching user analysis history:", error);
+      res.status(500).json({ error: "Failed to fetch user analysis history" });
+    }
+  });
+
   // Career roadmap routes
   app.post("/api/roadmaps/generate", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {

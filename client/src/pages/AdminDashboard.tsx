@@ -59,6 +59,7 @@ import {
   FileUp
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { UserAnalysisDialog } from "@/components/UserAnalysisDialog";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -79,6 +80,13 @@ export default function AdminDashboard() {
   // User management state
   const [userToTerminate, setUserToTerminate] = useState<string | null>(null);
   const [userToResendVerification, setUserToResendVerification] = useState<string | null>(null);
+  
+  // User analysis dialog state
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    name: string;
+    email: string;
+  } | null>(null);
 
   // Fetch institution overview data
   const { data: institutionData, isLoading } = useQuery({
@@ -681,7 +689,18 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {users.map((userData: any) => (
-                      <TableRow key={userData.id}>
+                      <TableRow 
+                        key={userData.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => {
+                          setSelectedUser({
+                            id: userData.id,
+                            name: `${userData.firstName} ${userData.lastName}`,
+                            email: userData.email,
+                          });
+                        }}
+                        data-testid={`user-row-${userData.id}`}
+                      >
                         <TableCell>
                           <div>
                             <div className="font-medium" data-testid={`user-name-${userData.id}`}>
@@ -722,13 +741,16 @@ export default function AdminDashboard() {
                             : "Never"
                           }
                         </TableCell>
-                        <TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
                           <div className="flex space-x-2">
                             {!userData.isVerified && (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleResendVerification(userData.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleResendVerification(userData.id);
+                                }}
                                 data-testid={`resend-verification-${userData.id}`}
                               >
                                 <Mail className="h-4 w-4" />
@@ -738,7 +760,10 @@ export default function AdminDashboard() {
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => handleTerminateUser(userData.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTerminateUser(userData.id);
+                                }}
                                 data-testid={`terminate-user-${userData.id}`}
                               >
                                 <Ban className="h-4 w-4" />
@@ -808,6 +833,20 @@ export default function AdminDashboard() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* User Analysis Dialog */}
+        {selectedUser && user?.institutionId && (
+          <UserAnalysisDialog
+            open={!!selectedUser}
+            onOpenChange={(open) => {
+              if (!open) setSelectedUser(null);
+            }}
+            userId={selectedUser.id}
+            institutionId={user.institutionId}
+            userName={selectedUser.name}
+            userEmail={selectedUser.email}
+          />
+        )}
       </div>
     </Layout>
   );
