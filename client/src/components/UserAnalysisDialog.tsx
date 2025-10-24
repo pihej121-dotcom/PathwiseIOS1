@@ -123,7 +123,7 @@ export function UserAnalysisDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="user-analysis-dialog">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
+            <GraduationCap className="w-5 h-5" />
             <span>{userName}'s Resume Analysis History</span>
           </DialogTitle>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

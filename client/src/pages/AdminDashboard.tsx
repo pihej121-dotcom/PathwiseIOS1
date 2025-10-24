@@ -315,7 +315,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+              <CardTitle className="text-sm font-medium">Active Students</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -669,9 +669,9 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>User Management</span>
+                  <span>Student Management</span>
                   <Badge variant="secondary" data-testid="users-count">
-                    {users.length} total users
+                    {users.length} total students
                   </Badge>
                 </CardTitle>
               </CardHeader>
@@ -679,7 +679,7 @@ export default function AdminDashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>User</TableHead>
+                      <TableHead>Student</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Verified</TableHead>
@@ -786,9 +786,9 @@ export default function AdminDashboard() {
         <AlertDialog open={!!userToTerminate} onOpenChange={() => setUserToTerminate(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Terminate User Account</AlertDialogTitle>
+              <AlertDialogTitle>Terminate Student Account</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to terminate this user's account? This action will:
+                Are you sure you want to terminate this student's account? This action will:
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>Deactivate their account immediately</li>
                   <li>Revoke all active sessions</li>
@@ -806,7 +806,7 @@ export default function AdminDashboard() {
                 disabled={terminateUserMutation.isPending}
                 data-testid="confirm-terminate"
               >
-                {terminateUserMutation.isPending ? "Terminating..." : "Terminate User"}
+                {terminateUserMutation.isPending ? "Terminating..." : "Terminate Student"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -818,7 +818,7 @@ export default function AdminDashboard() {
             <AlertDialogHeader>
               <AlertDialogTitle>Resend Verification Email</AlertDialogTitle>
               <AlertDialogDescription>
-                This will send a new verification email to the user. They will need to click the link in the email to verify their account.
+                This will send a new verification email to the student. They will need to click the link in the email to verify their account.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
