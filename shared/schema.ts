@@ -110,6 +110,9 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionEndsAt: timestamp("subscription_ends_at"),
+  // AI summary for institutional admins
+  aiSummary: text("ai_summary"),
+  aiSummaryGeneratedAt: timestamp("ai_summary_generated_at"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
 });
