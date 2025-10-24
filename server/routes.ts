@@ -1304,7 +1304,7 @@ Provide a concise, actionable summary (max 500 words) that an institutional admi
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       
       const openaiResponse = await openai.chat.completions.create({
-        model: "gpt-5",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
