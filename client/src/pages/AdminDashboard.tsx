@@ -65,6 +65,8 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { UserAnalysisDialog } from "@/components/UserAnalysisDialog";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -404,94 +406,6 @@ export default function AdminDashboard() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <UserPlus className="h-5 w-5" />
-                    <span>Quick Actions</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="w-full" data-testid="quick-invite-button">
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Invite New User
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Invite New User</DialogTitle>
-                        <DialogDescription>
-                          Send an email invitation to join your institution
-                        </DialogDescription>
-                      </DialogHeader>
-                      <form onSubmit={handleInviteSubmit} className="space-y-4">
-                        <div>
-                          <Label htmlFor="inviteEmail">Email Address</Label>
-                          <Input
-                            id="inviteEmail"
-                            type="email"
-                            value={inviteEmail}
-                            onChange={(e) => setInviteEmail(e.target.value)}
-                            placeholder="user@university.edu"
-                            required
-                            data-testid="invite-email-input"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="inviteRole">Role</Label>
-                          <Select value={inviteRole} onValueChange={setInviteRole}>
-                            <SelectTrigger data-testid="invite-role-select">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="student">Student</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button 
-                          type="submit" 
-                          className="w-full"
-                          disabled={inviteUserMutation.isPending}
-                          data-testid="send-invitation-button"
-                        >
-                          {inviteUserMutation.isPending ? "Sending..." : "Send Invitation"}
-                        </Button>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                  
-                </CardContent>
-              </Card>
-
-              {/* Recent Activity */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">System operational</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Clock className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm">{invitations.filter((inv: any) => inv.status === "pending").length} pending invitations</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Users className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{users.filter((u: any) => u.isActive).length} active users</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Group Insights Section */}
             <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
               <CardHeader>
@@ -527,9 +441,11 @@ export default function AdminDashboard() {
               <CardContent>
                 {groupInsights ? (
                   <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed" data-testid="group-insights-content">
-                      {groupInsights.insights}
-                    </p>
+                    <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground" data-testid="group-insights-content">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {groupInsights.insights}
+                      </ReactMarkdown>
+                    </div>
                     <div className="flex items-center justify-between pt-3 border-t border-border/20">
                       <p className="text-xs text-muted-foreground italic">
                         Generated on {new Date(groupInsights.generatedAt).toLocaleString()}

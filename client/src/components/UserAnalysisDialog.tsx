@@ -27,6 +27,8 @@ import {
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface UserAnalysisDialogProps {
   open: boolean;
@@ -216,9 +218,11 @@ export function UserAnalysisDialog({
               <CardContent>
                 {aiSummary ? (
                   <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                      {aiSummary.summary}
-                    </p>
+                    <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {aiSummary.summary}
+                      </ReactMarkdown>
+                    </div>
                     <p className="text-xs text-muted-foreground italic">
                       Generated on {format(new Date(aiSummary.generatedAt), "PPp")}
                     </p>
