@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserSettingsDialog } from "@/components/UserSettingsDialog";
@@ -61,13 +62,29 @@ export function DropdownNav() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const getInitials = (firstName?: string, lastName?: string) => {
-    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
-  };
-
   const userRole = user?.role;
   const isStudent = userRole === "student";
   const isAdmin = userRole === "admin" || userRole === "super_admin";
+
+  const { data: institutionData } = useQuery({
+    queryKey: [`/api/institutions/${user?.institutionId}`],
+    enabled: !!user?.institutionId && isAdmin,
+  });
+
+  const institution = (institutionData as any)?.institution;
+
+  const getInitials = (firstName?: string, lastName?: string, institutionName?: string) => {
+    if (isAdmin && institutionName) {
+      const words = institutionName.split(' ');
+      if (words.length >= 2) {
+        return `${words[0][0]}${words[1][0]}`.toUpperCase();
+      }
+      return institutionName.slice(0, 2).toUpperCase();
+    }
+    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
+  };
+
+  const displayName = isAdmin && institution?.name ? institution.name : `${user?.firstName} ${user?.lastName}`;
 
   const navigationItems = isStudent 
     ? studentNavigation.filter((item) => {
@@ -127,11 +144,11 @@ export function DropdownNav() {
                 >
                   <Avatar className="w-6 h-6">
                     <AvatarFallback className="bg-gradient-to-br from-accent to-primary text-white font-semibold text-xs">
-                      {getInitials(user?.firstName, user?.lastName)}
+                      {getInitials(user?.firstName, user?.lastName, institution?.name)}
                     </AvatarFallback>
                   </Avatar>
                   <span className="hidden sm:inline text-sm">
-                    {user?.firstName} {user?.lastName}
+                    {displayName}
                   </span>
                   <Menu className="w-4 h-4" />
                 </Button>
@@ -142,12 +159,12 @@ export function DropdownNav() {
                 <div className="flex items-center space-x-3">
                   <Avatar className="w-10 h-10">
                     <AvatarFallback className="bg-gradient-to-br from-accent to-primary text-white font-semibold text-sm">
-                      {getInitials(user?.firstName, user?.lastName)}
+                      {getInitials(user?.firstName, user?.lastName, institution?.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate" data-testid="user-name">
-                      {user?.firstName} {user?.lastName}
+                      {displayName}
                     </p>
                     <p className="text-xs text-muted-foreground truncate" data-testid="user-major">
                       {isAdmin 

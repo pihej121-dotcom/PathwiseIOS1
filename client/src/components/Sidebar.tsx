@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserSettingsDialog } from "@/components/UserSettingsDialog";
@@ -46,9 +47,28 @@ export function Sidebar() {
   const { user, logout } = useAuth();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const getInitials = (firstName?: string, lastName?: string) => {
+  const userRole = user?.role;
+  const isAdmin = userRole === "admin" || userRole === "super_admin";
+
+  const { data: institutionData } = useQuery({
+    queryKey: [`/api/institutions/${user?.institutionId}`],
+    enabled: !!user?.institutionId && isAdmin,
+  });
+
+  const institution = (institutionData as any)?.institution;
+
+  const getInitials = (firstName?: string, lastName?: string, institutionName?: string) => {
+    if (isAdmin && institutionName) {
+      const words = institutionName.split(' ');
+      if (words.length >= 2) {
+        return `${words[0][0]}${words[1][0]}`.toUpperCase();
+      }
+      return institutionName.slice(0, 2).toUpperCase();
+    }
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
+
+  const displayName = isAdmin && institution?.name ? institution.name : `${user?.firstName} ${user?.lastName}`;
 
   return (
     <aside className="w-64 bg-card border-r border-border flex flex-col h-screen">
@@ -142,20 +162,17 @@ export function Sidebar() {
         <div className="flex items-center space-x-3 mb-3">
           <Avatar className="w-10 h-10">
             <AvatarFallback className="bg-gradient-to-br from-accent to-primary text-white font-semibold text-sm">
-              {getInitials(user?.firstName, user?.lastName)}
+              {getInitials(user?.firstName, user?.lastName, institution?.name)}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate" data-testid="user-name">
-              {user?.firstName} {user?.lastName}
+              {displayName}
             </p>
             <p className="text-xs text-muted-foreground truncate" data-testid="user-major">
-              {(() => {
-                const userRole = user?.role;
-                return userRole === "admin" || userRole === "super_admin" 
-                  ? userRole === "super_admin" ? "Super Admin" : "Admin"
-                  : user?.major || "Student";
-              })()}
+              {isAdmin 
+                ? userRole === "super_admin" ? "Super Admin" : "Admin"
+                : user?.major || "Student"}
             </p>
           </div>
           <Button
