@@ -8,6 +8,26 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Job Analysis Persistence & Enhanced UI (November 2025)
+- **Complete job analysis history tracking** with database persistence
+- New database tables:
+  - `job_analyses`: Stores full analysis results with match scores, skills analysis, and experience analysis
+  - `cover_letters`: Stores generated cover letters linked to job analyses
+  - Updated `tailored_resumes`: Added `job_analysis_id` foreign key for linking
+- **Enhanced Skills Analysis UI**:
+  - Now displays partial matches separately from strong matches and missing skills
+  - Visual distinction with color-coded badges (green for strong, yellow for partial, red for missing)
+- **Complete Experience Analysis section**:
+  - Shows relevant experience items that match job requirements
+  - Displays experience gaps that need to be addressed
+  - Provides detailed explanations for both
+- **Full data linkage**: Each job analysis generates an `analysisId` that connects to all associated tailored resumes and cover letters
+- Backend API endpoints for retrieval:
+  - `/api/jobs/analyses`: Get user's job analysis history
+  - `/api/jobs/tailored-resumes`: Get tailored resume history
+  - `/api/jobs/cover-letters`: Get cover letter history
+- **Company name normalization**: Fixed extraction to properly handle both string and object formats from job scrapers
+
 ## Job Analysis Feature Migration (November 2025)
 - **Replaced job search/browse workflow** with streamlined job analysis feature
 - Users can now paste job posting URLs or manually enter job details (title, company, description, qualifications)
@@ -18,9 +38,9 @@ Preferred communication style: Simple, everyday language.
   3. **Cover Letter Generation**: AI-generated personalized cover letter
 - Backend endpoints:
   - `/api/jobs/extract-from-url`: Basic job detail extraction from URLs
-  - `/api/jobs/analyze-match`: AI match analysis without requiring job search
-  - `/api/jobs/generate-cover-letter`: Cover letter generation from job details
-  - Existing `/api/jobs/tailor-resume`: Resume tailoring for specific jobs
+  - `/api/jobs/analyze-match`: AI match analysis and persistence
+  - `/api/jobs/generate-cover-letter`: Cover letter generation with job analysis linking
+  - `/api/jobs/tailor-resume`: Resume tailoring with job analysis linking
 - Simplified UX: Single page with tabs for URL paste vs manual entry
 - Kept existing job search infrastructure (JobsService, BeyondJobsService) for backward compatibility
 
