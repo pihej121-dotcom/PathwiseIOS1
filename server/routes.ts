@@ -1658,7 +1658,111 @@ Make your recommendations specific, actionable, and data-driven based on the act
     }
   });
 
-  // New endpoint: Get detailed AI match analysis for a specific job
+  // New endpoint: Extract job details from URL
+  app.post("/api/jobs/extract-from-url", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const { url } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ error: "URL is required" });
+      }
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL: ${response.status}`);
+        }
+        
+        const html = await response.text();
+        
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        const descriptionMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+        
+        const title = titleMatch ? titleMatch[1].split('|')[0].split('-')[0].trim() : '';
+        const description = descriptionMatch ? descriptionMatch[1] : '';
+        
+        const textContent = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+                                 .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+                                 .replace(/<[^>]+>/g, ' ')
+                                 .replace(/\s+/g, ' ')
+                                 .trim();
+        
+        res.json({
+          title: title || 'Job Position',
+          company: 'Company Name',
+          description: description || textContent.substring(0, 2000),
+          url
+        });
+      } catch (fetchError) {
+        return res.status(400).json({ 
+          error: "Unable to extract job details from URL. Please enter details manually." 
+        });
+      }
+    } catch (error: any) {
+      console.error("URL extraction error:", error);
+      res.status(500).json({ error: "Failed to extract job details" });
+    }
+  });
+
+  // New endpoint: Analyze job match (simplified - no job ID needed)
+  app.post("/api/jobs/analyze-match", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+    try {
+      const { jobData } = req.body;
+      
+      if (!jobData) {
+        return res.status(400).json({ error: "Job data is required" });
+      }
+      
+      const activeResume = await storage.getActiveResume(req.user!.id);
+      
+      if (!activeResume?.extractedText) {
+        return res.status(400).json({ error: "No active resume found. Please upload a resume first." });
+      }
+      
+      const matchAnalysis = await aiService.analyzeJobMatch(activeResume.extractedText, jobData);
+      
+      res.json(matchAnalysis);
+    } catch (error: any) {
+      console.error("Job match analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze job match" });
+    }
+  });
+
+  // New endpoint: Generate cover letter for job
+  app.post("/api/jobs/generate-cover-letter", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+    try {
+      const { jobData } = req.body;
+      
+      if (!jobData) {
+        return res.status(400).json({ error: "Job data is required" });
+      }
+      
+      const activeResume = await storage.getActiveResume(req.user!.id);
+      
+      if (!activeResume?.extractedText) {
+        return res.status(400).json({ error: "No active resume found. Please upload a resume first." });
+      }
+      
+      const coverLetter = await aiService.generateCoverLetter(
+        activeResume.extractedText,
+        jobData.description || '',
+        jobData.company?.display_name || jobData.company || 'the company',
+        jobData.title || 'the position'
+      );
+      
+      res.json({ coverLetter });
+    } catch (error: any) {
+      console.error("Cover letter generation error:", error);
+      res.status(500).json({ error: "Failed to generate cover letter" });
+    }
+  });
+
+  // Old endpoint: Get detailed AI match analysis for a specific job
   app.post("/api/jobs/match-analysis", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
       console.log("Match analysis request received from user:", req.user?.id);
