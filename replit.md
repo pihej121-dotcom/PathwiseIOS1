@@ -8,6 +8,22 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Job Analysis Feature Migration (November 2025)
+- **Replaced job search/browse workflow** with streamlined job analysis feature
+- Users can now paste job posting URLs or manually enter job details (title, company, description, qualifications)
+- New `/jobs` route displays Job Analysis page instead of job search
+- Added three core AI-powered features for any job posting:
+  1. **Match Analysis**: Get detailed compatibility assessment between resume and job posting
+  2. **Resume Tailoring**: Generate job-specific optimized resume with downloadable DOCX
+  3. **Cover Letter Generation**: AI-generated personalized cover letter
+- Backend endpoints:
+  - `/api/jobs/extract-from-url`: Basic job detail extraction from URLs
+  - `/api/jobs/analyze-match`: AI match analysis without requiring job search
+  - `/api/jobs/generate-cover-letter`: Cover letter generation from job details
+  - Existing `/api/jobs/tailor-resume`: Resume tailoring for specific jobs
+- Simplified UX: Single page with tabs for URL paste vs manual entry
+- Kept existing job search infrastructure (JobsService, BeyondJobsService) for backward compatibility
+
 ## UI Cleanup and Simplification (October 2025)
 - Removed "Download Resume" button from AI Copilot Tailored Resumes modal for cleaner UX
 - Removed job search results count display (e.g., "350 jobs found") while keeping pagination navigation
