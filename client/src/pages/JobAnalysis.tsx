@@ -52,7 +52,7 @@ interface TailoredResumeResult {
   docxBuffer?: string;
 }
 
-export default function JobAnalysis() {
+export default function JobAnalysis({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
   const [inputMethod, setInputMethod] = useState<"url" | "manual">("manual");
   const [jobUrl, setJobUrl] = useState("");
@@ -221,15 +221,14 @@ export default function JobAnalysis() {
 
   const isJobDetailsValid = jobDetails.title && jobDetails.company && jobDetails.description;
 
-  return (
-    <Layout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Job Analysis</h1>
-          <p className="text-muted-foreground mt-2">
-            Paste a job link or enter details to get AI-powered match analysis, resume tailoring, and cover letter generation
-          </p>
-        </div>
+  const content = (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Job Analysis</h1>
+        <p className="text-muted-foreground mt-2">
+          Paste a job link or enter details to get AI-powered match analysis, resume tailoring, and cover letter generation
+        </p>
+      </div>
 
         <Card>
           <CardHeader>
@@ -539,7 +538,12 @@ export default function JobAnalysis() {
             </CardContent>
           </Card>
         )}
-      </div>
+    </div>
+  );
+
+  return embedded ? content : (
+    <Layout>
+      {content}
     </Layout>
   );
 }

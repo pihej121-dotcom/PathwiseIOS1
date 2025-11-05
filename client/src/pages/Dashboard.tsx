@@ -26,7 +26,7 @@ import { format } from "date-fns";
 // Import feature components
 import ResumeAnalysis from "./ResumeAnalysis";
 import CareerRoadmap from "./CareerRoadmap";
-import JobMatching from "./JobMatching";
+import JobAnalysis from "./JobAnalysis";
 import MicroProjects from "./MicroProjects";
 import { AICopilot } from "./AICopilot";
 import Applications from "./Applications";
@@ -324,7 +324,7 @@ export default function Dashboard() {
         <div className="mt-6">
           {selectedCard === 'resume' && <ResumeAnalysis embedded={true} />}
           {selectedCard === 'roadmap' && <CareerRoadmap embedded={true} />}
-          {selectedCard === 'jobs' && <JobMatching embedded={true} />}
+          {selectedCard === 'jobs' && <JobAnalysis embedded={true} />}
           {selectedCard === 'projects' && <MicroProjects embedded={true} />}
           {selectedCard === 'copilot' && <AICopilot embedded={true} />}
           {selectedCard === 'applications' && <Applications embedded={true} />}
