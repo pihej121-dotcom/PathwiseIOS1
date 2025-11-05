@@ -64,6 +64,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     requirements: "",
   });
   const [analysis, setAnalysis] = useState<JobAnalysisResult | null>(null);
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [tailoredResume, setTailoredResume] = useState<TailoredResumeResult | null>(null);
   const [coverLetter, setCoverLetter] = useState<string | null>(null);
 
@@ -118,6 +119,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     },
     onSuccess: (data: any) => {
       setAnalysis(data);
+      setAnalysisId(data.analysisId || null);
       toast({
         title: "Analysis complete",
         description: `${data.competitivenessBand} match - ${data.overallMatch}% compatibility`,
@@ -136,7 +138,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     mutationFn: async () => {
       const response = await fetch(`/api/jobs/tailor-resume`, {
         method: "POST",
-        body: JSON.stringify({ jobData: jobDetails }),
+        body: JSON.stringify({ jobData: jobDetails, jobAnalysisId: analysisId }),
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
@@ -163,7 +165,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     mutationFn: async () => {
       const response = await fetch(`/api/jobs/generate-cover-letter`, {
         method: "POST",
-        body: JSON.stringify({ jobData: jobDetails }),
+        body: JSON.stringify({ jobData: jobDetails, jobAnalysisId: analysisId }),
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
@@ -437,7 +439,17 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
                     <p className="text-xs font-medium text-green-600 dark:text-green-400 mt-2">Strong Matches:</p>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {analysis.skillsAnalysis.strongMatches.map((skill, i) => (
-                        <Badge key={i} variant="outline" className="text-xs">{skill}</Badge>
+                        <Badge key={i} variant="outline" className="text-xs bg-green-50 dark:bg-green-900/20">{skill}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {analysis.skillsAnalysis.partialMatches && analysis.skillsAnalysis.partialMatches.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mt-2">Partial Matches:</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {analysis.skillsAnalysis.partialMatches.map((skill, i) => (
+                        <Badge key={i} variant="outline" className="text-xs bg-blue-50 dark:bg-blue-900/20">{skill}</Badge>
                       ))}
                     </div>
                   </div>
@@ -450,6 +462,31 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
                         <Badge key={i} variant="secondary" className="text-xs">{skill}</Badge>
                       ))}
                     </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold">Experience Analysis</h3>
+                <p className="text-sm text-muted-foreground">{analysis.experienceAnalysis.explanation}</p>
+                {analysis.experienceAnalysis.relevantExperience.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-green-600 dark:text-green-400 mt-2">Relevant Experience:</p>
+                    <ul className="list-disc pl-5 space-y-1 mt-1">
+                      {analysis.experienceAnalysis.relevantExperience.map((exp, i) => (
+                        <li key={i} className="text-sm">{exp}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {analysis.experienceAnalysis.experienceGaps.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-orange-600 dark:text-orange-400 mt-2">Experience Gaps:</p>
+                    <ul className="list-disc pl-5 space-y-1 mt-1">
+                      {analysis.experienceAnalysis.experienceGaps.map((gap, i) => (
+                        <li key={i} className="text-sm text-muted-foreground">{gap}</li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>

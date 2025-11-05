@@ -1726,7 +1726,29 @@ Make your recommendations specific, actionable, and data-driven based on the act
       
       const matchAnalysis = await aiService.analyzeJobMatch(activeResume.extractedText, jobData);
       
-      res.json(matchAnalysis);
+      // Save the job analysis to database
+      const jobAnalysisData = {
+        userId: req.user!.id,
+        resumeId: activeResume.id,
+        jobTitle: jobData.title || 'Untitled Position',
+        jobCompany: jobData.company?.display_name || jobData.company || 'Unknown Company',
+        jobLocation: jobData.location || null,
+        jobDescription: jobData.description || '',
+        jobRequirements: jobData.requirements || null,
+        jobUrl: jobData.url || null,
+        overallMatch: matchAnalysis.overallMatch,
+        competitivenessBand: matchAnalysis.competitivenessBand,
+        strengths: matchAnalysis.strengths,
+        concerns: matchAnalysis.concerns,
+        skillsAnalysis: matchAnalysis.skillsAnalysis,
+        experienceAnalysis: matchAnalysis.experienceAnalysis,
+        recommendations: matchAnalysis.recommendations,
+        nextSteps: matchAnalysis.nextSteps,
+      };
+      
+      const savedAnalysis = await storage.createJobAnalysis(jobAnalysisData);
+      
+      res.json({ ...matchAnalysis, analysisId: savedAnalysis.id });
     } catch (error: any) {
       console.error("Job match analysis error:", error);
       res.status(500).json({ error: "Failed to analyze job match" });
@@ -1736,7 +1758,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
   // New endpoint: Generate cover letter for job
   app.post("/api/jobs/generate-cover-letter", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
-      const { jobData } = req.body;
+      const { jobData, jobAnalysisId } = req.body;
       
       if (!jobData) {
         return res.status(400).json({ error: "Job data is required" });
@@ -1755,7 +1777,19 @@ Make your recommendations specific, actionable, and data-driven based on the act
         jobData.title || 'the position'
       );
       
-      res.json({ coverLetter });
+      // Save the cover letter to database
+      const coverLetterData = {
+        userId: req.user!.id,
+        resumeId: activeResume.id,
+        jobAnalysisId: jobAnalysisId || null,
+        jobTitle: jobData.title || 'Untitled Position',
+        jobCompany: jobData.company?.display_name || jobData.company || 'Unknown Company',
+        content: coverLetter,
+      };
+      
+      const savedCoverLetter = await storage.createCoverLetter(coverLetterData);
+      
+      res.json({ coverLetter, coverLetterId: savedCoverLetter.id });
     } catch (error: any) {
       console.error("Cover letter generation error:", error);
       res.status(500).json({ error: "Failed to generate cover letter" });
@@ -1803,6 +1837,42 @@ Make your recommendations specific, actionable, and data-driven based on the act
     } catch (error) {
       console.error("Get job matches error:", error);
       res.status(500).json({ error: "Failed to get job matches" });
+    }
+  });
+
+  // Get user's job analysis history
+  app.get("/api/jobs/analyses", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const analyses = await storage.getUserJobAnalyses(req.user!.id, limit);
+      res.json(analyses);
+    } catch (error) {
+      console.error("Get job analyses error:", error);
+      res.status(500).json({ error: "Failed to get job analyses" });
+    }
+  });
+
+  // Get user's tailored resumes
+  app.get("/api/jobs/tailored-resumes", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const tailoredResumes = await storage.getTailoredResumes(req.user!.id, limit);
+      res.json(tailoredResumes);
+    } catch (error) {
+      console.error("Get tailored resumes error:", error);
+      res.status(500).json({ error: "Failed to get tailored resumes" });
+    }
+  });
+
+  // Get user's cover letters
+  app.get("/api/jobs/cover-letters", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const coverLetters = await storage.getUserCoverLetters(req.user!.id, limit);
+      res.json(coverLetters);
+    } catch (error) {
+      console.error("Get cover letters error:", error);
+      res.status(500).json({ error: "Failed to get cover letters" });
     }
   });
 
@@ -1993,7 +2063,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
 
   app.post("/api/jobs/tailor-resume", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
-      const { jobData, baseResumeId } = req.body;
+      const { jobData, baseResumeId, jobAnalysisId } = req.body;
       
       if (!jobData) {
         return res.status(400).json({ error: "Job data is required" });
@@ -2060,6 +2130,9 @@ Make your recommendations specific, actionable, and data-driven based on the act
         userId: req.user!.id,
         baseResumeId: resume.id,
         jobMatchId: jobMatch.id,
+        jobAnalysisId: jobAnalysisId || null,
+        jobTitle: jobData.title || 'Job Position',
+        jobCompany: jobData.company?.display_name || jobData.company || 'Company',
         tailoredContent: tailoredResult.tailoredContent,
         diffJson: tailoredResult.diffJson,
         jobSpecificScore: tailoredResult.jobSpecificScore,

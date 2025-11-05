@@ -1,12 +1,15 @@
 import { 
-  users, sessions, resumes, roadmaps, jobMatches, tailoredResumes, 
-  applications, achievements, activities, resources, institutions,
+  users, sessions, resumes, roadmaps, jobMatches, jobAnalyses, tailoredResumes, 
+  coverLetters, applications, achievements, activities, resources, institutions,
   licenses, invitations, emailVerifications, promoCodes, passwordResetTokens,
   skillGapAnalyses, microProjects, projectCompletions, portfolioArtifacts,
   opportunities, savedOpportunities, tourCompletions, resumeAnalysisHistory,
   type User, type InsertUser, type Resume, type InsertResume,
   type Roadmap, type InsertRoadmap, type JobMatch, type InsertJobMatch,
-  type TailoredResume, type Application, type InsertApplication,
+  type JobAnalysis, type InsertJobAnalysis,
+  type TailoredResume, type InsertTailoredResume,
+  type CoverLetter, type InsertCoverLetter,
+  type Application, type InsertApplication,
   type Achievement, type Activity, type Resource, type Institution,
   type InsertInstitution, type License, type InsertLicense,
   type Invitation, type InsertInvitation, type EmailVerification,
@@ -69,9 +72,18 @@ export interface IStorage {
   updateJobMatchBookmark(id: string, isBookmarked: boolean): Promise<JobMatch>;
   getJobMatchById(id: string): Promise<JobMatch | undefined>;
   
+  // Job Analyses
+  createJobAnalysis(jobAnalysis: InsertJobAnalysis): Promise<JobAnalysis>;
+  getUserJobAnalyses(userId: string, limit?: number): Promise<JobAnalysis[]>;
+  getJobAnalysisById(id: string): Promise<JobAnalysis | undefined>;
+  
   // Tailored Resumes
-  createTailoredResume(tailoredResume: any): Promise<TailoredResume>;
-  getTailoredResumes(userId: string): Promise<any[]>;
+  createTailoredResume(tailoredResume: InsertTailoredResume): Promise<TailoredResume>;
+  getTailoredResumes(userId: string, limit?: number): Promise<TailoredResume[]>;
+  
+  // Cover Letters
+  createCoverLetter(coverLetter: InsertCoverLetter): Promise<CoverLetter>;
+  getUserCoverLetters(userId: string, limit?: number): Promise<CoverLetter[]>;
   
   // Applications
   createApplication(application: InsertApplication): Promise<Application>;
@@ -557,23 +569,55 @@ export class DatabaseStorage implements IStorage {
     return newTailoredResume;
   }
 
-  async getTailoredResumes(userId: string): Promise<any[]> {
-    return await db
-      .select({
-        id: tailoredResumes.id,
-        tailoredContent: tailoredResumes.tailoredContent,
-        jobSpecificScore: tailoredResumes.jobSpecificScore,
-        keywordsCovered: tailoredResumes.keywordsCovered,
-        createdAt: tailoredResumes.createdAt,
-        jobTitle: jobMatches.title,
-        company: jobMatches.company,
-        baseResumeFileName: resumes.fileName,
-      })
+  async getTailoredResumes(userId: string, limit?: number): Promise<TailoredResume[]> {
+    const query = db
+      .select()
       .from(tailoredResumes)
-      .leftJoin(jobMatches, eq(tailoredResumes.jobMatchId, jobMatches.id))
-      .leftJoin(resumes, eq(tailoredResumes.baseResumeId, resumes.id))
       .where(eq(tailoredResumes.userId, userId))
       .orderBy(desc(tailoredResumes.createdAt));
+    
+    if (limit) {
+      return await query.limit(limit);
+    }
+    return await query;
+  }
+
+  // Job Analyses Methods
+  async createJobAnalysis(jobAnalysis: InsertJobAnalysis): Promise<JobAnalysis> {
+    const [newJobAnalysis] = await db.insert(jobAnalyses).values(jobAnalysis).returning();
+    return newJobAnalysis;
+  }
+
+  async getUserJobAnalyses(userId: string, limit = 20): Promise<JobAnalysis[]> {
+    return await db
+      .select()
+      .from(jobAnalyses)
+      .where(eq(jobAnalyses.userId, userId))
+      .orderBy(desc(jobAnalyses.createdAt))
+      .limit(limit);
+  }
+
+  async getJobAnalysisById(id: string): Promise<JobAnalysis | undefined> {
+    const [jobAnalysis] = await db
+      .select()
+      .from(jobAnalyses)
+      .where(eq(jobAnalyses.id, id));
+    return jobAnalysis || undefined;
+  }
+
+  // Cover Letters Methods
+  async createCoverLetter(coverLetter: InsertCoverLetter): Promise<CoverLetter> {
+    const [newCoverLetter] = await db.insert(coverLetters).values(coverLetter).returning();
+    return newCoverLetter;
+  }
+
+  async getUserCoverLetters(userId: string, limit = 20): Promise<CoverLetter[]> {
+    return await db
+      .select()
+      .from(coverLetters)
+      .where(eq(coverLetters.userId, userId))
+      .orderBy(desc(coverLetters.createdAt))
+      .limit(limit);
   }
 
   async getResources(skillCategories?: string[]): Promise<Resource[]> {
