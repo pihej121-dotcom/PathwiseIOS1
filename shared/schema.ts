@@ -246,12 +246,37 @@ export const jobMatches = pgTable("job_matches", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+// Job analyses - stores AI analysis results for job postings
+export const jobAnalyses = pgTable("job_analyses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  resumeId: varchar("resume_id").notNull().references(() => resumes.id),
+  jobTitle: text("job_title").notNull(),
+  jobCompany: text("job_company").notNull(),
+  jobLocation: text("job_location"),
+  jobDescription: text("job_description").notNull(),
+  jobRequirements: text("job_requirements"),
+  jobUrl: text("job_url"),
+  overallMatch: integer("overall_match"), // 0-100
+  competitivenessBand: text("competitiveness_band"),
+  strengths: text("strengths").array(),
+  concerns: text("concerns").array(),
+  skillsAnalysis: jsonb("skills_analysis"), // { strongMatches, partialMatches, missingSkills, explanation }
+  experienceAnalysis: jsonb("experience_analysis"), // { relevantExperience, experienceGaps, explanation }
+  recommendations: text("recommendations").array(),
+  nextSteps: text("next_steps").array(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 // Tailored resumes
 export const tailoredResumes = pgTable("tailored_resumes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   baseResumeId: varchar("base_resume_id").notNull().references(() => resumes.id),
-  jobMatchId: varchar("job_match_id").notNull().references(() => jobMatches.id),
+  jobAnalysisId: varchar("job_analysis_id").references(() => jobAnalyses.id),
+  jobMatchId: varchar("job_match_id").references(() => jobMatches.id),
+  jobTitle: text("job_title").notNull(),
+  jobCompany: text("job_company").notNull(),
   tailoredContent: text("tailored_content").notNull(),
   diffJson: jsonb("diff_json"), // Source map of all edits
   jobSpecificScore: integer("job_specific_score"), // 0-100
@@ -259,6 +284,18 @@ export const tailoredResumes = pgTable("tailored_resumes", {
   remainingGaps: jsonb("remaining_gaps"),
   docxPath: text("docx_path"),
   pdfPath: text("pdf_path"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+// Cover letters - stores AI-generated cover letters
+export const coverLetters = pgTable("cover_letters", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  resumeId: varchar("resume_id").notNull().references(() => resumes.id),
+  jobAnalysisId: varchar("job_analysis_id").references(() => jobAnalyses.id),
+  jobTitle: text("job_title").notNull(),
+  jobCompany: text("job_company").notNull(),
+  content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
@@ -649,6 +686,21 @@ export const insertJobMatchSchema = createInsertSchema(jobMatches).omit({
   createdAt: true,
 });
 
+export const insertJobAnalysisSchema = createInsertSchema(jobAnalyses).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTailoredResumeSchema = createInsertSchema(tailoredResumes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCoverLetterSchema = createInsertSchema(coverLetters).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertApplicationSchema = createInsertSchema(applications).omit({
   id: true,
   createdAt: true,
@@ -741,7 +793,12 @@ export type RoadmapSubsection = typeof roadmapSubsections.$inferSelect;
 export type InsertRoadmapSubsection = z.infer<typeof insertRoadmapSubsectionSchema>;
 export type JobMatch = typeof jobMatches.$inferSelect;
 export type InsertJobMatch = z.infer<typeof insertJobMatchSchema>;
+export type JobAnalysis = typeof jobAnalyses.$inferSelect;
+export type InsertJobAnalysis = z.infer<typeof insertJobAnalysisSchema>;
 export type TailoredResume = typeof tailoredResumes.$inferSelect;
+export type InsertTailoredResume = z.infer<typeof insertTailoredResumeSchema>;
+export type CoverLetter = typeof coverLetters.$inferSelect;
+export type InsertCoverLetter = z.infer<typeof insertCoverLetterSchema>;
 export type Application = typeof applications.$inferSelect;
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
 export type Achievement = typeof achievements.$inferSelect;
