@@ -210,6 +210,27 @@ ID REQUIREMENTS:
     }
   }
 
+  private sanitizeJSON(rawJSON: string): string {
+    try {
+      let sanitized = rawJSON.trim();
+      
+      if (sanitized.startsWith('```json')) {
+        sanitized = sanitized.replace(/^```json\s*/i, '').replace(/```\s*$/, '');
+      } else if (sanitized.startsWith('```')) {
+        sanitized = sanitized.replace(/^```\s*/, '').replace(/```\s*$/, '');
+      }
+      
+      sanitized = sanitized.replace(/,(\s*[}\]])/g, '$1');
+      sanitized = sanitized.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":');
+      sanitized = sanitized.replace(/:\s*'([^']*)'/g, ': "$1"');
+      
+      return sanitized.trim();
+    } catch (error) {
+      console.error('JSON sanitization error:', error);
+      return rawJSON;
+    }
+  }
+
   async analyzeJobMatch(resumeText: string, jobData: any): Promise<JobMatchAnalysis> {
     try {
       const prompt = `You are an expert career counselor and hiring manager analyzing how well a candidate's resume matches a specific job posting. Provide comprehensive, data-driven insights that quantify why the candidate is or isn't competitive for this role.
@@ -277,22 +298,32 @@ Below 50: Poor fit - not competitive for this specific role
 Focus on being brutally honest about competitiveness while providing constructive, actionable guidance.`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // Using GPT-4o for reliable performance
+        model: "gpt-4o",
         messages: [
           { role: "system", content: "You are an expert hiring manager. Respond with valid JSON exactly matching the required schema. No additional prose or markdown." },
           { role: "user", content: prompt }
         ],
         response_format: { type: "json_object" },
-        max_tokens: 1500, // Control token usage for cost optimization
-        temperature: 0.3, // Lower temperature for more consistent analysis
-        top_p: 0.9 // Focus on most relevant outputs
+        max_tokens: 1500,
+        temperature: 0.3,
+        top_p: 0.9
       });
 
-      const rawAnalysis = JSON.parse(response.choices[0].message.content || '{}');
+      const rawContent = response.choices[0].message.content || '{}';
+      let rawAnalysis;
       
-      // Validate the analysis using Zod schema for runtime safety
       try {
-        // Add competitiveness band based on overall match score
+        const sanitizedContent = this.sanitizeJSON(rawContent);
+        rawAnalysis = JSON.parse(sanitizedContent);
+      } catch (parseError) {
+        console.error('❌ JSON parsing failed for job match analysis');
+        console.error('Parse error:', parseError);
+        console.error('Raw content (first 500 chars):', rawContent.substring(0, 500));
+        console.error('Falling back to default analysis due to malformed JSON from AI');
+        return this.getFallbackAnalysis();
+      }
+      
+      try {
         const analysisWithBand = {
           ...rawAnalysis,
           competitivenessBand: getCompetitivenessBand(rawAnalysis.overallMatch || 75)
@@ -301,12 +332,12 @@ Focus on being brutally honest about competitiveness while providing constructiv
         const validatedAnalysis = jobMatchAnalysisSchema.parse(analysisWithBand);
         return validatedAnalysis;
       } catch (validationError) {
-        console.error('AI analysis validation failed:', validationError);
-        // Return structured fallback if validation fails
+        console.error('❌ AI analysis validation failed:', validationError);
+        console.error('Raw analysis structure:', JSON.stringify(rawAnalysis, null, 2).substring(0, 500));
         return this.getFallbackAnalysis();
       }
     } catch (error) {
-      console.error('AI job match analysis failed:', error);
+      console.error('❌ AI job match analysis failed:', error);
       return this.getFallbackAnalysis();
     }
   }
