@@ -1,0 +1,31 @@
+Job match analysis error: error: invalid input syntax for type json
+    at /app/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+    at async DatabaseStorage.createJobAnalysis (file:///app/dist/index.js:1136:34)
+    at async file:///app/dist/index.js:6168:29 {
+  length: 243,
+  severity: 'ERROR',
+  code: '22P02',
+  detail: 'Expected ":", but found ",".',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: 'JSON data, line 1: ...ring excellent product and service experiences.",...\n' +
+    "unnamed portal parameter $11 = '...'",
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'jsonfuncs.c',
+  line: '657',
+  routine: 'json_errsave_error'
+}
+4:00:09 AM [express] POST /api/jobs/analyze-match 500 in 11872ms :: {"error":"Failed to analyze job …
+2025-11-06 04:00:09.483 UTC [23092] ERROR:  invalid input syntax for type json
+2025-11-06 04:00:09.483 UTC [23092] DETAIL:  Expected ":", but found ",".
+2025-11-06 04:00:09.483 UTC [23092] CONTEXT:  JSON data, line 1: ...ring excellent product and service experiences.",...
+	unnamed portal parameter $11 = '...'
+2025-11-06 04:00:09.483 UTC [23092] STATEMENT:  insert into "job_analyses" ("id", "user_id", "resume_id", "job_title", "job_company", "job_location", "job_description", "job_requirements", "job_url", "overall_match", "competitiveness_band", "strengths", "concerns", "skills_analysis", "experience_analysis", "recommendations", "next_steps", "created_at") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, default) returning "id", "user_id", "resume_id", "job_title", "job_company", "job_location", "job_description", "job_requirements", "job_url", "overall_match", "competitiveness_band", "strengths", "concerns", "skills_analysis", "experience_analysis", "recommendations", "next_steps", "created_at"
