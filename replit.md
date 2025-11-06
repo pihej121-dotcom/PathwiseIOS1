@@ -8,6 +8,24 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Resume Upload and Analysis Page Separation (November 2025)
+- **Split resume workflow into two distinct pages** for improved user experience
+- **New Resume Upload page** (`/resume-upload`):
+  - Dedicated page for uploading resumes (PDF or plain text)
+  - Resume list management with set active/delete functionality
+  - Target role input for personalized AI analysis
+  - Clear success messages with direct link to analysis page
+- **Updated Resume Analysis page** (`/resume`):
+  - Focused solely on displaying AI-powered resume insights
+  - Automatically fetches and displays active resume analysis
+  - Helpful empty state with link to upload page when no resume exists
+  - Removed upload components for cleaner, focused UX
+- **Navigation updates**:
+  - Added "Resume Upload" option to sidebar navigation
+  - Kept "Resume Analysis" as separate navigation item
+  - Logical workflow: Upload → Analysis
+- **Benefits**: Separated concerns, clearer user flow, reduced page complexity
+
 ## Job Analysis Persistence & Enhanced UI (November 2025)
 - **Complete job analysis history tracking** with database persistence
 - New database tables:
