@@ -167,6 +167,43 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               </CardContent>
             </Card>
 
+            {/* Target Analysis Context */}
+            {((activeResume as any)?.targetRole || (activeResume as any)?.targetIndustry || (activeResume as any)?.targetCompanies) && (
+              <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+                <CardHeader>
+                  <CardTitle className="text-base font-medium flex items-center gap-2">
+                    <Target className="w-4 h-4" />
+                    Analysis Target Context
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {(activeResume as any)?.targetRole && (
+                      <div className="space-y-1" data-testid="target-role-display">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Target Role</p>
+                        <p className="text-sm font-medium">{(activeResume as any).targetRole}</p>
+                      </div>
+                    )}
+                    {(activeResume as any)?.targetIndustry && (
+                      <div className="space-y-1" data-testid="target-industry-display">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Target Industry</p>
+                        <p className="text-sm font-medium">{(activeResume as any).targetIndustry}</p>
+                      </div>
+                    )}
+                    {(activeResume as any)?.targetCompanies && (
+                      <div className="space-y-1" data-testid="target-companies-display">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">Target Companies</p>
+                        <p className="text-sm font-medium">{(activeResume as any).targetCompanies}</p>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Your resume was analyzed against these target criteria to provide personalized insights.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Category Scores */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <Card 

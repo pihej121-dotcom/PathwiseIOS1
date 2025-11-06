@@ -130,13 +130,13 @@ function Router() {
       {/* Student routes - all accessible from unified dashboard */}
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} studentOnly />} />
       <Route path="/resume-upload" component={() => <ProtectedRoute component={ResumeUpload} studentOnly />} />
-      <Route path="/resume" component={() => <ProtectedRoute component={ResumeAnalysis} studentOnly />} />
-      <Route path="/roadmap" component={() => <ProtectedRoute component={CareerRoadmap} studentOnly />} />
-      <Route path="/jobs" component={() => <ProtectedRoute component={JobAnalysis} studentOnly />} />
-      <Route path="/micro-projects" component={() => <ProtectedRoute component={MicroProjects} studentOnly />} />
-      <Route path="/ai-copilot" component={() => <ProtectedRoute component={AICopilot} studentOnly />} />
-      <Route path="/applications" component={() => <ProtectedRoute component={Applications} studentOnly />} />
-      <Route path="/interview-prep" component={() => <ProtectedRoute component={InterviewPrep} studentOnly />} />
+      <Route path="/resume" component={() => <ProtectedRoute component={() => <ResumeAnalysis />} studentOnly />} />
+      <Route path="/roadmap" component={() => <ProtectedRoute component={() => <CareerRoadmap />} studentOnly />} />
+      <Route path="/jobs" component={() => <ProtectedRoute component={() => <JobAnalysis />} studentOnly />} />
+      <Route path="/micro-projects" component={() => <ProtectedRoute component={() => <MicroProjects />} studentOnly />} />
+      <Route path="/ai-copilot" component={() => <ProtectedRoute component={() => <AICopilot />} studentOnly />} />
+      <Route path="/applications" component={() => <ProtectedRoute component={() => <Applications />} studentOnly />} />
+      <Route path="/interview-prep" component={() => <ProtectedRoute component={() => <InterviewPrep />} studentOnly />} />
       
       {/* Super Admin routes */}
       <Route path="/admin/dashboard" component={() => <ProtectedRoute component={SuperAdminDashboard} superAdminOnly />} />
