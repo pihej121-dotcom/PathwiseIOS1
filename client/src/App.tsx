@@ -129,7 +129,7 @@ function Router() {
       
       {/* Student routes - all accessible from unified dashboard */}
       <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} studentOnly />} />
-      <Route path="/resume-upload" component={() => <ProtectedRoute component={ResumeUpload} studentOnly />} />
+      <Route path="/resume-upload" component={() => <ProtectedRoute component={() => <ResumeUpload />} studentOnly />} />
       <Route path="/resume" component={() => <ProtectedRoute component={() => <ResumeAnalysis />} studentOnly />} />
       <Route path="/roadmap" component={() => <ProtectedRoute component={() => <CareerRoadmap />} studentOnly />} />
       <Route path="/jobs" component={() => <ProtectedRoute component={() => <JobAnalysis />} studentOnly />} />

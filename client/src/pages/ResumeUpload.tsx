@@ -16,14 +16,11 @@ import { format } from "date-fns";
 import { Link } from "wouter";
 import type { Resume } from "@shared/schema";
 
-export default function ResumeUpload() {
+export default function ResumeUpload({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [resumeText, setResumeText] = useState("");
   const [fileName, setFileName] = useState("");
-  const [targetRole, setTargetRole] = useState("");
-  const [targetIndustry, setTargetIndustry] = useState("");
-  const [targetCompanies, setTargetCompanies] = useState("");
 
   const { data: resumes = [], isLoading } = useQuery<Resume[]>({
     queryKey: ["/api/resumes"],
@@ -37,23 +34,14 @@ export default function ResumeUpload() {
     mutationFn: async ({
       resumeText,
       fileName,
-      targetRole,
-      targetIndustry,
-      targetCompanies,
     }: {
       resumeText: string;
       fileName: string;
-      targetRole: string;
-      targetIndustry?: string;
-      targetCompanies?: string;
     }) => {
       const res = await apiRequest("POST", "/api/resumes", {
         fileName,
         filePath: "/text-input",
         extractedText: resumeText,
-        targetRole,
-        targetIndustry,
-        targetCompanies,
       });
       return res.json();
     },
@@ -62,13 +50,10 @@ export default function ResumeUpload() {
       queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
       toast({
         title: "Resume uploaded successfully!",
-        description: "Your resume has been saved and analyzed. View insights in Resume Analysis.",
+        description: "Your resume has been saved. Switch to Resume Analysis to analyze it.",
       });
       setResumeText("");
       setFileName("");
-      setTargetRole("");
-      setTargetIndustry("");
-      setTargetCompanies("");
     },
     onError: (error: any) => {
       toast({
@@ -100,37 +85,28 @@ export default function ResumeUpload() {
       return;
     }
 
-    if (!targetRole.trim()) {
-      toast({
-        title: "Target role required",
-        description: "Please enter your target role.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     uploadMutation.mutate({
       resumeText: resumeText.trim(),
       fileName: fileName || "resume.txt",
-      targetRole: targetRole.trim(),
-      targetIndustry: targetIndustry.trim(),
-      targetCompanies: targetCompanies.trim(),
     });
   };
 
+  const loadingContent = (
+    <div className="animate-pulse space-y-6">
+      <div className="h-64 bg-muted rounded-lg"></div>
+      <div className="h-48 bg-muted rounded-lg"></div>
+    </div>
+  );
+
   if (isLoading) {
-    return (
+    return embedded ? loadingContent : (
       <Layout title="Resume Upload" subtitle="Upload and manage your resumes">
-        <div className="animate-pulse space-y-6">
-          <div className="h-64 bg-muted rounded-lg"></div>
-          <div className="h-48 bg-muted rounded-lg"></div>
-        </div>
+        {loadingContent}
       </Layout>
     );
   }
 
-  return (
-    <Layout title="Resume Upload" subtitle="Upload and manage your resumes">
+  const content = (
       <div className="space-y-6">
         {/* Upload Form */}
         <Card className="border-none shadow-sm">
@@ -142,46 +118,6 @@ export default function ResumeUpload() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="target-role">Target Role *</Label>
-                  <Input
-                    id="target-role"
-                    value={targetRole}
-                    onChange={(e) => setTargetRole(e.target.value)}
-                    placeholder="e.g., Senior Software Engineer"
-                    required
-                    data-testid="input-target-role"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="target-industry">Target Industry</Label>
-                  <Input
-                    id="target-industry"
-                    value={targetIndustry}
-                    onChange={(e) => setTargetIndustry(e.target.value)}
-                    placeholder="e.g., Technology, Healthcare"
-                    data-testid="input-target-industry"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="target-companies">Target Companies</Label>
-                  <Input
-                    id="target-companies"
-                    value={targetCompanies}
-                    onChange={(e) => setTargetCompanies(e.target.value)}
-                    placeholder="e.g., Google, Microsoft"
-                    data-testid="input-target-companies"
-                  />
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                Enter your career goals for personalized analysis
-              </p>
-
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Upload Resume File</Label>
@@ -225,7 +161,7 @@ export default function ResumeUpload() {
               <Button
                 type="submit"
                 className="w-full h-10"
-                disabled={!resumeText.trim() || !targetRole.trim() || uploadMutation.isPending}
+                disabled={!resumeText.trim() || uploadMutation.isPending}
                 data-testid="button-save-resume"
               >
                 {uploadMutation.isPending ? (
@@ -245,14 +181,14 @@ export default function ResumeUpload() {
         </Card>
 
         {/* Success Message */}
-        {uploadMutation.isSuccess && (
+        {uploadMutation.isSuccess && !embedded && (
           <Alert className="border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950">
             <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
             <AlertDescription className="text-green-800 dark:text-green-200">
               Resume saved successfully!{" "}
               <Link href="/resume">
                 <a className="font-medium underline inline-flex items-center gap-1 hover:text-green-900 dark:hover:text-green-100">
-                  View Analysis <ArrowRight className="w-3 h-3" />
+                  Go to Resume Analysis <ArrowRight className="w-3 h-3" />
                 </a>
               </Link>
             </AlertDescription>
@@ -314,6 +250,11 @@ export default function ResumeUpload() {
           </CardContent>
         </Card>
       </div>
+  );
+
+  return embedded ? content : (
+    <Layout title="Resume Upload" subtitle="Upload and manage your resumes">
+      {content}
     </Layout>
   );
 }
