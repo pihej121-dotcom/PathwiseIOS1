@@ -1832,17 +1832,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
       
       const matchAnalysis = await aiService.analyzeJobMatch(activeResume.extractedText, jobData);
       
-      // Ensure JSONB fields are properly structured objects (not stringified)
-      // Drizzle ORM expects plain objects for JSONB columns, not JSON strings
-      const skillsAnalysis = typeof matchAnalysis.skillsAnalysis === 'string' 
-        ? JSON.parse(matchAnalysis.skillsAnalysis) 
-        : matchAnalysis.skillsAnalysis;
-      
-      const experienceAnalysis = typeof matchAnalysis.experienceAnalysis === 'string'
-        ? JSON.parse(matchAnalysis.experienceAnalysis)
-        : matchAnalysis.experienceAnalysis;
-      
-      // Save the job analysis to database
+      // Save the job analysis to database (without skills/experience analysis)
       const jobAnalysisData = {
         userId: req.user!.id,
         resumeId: activeResume.id,
@@ -1856,22 +1846,13 @@ Make your recommendations specific, actionable, and data-driven based on the act
         competitivenessBand: matchAnalysis.competitivenessBand,
         strengths: matchAnalysis.strengths,
         concerns: matchAnalysis.concerns,
-        skillsAnalysis: skillsAnalysis,
-        experienceAnalysis: experienceAnalysis,
         recommendations: matchAnalysis.recommendations,
         nextSteps: matchAnalysis.nextSteps,
       };
       
-      console.log('Saving job analysis with data:', {
-        jobTitle: jobAnalysisData.jobTitle,
-        skillsAnalysisType: typeof skillsAnalysis,
-        experienceAnalysisType: typeof experienceAnalysis,
-        skillsAnalysisKeys: Object.keys(skillsAnalysis || {}),
-        experienceAnalysisKeys: Object.keys(experienceAnalysis || {})
-      });
-      
       const savedAnalysis = await storage.createJobAnalysis(jobAnalysisData);
       
+      // Return full analysis including skills/experience (not stored in DB)
       res.json({ ...matchAnalysis, analysisId: savedAnalysis.id });
     } catch (error: any) {
       console.error("Job match analysis error:", error);

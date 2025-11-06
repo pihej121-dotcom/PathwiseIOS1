@@ -261,8 +261,6 @@ export const jobAnalyses = pgTable("job_analyses", {
   competitivenessBand: text("competitiveness_band"),
   strengths: text("strengths").array(),
   concerns: text("concerns").array(),
-  skillsAnalysis: jsonb("skills_analysis"), // { strongMatches, partialMatches, missingSkills, explanation }
-  experienceAnalysis: jsonb("experience_analysis"), // { relevantExperience, experienceGaps, explanation }
   recommendations: text("recommendations").array(),
   nextSteps: text("next_steps").array(),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
