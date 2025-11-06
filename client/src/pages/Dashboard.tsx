@@ -18,12 +18,14 @@ import {
   Lightbulb,
   Brain,
   ListTodo,
-  MessageSquare
+  MessageSquare,
+  Upload
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
 
 // Import feature components
+import ResumeUpload from "./ResumeUpload";
 import ResumeAnalysis from "./ResumeAnalysis";
 import CareerRoadmap from "./CareerRoadmap";
 import JobAnalysis from "./JobAnalysis";
@@ -126,6 +128,20 @@ export default function Dashboard() {
       {/* Feature Cards */}
       <div className="flex flex-wrap justify-center gap-4 mb-6">
         <Card 
+          className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'upload' ? 'ring-2 ring-cyan-500 shadow-lg' : ''}`} 
+          onClick={() => setSelectedCard('upload')} 
+          data-testid="card-upload"
+        >
+          <CardContent className="pt-6 text-center">
+            <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Upload className="w-6 h-6 text-cyan-600" />
+            </div>
+            <h3 className="font-semibold mb-1">Resume Upload</h3>
+            <p className="text-xs text-muted-foreground">Upload & manage</p>
+          </CardContent>
+        </Card>
+
+        <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'resume' ? 'ring-2 ring-blue-500 shadow-lg' : ''}`} 
           onClick={() => setSelectedCard('resume')} 
           data-testid="card-resume"
@@ -134,7 +150,7 @@ export default function Dashboard() {
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <FileText className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="font-semibold mb-1">Resume</h3>
+            <h3 className="font-semibold mb-1">Resume Analysis</h3>
             <p className="text-xs text-muted-foreground">Analyze & optimize</p>
           </CardContent>
         </Card>
@@ -210,13 +226,13 @@ export default function Dashboard() {
         </Card>
 
         <Card 
-          className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'interview' ? 'ring-2 ring-cyan-500 shadow-lg' : ''}`} 
+          className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'interview' ? 'ring-2 ring-amber-500 shadow-lg' : ''}`} 
           onClick={() => setSelectedCard('interview')} 
           data-testid="card-interview"
         >
           <CardContent className="pt-6 text-center">
-            <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-              <MessageSquare className="w-6 h-6 text-cyan-600" />
+            <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <MessageSquare className="w-6 h-6 text-amber-600" />
             </div>
             <h3 className="font-semibold mb-1">Interview Prep</h3>
             <p className="text-xs text-muted-foreground">Practice & prepare</p>
@@ -322,6 +338,7 @@ export default function Dashboard() {
       {/* Selected Card Content */}
       {selectedCard && (
         <div className="mt-6">
+          {selectedCard === 'upload' && <ResumeUpload embedded={true} />}
           {selectedCard === 'resume' && <ResumeAnalysis embedded={true} />}
           {selectedCard === 'roadmap' && <CareerRoadmap embedded={true} />}
           {selectedCard === 'jobs' && <JobAnalysis embedded={true} />}
