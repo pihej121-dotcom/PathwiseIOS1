@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ProgressRing } from "@/components/ProgressRing";
 import { PaywallOverlay } from "@/components/PaywallOverlay";
 import { TourButton } from "@/components/TourButton";
@@ -29,38 +26,23 @@ import {
   CheckCircle,
   AlertCircle,
   ExternalLink,
-  Hash
+  Hash,
+  Upload
 } from "lucide-react";
 import { format } from "date-fns";
+import { Link } from "wouter";
 import { ResumeHistoryChart } from "@/components/ResumeHistoryChart";
-import { FileUploadExtractor } from "@/components/FileUploadExtractor";
 import { ResumeAnalysisHistory } from "@/components/ResumeAnalysisHistory";
 import type { Resume } from "@shared/schema";
 
 export default function ResumeAnalysis({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [resumeText, setResumeText] = useState("");
-  const [targetRole, setTargetRole] = useState("");
-  const [targetIndustry, setTargetIndustry] = useState("");
-  const [targetCompanies, setTargetCompanies] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
-  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedResumeId, setSelectedResumeId] = useState<string | undefined>();
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
-
-  // Cleanup timer when component unmounts
-  useEffect(() => {
-    return () => {
-      if (loadingTimerRef.current) {
-        clearTimeout(loadingTimerRef.current);
-      }
-    };
-  }, []);
 
   // Handle upgrade to Pro
   const handleUpgrade = async () => {
@@ -93,89 +75,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const { data: activeResume = null } = useQuery<Resume | null>({
     queryKey: ["/api/resumes/active"],
   });
-
-  const analyzeMutation = useMutation({
-    mutationFn: async ({ resumeText, targetRole, targetIndustry, targetCompanies }: { resumeText: string; targetRole: string; targetIndustry?: string; targetCompanies?: string }) => {
-      const res = await apiRequest("POST", "/api/resumes", { 
-        fileName: "resume.txt", 
-        filePath: "/text-input", 
-        extractedText: resumeText,
-        targetRole,
-        targetIndustry,
-        targetCompanies 
-      });
-      return res.json();
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
-      toast({
-        title: "Resume analyzed successfully!",
-        description: "Your resume has been analyzed. Check the scores and recommendations below.",
-      });
-      setResumeText("");
-      setTargetRole("");
-      setTargetIndustry("");
-      setTargetCompanies("");
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Analysis failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleFileTextExtracted = (text: string, fileName: string) => {
-    setResumeText(text);
-    toast({
-      title: "Text extracted successfully",
-      description: `Extracted text from ${fileName}. Review and submit for analysis.`,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!resumeText.trim()) {
-      toast({
-        title: "Resume text required",
-        description: "Please paste your resume content or upload a file.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (!targetRole.trim()) {
-      toast({
-        title: "Target role required",
-        description: "Please enter your target role.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Clear any existing timer before starting a new one
-    if (loadingTimerRef.current) {
-      clearTimeout(loadingTimerRef.current);
-    }
-    
-    setIsAnalyzing(true);
-    
-    // Set a 60-second timer to hide loading screen and store it in ref
-    loadingTimerRef.current = setTimeout(() => {
-      setIsAnalyzing(false);
-      loadingTimerRef.current = null;
-    }, 60000);
-    
-    analyzeMutation.mutate({
-      resumeText: resumeText.trim(),
-      targetRole: targetRole.trim(),
-      targetIndustry: targetIndustry.trim(),
-      targetCompanies: targetCompanies.trim()
-    });
-  };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -225,121 +124,21 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
         />
       </div>
       <div className="space-y-6">
-        {/* Resume Input Section - Always Show */}
-        <Card className="border-none shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base font-medium flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Analyze Your Resume
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isAnalyzing ? (
-              <div className="text-center space-y-4 py-8">
-                <div className="animate-spin rounded-full h-12 w-12 mx-auto border-b-2 border-primary"></div>
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold">Analyzing Your Resume</h3>
-                  <p className="text-sm text-muted-foreground">AI is processing your resume and identifying gaps for your target role...</p>
-                  <div className="w-48 mx-auto bg-muted h-2 rounded-full overflow-hidden">
-                    <div className="bg-primary h-2 rounded-full w-1/3 animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="target-role">Target Role *</Label>
-                    <Input
-                      id="target-role"
-                      value={targetRole}
-                      onChange={(e) => setTargetRole(e.target.value)}
-                      placeholder="e.g., Senior Software Engineer"
-                      required
-                      data-testid="input-target-role"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="target-industry">Target Industry</Label>
-                    <Input
-                      id="target-industry"
-                      value={targetIndustry}
-                      onChange={(e) => setTargetIndustry(e.target.value)}
-                      placeholder="e.g., Technology, Healthcare, Finance"
-                      data-testid="input-target-industry"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="target-companies">Target Companies</Label>
-                    <Input
-                      id="target-companies"
-                      value={targetCompanies}
-                      onChange={(e) => setTargetCompanies(e.target.value)}
-                      placeholder="e.g., Google, Microsoft, Startup"
-                      data-testid="input-target-companies"
-                    />
-                  </div>
-                </div>
-                
-                <p className="text-xs text-muted-foreground">
-                  Enter your career goals for personalized gap analysis and recommendations
-                </p>
-                
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Upload Resume File</Label>
-                    <FileUploadExtractor
-                      onTextExtracted={handleFileTextExtracted}
-                      disabled={isAnalyzing}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Upload a PDF or DOCX file to automatically extract the text
-                    </p>
-                  </div>
-                  
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">
-                        Or paste text manually
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="resume-text">Resume Content *</Label>
-                    <Textarea
-                      id="resume-text"
-                      value={resumeText}
-                      onChange={(e) => setResumeText(e.target.value)}
-                      placeholder="Copy and paste your resume content here..."
-                      className="min-h-[300px] font-mono text-sm"
-                      required
-                      data-testid="textarea-resume-content"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Paste the full text of your resume for comprehensive analysis
-                    </p>
-                  </div>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full h-10"
-                  disabled={!resumeText.trim() || !targetRole.trim()}
-                  data-testid="button-analyze-resume"
-                >
-                  <Target className="w-4 h-4 mr-2" />
-                  Analyze Resume
-                </Button>
-              </form>
-            )}
-          </CardContent>
-        </Card>
+        {/* No Resume Message */}
+        {!activeResume && (
+          <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
+            <Upload className="h-4 h-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-800 dark:text-blue-200">
+              No resume uploaded yet.{" "}
+              <Link href="/resume-upload">
+                <a className="font-medium underline hover:text-blue-900 dark:hover:text-blue-100" data-testid="link-upload-resume">
+                  Upload your resume
+                </a>
+              </Link>
+              {" "}to see AI-powered insights and analysis.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Active Resume Analysis */}
         {activeResume && (

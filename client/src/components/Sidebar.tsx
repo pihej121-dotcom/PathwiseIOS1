@@ -20,11 +20,13 @@ import {
   UserPlus,
   Crown,
   Zap,
-  Sparkles
+  Sparkles,
+  Upload
 } from "lucide-react";
 
 const studentNavigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard, requiresPaid: false },
+  { name: "Resume Upload", href: "/resume-upload", icon: Upload, requiresPaid: false },
   { name: "Resume Analysis", href: "/resume", icon: FileText, requiresPaid: false },
   { name: "Career Roadmap", href: "/roadmap", icon: Route, requiresPaid: true },
   { name: "Job Matching", href: "/jobs", icon: Briefcase, requiresPaid: true },
