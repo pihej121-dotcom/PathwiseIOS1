@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ProgressRing } from "@/components/ProgressRing";
 import { PaywallOverlay } from "@/components/PaywallOverlay";
 import { TourButton } from "@/components/TourButton";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient as globalQueryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { 
@@ -27,7 +29,8 @@ import {
   AlertCircle,
   ExternalLink,
   Hash,
-  Upload
+  Upload,
+  RefreshCw
 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "wouter";
@@ -37,9 +40,14 @@ import type { Resume } from "@shared/schema";
 
 export default function ResumeAnalysis({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [selectedResumeId, setSelectedResumeId] = useState<string | undefined>();
+  const [showTargetForm, setShowTargetForm] = useState(false);
+  const [targetRole, setTargetRole] = useState("");
+  const [targetIndustry, setTargetIndustry] = useState("");
+  const [targetCompanies, setTargetCompanies] = useState("");
 
   // Check if user has free tier
   const isFreeUser = user?.subscriptionTier === "free";
@@ -75,6 +83,77 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   const { data: activeResume = null } = useQuery<Resume | null>({
     queryKey: ["/api/resumes/active"],
   });
+
+  const reanalyzeMutation = useMutation({
+    mutationFn: async ({
+      resumeId,
+      targetRole,
+      targetIndustry,
+      targetCompanies,
+    }: {
+      resumeId: string;
+      targetRole: string;
+      targetIndustry?: string;
+      targetCompanies?: string;
+    }) => {
+      const res = await apiRequest("POST", `/api/resumes/${resumeId}/analyze`, {
+        targetRole,
+        targetIndustry,
+        targetCompanies,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/resume-analysis-history"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Analysis Updated!",
+        description: "Your resume has been re-analyzed with the new target criteria.",
+      });
+      setShowTargetForm(false);
+      setTargetRole("");
+      setTargetIndustry("");
+      setTargetCompanies("");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Re-analysis failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleReanalyze = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!activeResume) {
+      toast({
+        title: "No resume found",
+        description: "Please upload a resume first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!targetRole.trim()) {
+      toast({
+        title: "Target role required",
+        description: "Please enter a target role to re-analyze your resume.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    reanalyzeMutation.mutate({
+      resumeId: activeResume.id,
+      targetRole: targetRole.trim(),
+      targetIndustry: targetIndustry.trim() || undefined,
+      targetCompanies: targetCompanies.trim() || undefined,
+    });
+  };
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -138,6 +217,110 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
               {" "}to see AI-powered insights and analysis.
             </AlertDescription>
           </Alert>
+        )}
+
+        {/* Target Analysis Form */}
+        {activeResume && (
+          <Card className="border-none shadow-sm bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+            <CardHeader>
+              <CardTitle className="text-base font-medium flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Generate Analysis for Target Role
+                </div>
+                {!showTargetForm && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowTargetForm(true);
+                      setTargetRole((activeResume as any)?.targetRole || "");
+                      setTargetIndustry((activeResume as any)?.targetIndustry || "");
+                      setTargetCompanies((activeResume as any)?.targetCompanies || "");
+                    }}
+                    data-testid="button-show-target-form"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Update Target Criteria
+                  </Button>
+                )}
+              </CardTitle>
+            </CardHeader>
+            {showTargetForm && (
+              <CardContent>
+                <form onSubmit={handleReanalyze} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="target-role">Target Role *</Label>
+                      <Input
+                        id="target-role"
+                        value={targetRole}
+                        onChange={(e) => setTargetRole(e.target.value)}
+                        placeholder="e.g., Software Engineer"
+                        required
+                        data-testid="input-target-role"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="target-industry">Target Field/Industry</Label>
+                      <Input
+                        id="target-industry"
+                        value={targetIndustry}
+                        onChange={(e) => setTargetIndustry(e.target.value)}
+                        placeholder="e.g., Technology, Finance"
+                        data-testid="input-target-industry"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="target-companies">Target Companies</Label>
+                      <Input
+                        id="target-companies"
+                        value={targetCompanies}
+                        onChange={(e) => setTargetCompanies(e.target.value)}
+                        placeholder="e.g., Google, Amazon, Meta"
+                        data-testid="input-target-companies"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="submit"
+                      disabled={!targetRole.trim() || reanalyzeMutation.isPending}
+                      data-testid="button-reanalyze"
+                    >
+                      {reanalyzeMutation.isPending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Analyzing...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Generate Analysis
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowTargetForm(false);
+                        setTargetRole("");
+                        setTargetIndustry("");
+                        setTargetCompanies("");
+                      }}
+                      data-testid="button-cancel-target-form"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Enter your target career role, field, and companies to get a personalized analysis of how well your resume matches.
+                  </p>
+                </form>
+              </CardContent>
+            )}
+          </Card>
         )}
 
         {/* Active Resume Analysis */}
