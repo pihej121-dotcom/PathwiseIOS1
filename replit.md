@@ -8,23 +8,28 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
-## Resume Upload and Analysis Page Separation (November 2025)
-- **Split resume workflow into two distinct pages** for improved user experience
-- **New Resume Upload page** (`/resume-upload`):
-  - Dedicated page for uploading resumes (PDF or plain text)
-  - Resume list management with set active/delete functionality
-  - Target role input for personalized AI analysis
-  - Clear success messages with direct link to analysis page
-- **Updated Resume Analysis page** (`/resume`):
-  - Focused solely on displaying AI-powered resume insights
-  - Automatically fetches and displays active resume analysis
+## Resume Upload and Analysis Workflow Redesign (November 2025)
+- **Complete separation of resume upload from analysis execution** for clearer user experience
+- **Resume Upload page** (`/resume-upload`):
+  - **Simplified upload workflow**: Just upload resumes (PDF or plain text) without analysis parameters
+  - Removed target role, industry, and companies inputs from upload form
+  - Resume list management (view all uploaded resumes with active resume indicator)
+  - Now embedded in Dashboard as a card for quick access
+  - Upload completes immediately without triggering AI analysis
+- **Resume Analysis page** (`/resume`):
+  - **Two-step analysis process**: Display existing analysis OR trigger new analysis
+  - Shows target context (role, industry, companies) for analyzed resumes
+  - Dedicated form to set analysis parameters and trigger AI analysis (upcoming)
+  - Automatically displays active resume's analysis results
   - Helpful empty state with link to upload page when no resume exists
-  - Removed upload components for cleaner, focused UX
-- **Navigation updates**:
-  - Added "Resume Upload" option to sidebar navigation
-  - Kept "Resume Analysis" as separate navigation item
-  - Logical workflow: Upload → Analysis
-- **Benefits**: Separated concerns, clearer user flow, reduced page complexity
+  - Also embedded in Dashboard as a separate card
+- **Dashboard Integration**:
+  - Added "Resume Upload" card (cyan color scheme with Upload icon)
+  - Renamed existing "Resume" card to "Resume Analysis" for clarity
+  - Both features accessible as embedded views within Dashboard
+  - Interview Prep card color changed to amber to avoid color conflicts
+- **User workflow**: Upload resume → Switch to Analysis → Set targets → Run analysis → View results
+- **Benefits**: Decoupled upload from analysis, users can upload multiple resumes and analyze them separately with different target parameters
 
 ## Job Analysis Persistence & Enhanced UI (November 2025)
 - **Complete job analysis history tracking** with database persistence

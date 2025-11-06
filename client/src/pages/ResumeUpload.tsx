@@ -107,7 +107,7 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
   }
 
   const content = (
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Upload Form */}
         <Card className="border-none shadow-sm">
           <CardHeader>
@@ -249,7 +249,7 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
             )}
           </CardContent>
         </Card>
-      </div>
+    </div>
   );
 
   return embedded ? content : (
