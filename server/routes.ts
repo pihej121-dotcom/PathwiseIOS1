@@ -1179,6 +1179,112 @@ if (existingUser && !existingUser.isActive) {
     }
   });
 
+  app.post("/api/resumes/:id/analyze", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { targetRole, targetIndustry, targetCompanies } = req.body;
+      
+      if (!targetRole) {
+        return res.status(400).json({ error: "targetRole is required" });
+      }
+
+      // Get the resume
+      const resumes = await storage.getUserResumes(req.user!.id);
+      const resume = resumes.find(r => r.id === id);
+      
+      if (!resume) {
+        return res.status(404).json({ error: "Resume not found" });
+      }
+
+      if (!resume.extractedText) {
+        return res.status(400).json({ error: "Resume has no text content" });
+      }
+
+      // Trigger AI analysis with new target criteria
+      try {
+        const analysis = await aiService.analyzeResume(
+          req.user!.id,
+          resume.extractedText,
+          targetRole,
+          targetIndustry,
+          targetCompanies
+        );
+        
+        console.log("AI Re-Analysis Response:", JSON.stringify(analysis, null, 2));
+        
+        // Calculate rmsScore if not provided by AI or if it's 0
+        let finalRmsScore = analysis.rmsScore;
+        if (!finalRmsScore || finalRmsScore === 0) {
+          // Calculate as weighted average of section scores
+          const scores = [
+            analysis.skillsScore || 0,
+            analysis.experienceScore || 0,
+            analysis.keywordsScore || 0,
+            analysis.educationScore || 0,
+            analysis.certificationsScore || 0
+          ];
+          finalRmsScore = Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+          console.log(`Calculated rmsScore from section scores: ${finalRmsScore}`);
+        }
+        
+        await storage.updateResumeAnalysis(resume.id, {
+          rmsScore: finalRmsScore,
+          skillsScore: analysis.skillsScore,
+          experienceScore: analysis.experienceScore,
+          keywordsScore: analysis.keywordsScore,
+          educationScore: analysis.educationScore,
+          certificationsScore: analysis.certificationsScore,
+          gaps: analysis.gaps,
+          overallInsights: analysis.overallInsights,
+          sectionAnalysis: analysis.sectionAnalysis,
+          targetRole: targetRole,
+          targetIndustry: targetIndustry,
+          targetCompanies: targetCompanies,
+          analysisHash: analysis.analysisHash
+        });
+
+        // Save to analysis history for tracking over time
+        await storage.createResumeAnalysisHistory({
+          userId: req.user!.id,
+          resumeId: resume.id,
+          fileName: resume.fileName,
+          rmsScore: finalRmsScore,
+          skillsScore: analysis.skillsScore,
+          experienceScore: analysis.experienceScore,
+          keywordsScore: analysis.keywordsScore,
+          educationScore: analysis.educationScore,
+          certificationsScore: analysis.certificationsScore,
+          gaps: analysis.gaps,
+          overallInsights: analysis.overallInsights,
+          sectionAnalysis: analysis.sectionAnalysis,
+          targetRole: targetRole || null,
+          targetIndustry: targetIndustry || null,
+          targetCompanies: targetCompanies ? [targetCompanies] : null,
+          analysisHash: analysis.analysisHash
+        });
+
+        // Create activity
+        await storage.createActivity(
+          req.user!.id,
+          "resume_analyzed",
+          "Resume Re-Analyzed",
+          `Your resume was re-analyzed for ${targetRole} and scored ${finalRmsScore}/100`
+        );
+
+        res.json({ 
+          message: "Resume re-analyzed successfully",
+          rmsScore: finalRmsScore 
+        });
+      } catch (aiError) {
+        console.error("AI analysis error:", aiError);
+        res.status(500).json({ error: "Failed to analyze resume" });
+      }
+    } catch (error) {
+      console.error("Resume re-analysis error:", error);
+      res.status(500).json({ error: "Failed to re-analyze resume" });
+    }
+  });
+
   app.get("/api/resumes", authenticate, async (req: AuthRequest, res) => {
     try {
       const resumes = await storage.getUserResumes(req.user!.id);
