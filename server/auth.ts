@@ -94,7 +94,50 @@ export function requireSuperAdmin(req: AuthRequest, res: Response, next: NextFun
   next();
 }
 
-// Middleware to check if user has access to paid features
+// Utility function to check if user has access to a specific feature
+export async function hasFeatureAccess(userId: string, featureKey: string): Promise<boolean> {
+  const user = await storage.getUser(userId);
+  
+  if (!user) {
+    return false;
+  }
+  
+  // Check if user has active subscription (paid or institutional)
+  if (user.subscriptionTier === 'paid' || user.subscriptionTier === 'institutional') {
+    // Check subscription status is active or trialing
+    if (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing') {
+      return true;
+    }
+  }
+  
+  // Check if user purchased this specific feature
+  const purchasedFeature = await storage.getUserPurchasedFeature(userId, featureKey);
+  return !!purchasedFeature;
+}
+
+// Middleware to check if user has access to a specific feature
+export function requireFeature(featureKey: string) {
+  return async (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const hasAccess = await hasFeatureAccess(req.user.id, featureKey);
+    
+    if (hasAccess) {
+      return next();
+    }
+
+    // User doesn't have access - send upgrade prompt
+    return res.status(403).json({ 
+      error: `This feature requires either purchasing it individually or subscribing to Pathwise Unlimited.`,
+      requiresUpgrade: true,
+      featureKey: featureKey
+    });
+  };
+}
+
+// Middleware to check if user has access to paid features (legacy - for routes that don't specify a feature)
 export function requirePaidFeatures(req: AuthRequest, res: Response, next: NextFunction) {
   if (!req.user) {
     return res.status(401).json({ error: "Authentication required" });
