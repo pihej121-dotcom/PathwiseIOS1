@@ -210,7 +210,7 @@ export default function Dashboard() {
               <Brain className="w-6 h-6 text-indigo-600" />
             </div>
             <h3 className="font-semibold mb-1">Compensation Insights</h3>
-            <p className="text-xs text-muted-foreground">Compare salaries, assess your value, and strengthen your negotiation.</p>
+            <p className="text-xs text-muted-foreground"> Salary Negotiation Coach.</p>
           </CardContent>
         </Card>
 
