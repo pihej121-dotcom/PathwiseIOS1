@@ -29,6 +29,7 @@ import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
 import InstitutionAdminDashboard from "@/pages/InstitutionAdminDashboard";
 import Contact from "@/pages/Contact";
 import TermsOfService from "@/pages/TermsOfService";
+import Pricing from "@/pages/Pricing";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component, adminOnly = false, institutionAdminOnly = false, superAdminOnly = false, studentOnly = false }: { component: () => JSX.Element, adminOnly?: boolean, institutionAdminOnly?: boolean, superAdminOnly?: boolean, studentOnly?: boolean }) {
@@ -121,6 +122,7 @@ function Router() {
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
+      <Route path="/pricing" component={() => <ProtectedRoute component={Pricing} studentOnly />} />
       <Route path="/contact" component={Contact} />
       <Route path="/terms" component={TermsOfService} />
       

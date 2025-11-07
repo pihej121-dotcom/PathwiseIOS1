@@ -3594,6 +3594,47 @@ Make your recommendations specific, actionable, and data-driven based on the act
     }
   });
 
+  // Get user feature access status
+  app.get("/api/user/feature-access", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const user = await storage.getUser(userId);
+      const purchasedFeatures = await storage.getUserPurchasedFeatures(userId);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Check subscription status
+      const hasActiveSubscription = 
+        (user.subscriptionTier === 'paid' || user.subscriptionTier === 'institutional') &&
+        (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing');
+
+      // Build feature access map
+      const featureAccess: Record<string, boolean> = {};
+      for (const key in FEATURE_CATALOG) {
+        const featureKey = key as FeatureKey;
+        if (hasActiveSubscription) {
+          featureAccess[featureKey] = true;
+        } else {
+          const purchased = purchasedFeatures.find(f => f.featureKey === featureKey);
+          featureAccess[featureKey] = !!purchased;
+        }
+      }
+
+      res.json({
+        subscriptionTier: user.subscriptionTier,
+        subscriptionStatus: user.subscriptionStatus,
+        hasActiveSubscription,
+        purchasedFeatures: purchasedFeatures.map(f => f.featureKey),
+        featureAccess,
+      });
+    } catch (err: any) {
+      console.error('Feature access error:', err.message);
+      res.status(500).json({ error: err.message || "Failed to fetch feature access" });
+    }
+  });
+
   // Delete user account endpoint
   app.delete("/api/users/delete-account", authenticate, async (req: AuthRequest, res) => {
     try {
