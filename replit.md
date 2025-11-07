@@ -8,11 +8,32 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Freemium Model with Individual Feature Purchases (November 2025)
+- **Complete freemium transformation**: Users can register for free and purchase individual AI features
+- **Free Registration**: All new users default to free tier without requiring payment
+- **Per-Feature Pricing**: Six premium features available for individual purchase via Stripe:
+  1. Interview Prep Assistant
+  2. Salary Negotiator
+  3. Micro-Project Generator
+  4. Career Roadmap Generator
+  5. Job Match Assistant
+  6. Resume Analysis
+- **Access Control System**:
+  - Created `useFeatureAccess` hook that checks both subscription status and individual purchases
+  - Backend endpoint `/api/user/feature-access` returns comprehensive access map
+  - Paid/institutional subscribers get access to ALL features
+  - Free users only access features they've purchased individually
+- **Stripe Integration**:
+  - Feature-specific Price IDs stored in environment variables (`STRIPE_PRICE_ID_*`)
+  - Checkout flow handles both subscription upgrades and individual feature purchases
+  - Webhook processes both purchase types via `purchaseType` metadata
+- **Database Schema**: `userPurchasedFeatures` table tracks individual feature purchases with foreign keys to users
+
 ## Resume Upload and Analysis Workflow Redesign (November 2025)
 - **Complete separation of resume upload from analysis execution** for clearer user experience
 - **Resume Upload page** (`/resume-upload`):
   - **Simplified upload workflow**: Just upload resumes (PDF or plain text) without analysis parameters
-  - Removed target role, industry, and companies inputs from upload form
+  - Target role, industry, and companies are now optional fields
   - Resume list management (view all uploaded resumes with active resume indicator)
   - Now embedded in Dashboard as a card for quick access
   - Upload completes immediately without triggering AI analysis
