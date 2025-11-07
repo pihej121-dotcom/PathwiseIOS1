@@ -1815,51 +1815,77 @@ Make your recommendations specific, actionable, and data-driven based on the act
     }
   });
 
+  // New endpoint: Extract job details from URL
+  app.post("/api/jobs/extract-from-url", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const { url } = req.body;
+
+      if (!url) {
+        return res.status(400).json({ error: "URL is required" });
+      }
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL: ${response.status}`);
+        }
+
+        const html = await response.text();
+
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        const descriptionMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+
+        const title = titleMatch ? titleMatch[1].split('|')[0].split('-')[0].trim() : '';
+        const description = descriptionMatch ? descriptionMatch[1] : '';
+
+        const textContent = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+                                 .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+                                 .replace(/<[^>]+>/g, ' ')
+                                 .replace(/\s+/g, ' ')
+                                 .trim();
+
+        res.json({
+          title: title || 'Job Position',
+          company: 'Company Name',
+          description: description || textContent.substring(0, 2000),
+          url
+        });
+      } catch (fetchError) {
+        return res.status(400).json({ 
+          error: "Unable to extract job details from URL. Please enter details manually." 
+        });
+      }
+    } catch (error: any) {
+      console.error("URL extraction error:", error);
+      res.status(500).json({ error: "Failed to extract job details" });
+    }
+  });
+
   // New endpoint: Analyze job match (simplified - no job ID needed)
   app.post("/api/jobs/analyze-match", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
       const { jobData } = req.body;
-      
+
       if (!jobData) {
         return res.status(400).json({ error: "Job data is required" });
       }
-      
+
       const activeResume = await storage.getActiveResume(req.user!.id);
-      
+
       if (!activeResume?.extractedText) {
         return res.status(400).json({ error: "No active resume found. Please upload a resume first." });
       }
-      
+
       const matchAnalysis = await aiService.analyzeJobMatch(activeResume.extractedText, jobData);
-      
-      // Save the job analysis to database (without skills/experience analysis)
-      const jobAnalysisData = {
-        userId: req.user!.id,
-        resumeId: activeResume.id,
-        jobTitle: jobData.title || 'Untitled Position',
-        jobCompany: jobData.company?.display_name || jobData.company || 'Unknown Company',
-        jobLocation: jobData.location || null,
-        jobDescription: jobData.description || '',
-        jobRequirements: jobData.requirements || null,
-        jobUrl: jobData.url || null,
-        overallMatch: matchAnalysis.overallMatch,
-        competitivenessBand: matchAnalysis.competitivenessBand,
-        strengths: matchAnalysis.strengths,
-        concerns: matchAnalysis.concerns,
-        recommendations: matchAnalysis.recommendations,
-        nextSteps: matchAnalysis.nextSteps,
-      };
-      
-      const savedAnalysis = await storage.createJobAnalysis(jobAnalysisData);
-      
-      // Return full analysis including skills/experience (not stored in DB)
-      res.json({ ...matchAnalysis, analysisId: savedAnalysis.id });
+
+      res.json(matchAnalysis);
     } catch (error: any) {
       console.error("Job match analysis error:", error);
-      console.error("Error details:", error.message);
-      if (error.stack) {
-        console.error("Stack trace:", error.stack);
-      }
       res.status(500).json({ error: "Failed to analyze job match" });
     }
   });
@@ -1867,44 +1893,33 @@ Make your recommendations specific, actionable, and data-driven based on the act
   // New endpoint: Generate cover letter for job
   app.post("/api/jobs/generate-cover-letter", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
-      const { jobData, jobAnalysisId } = req.body;
-      
+      const { jobData } = req.body;
+
       if (!jobData) {
         return res.status(400).json({ error: "Job data is required" });
       }
-      
+
       const activeResume = await storage.getActiveResume(req.user!.id);
-      
+
       if (!activeResume?.extractedText) {
         return res.status(400).json({ error: "No active resume found. Please upload a resume first." });
       }
-      
+
       const coverLetter = await aiService.generateCoverLetter(
         activeResume.extractedText,
         jobData.description || '',
         jobData.company?.display_name || jobData.company || 'the company',
         jobData.title || 'the position'
       );
-      
-      // Save the cover letter to database
-      const coverLetterData = {
-        userId: req.user!.id,
-        resumeId: activeResume.id,
-        jobAnalysisId: jobAnalysisId || null,
-        jobTitle: jobData.title || 'Untitled Position',
-        jobCompany: jobData.company?.display_name || jobData.company || 'Unknown Company',
-        content: coverLetter,
-      };
-      
-      const savedCoverLetter = await storage.createCoverLetter(coverLetterData);
-      
-      res.json({ coverLetter, coverLetterId: savedCoverLetter.id });
+
+      res.json({ coverLetter });
     } catch (error: any) {
       console.error("Cover letter generation error:", error);
       res.status(500).json({ error: "Failed to generate cover letter" });
     }
   });
 
+  // Old endpoint: Get detailed AI match analysis for a specific job
   // Old endpoint: Get detailed AI match analysis for a specific job
   app.post("/api/jobs/match-analysis", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
