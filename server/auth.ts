@@ -102,7 +102,7 @@ export async function hasFeatureAccess(userId: string, featureKey: string): Prom
     return false;
   }
   
-  // Check if user has active subscription (paid or institutional)
+  // Check if user has active subscription (paid or institutional) - unlimited use
   if (user.subscriptionTier === 'paid' || user.subscriptionTier === 'institutional') {
     // Check subscription status is active or trialing
     if (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing') {
@@ -110,9 +110,9 @@ export async function hasFeatureAccess(userId: string, featureKey: string): Prom
     }
   }
   
-  // Check if user purchased this specific feature
-  const purchasedFeature = await storage.getUserPurchasedFeature(userId, featureKey);
-  return !!purchasedFeature;
+  // Check if user has unused credit for this specific feature - one-time use
+  const unusedCredit = await storage.getUnusedFeatureCredit(userId, featureKey);
+  return !!unusedCredit;
 }
 
 // Middleware to check if user has access to a specific feature

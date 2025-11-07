@@ -143,7 +143,10 @@ export interface IStorage {
   // User Purchased Features
   getUserPurchasedFeature(userId: string, featureKey: string): Promise<UserPurchasedFeature | undefined>;
   getUserPurchasedFeatures(userId: string): Promise<UserPurchasedFeature[]>;
+  getUnusedFeatureCredit(userId: string, featureKey: string): Promise<UserPurchasedFeature | undefined>;
+  getUserUnusedCredits(userId: string): Promise<UserPurchasedFeature[]>;
   createUserPurchasedFeature(feature: InsertUserPurchasedFeature): Promise<UserPurchasedFeature>;
+  consumeFeatureCredit(creditId: string): Promise<UserPurchasedFeature>;
   
   // User management with licensing
   activateUser(userId: string): Promise<User>;
@@ -1144,6 +1147,32 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(userPurchasedFeatures.purchasedAt));
   }
 
+  async getUnusedFeatureCredit(userId: string, featureKey: string): Promise<UserPurchasedFeature | undefined> {
+    const [feature] = await db
+      .select()
+      .from(userPurchasedFeatures)
+      .where(and(
+        eq(userPurchasedFeatures.userId, userId),
+        eq(userPurchasedFeatures.featureKey, featureKey),
+        eq(userPurchasedFeatures.isUsed, false)
+      ))
+      .orderBy(desc(userPurchasedFeatures.purchasedAt))
+      .limit(1);
+    
+    return feature || undefined;
+  }
+
+  async getUserUnusedCredits(userId: string): Promise<UserPurchasedFeature[]> {
+    return await db
+      .select()
+      .from(userPurchasedFeatures)
+      .where(and(
+        eq(userPurchasedFeatures.userId, userId),
+        eq(userPurchasedFeatures.isUsed, false)
+      ))
+      .orderBy(desc(userPurchasedFeatures.purchasedAt));
+  }
+
   async createUserPurchasedFeature(feature: InsertUserPurchasedFeature): Promise<UserPurchasedFeature> {
     const [purchasedFeature] = await db
       .insert(userPurchasedFeatures)
@@ -1151,6 +1180,19 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return purchasedFeature;
+  }
+
+  async consumeFeatureCredit(creditId: string): Promise<UserPurchasedFeature> {
+    const [consumed] = await db
+      .update(userPurchasedFeatures)
+      .set({ 
+        isUsed: true, 
+        usedAt: sql`now()` 
+      })
+      .where(eq(userPurchasedFeatures.id, creditId))
+      .returning();
+    
+    return consumed;
   }
 
   async getUserCompletedTours(userId: string): Promise<TourCompletion[]> {
