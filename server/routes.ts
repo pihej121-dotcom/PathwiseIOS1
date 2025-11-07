@@ -3251,18 +3251,26 @@ Make your recommendations specific, actionable, and data-driven based on the act
       const url = new URL(referer);
       const baseUrl = `${url.protocol}//${url.host}`;
 
-      // Create checkout session for one-time payment
+      // Get Price ID from environment variables
+      const priceIdEnvKey = `STRIPE_PRICE_ID_${featureKey.split('_').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join('_')}`;
+      const priceId = process.env[priceIdEnvKey];
+
+      if (!priceId) {
+        return res.status(500).json({ 
+          error: `Stripe Price ID not configured for ${feature.name}. Please add ${priceIdEnvKey} to environment variables.` 
+        });
+      }
+
+      // Create checkout session for one-time payment using actual Price ID
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: 'payment', // One-time payment
         payment_method_types: ['card'],
         line_items: [
           {
-            price_data: {
-              currency: 'usd',
-              product: feature.stripeProductId,
-              unit_amount: feature.price, // in cents
-            },
+            price: priceId, // Use actual Stripe Price ID
             quantity: 1,
           },
         ],

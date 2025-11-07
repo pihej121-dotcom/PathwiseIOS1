@@ -25,8 +25,8 @@ export default function Register() {
   const urlParams = new URLSearchParams(window.location.search);
   const invitationToken = urlParams.get('invitationToken') || urlParams.get('token');
   
-  // Always set to paid for non-invited users (no free tier available)
-  const selectedPlan = invitationToken ? null : 'paid';
+  // Default everyone to free tier
+  const selectedPlan = 'free';
   
   const {
     register,
@@ -51,11 +51,11 @@ export default function Register() {
     try {
       setError("");
       
-      // Add selected plan to registration data
+      // Add selected plan to registration data (always free for new signups)
       // Note: Backend ignores selectedPlan when invitationToken is provided (sets to "institutional")
       const registrationData = {
         ...data,
-        selectedPlan: invitationToken ? undefined : (selectedPlan || 'paid'),
+        selectedPlan: invitationToken ? undefined : selectedPlan,
       };
       
       // Call register API directly to get the response
@@ -71,13 +71,7 @@ export default function Register() {
         throw new Error(result.error || 'Registration failed');
       }
 
-      // If paid user, redirect to Stripe checkout
-      if (result.requiresPayment && result.checkoutUrl) {
-        window.location.href = result.checkoutUrl;
-        return;
-      }
-
-      // For free/institutional users, save token and login
+      // Save token and login (no payment required for registration)
       if (result.token) {
         localStorage.setItem('auth_token', result.token);
         window.location.href = '/';
@@ -112,7 +106,7 @@ export default function Register() {
             <CardHeader>
               <CardTitle data-testid="register-title">Create Account</CardTitle>
               <CardDescription>
-                {invitationToken ? "Complete your registration" : "Start your Pro subscription"}
+                {invitationToken ? "Complete your registration" : "Start your free account"}
               </CardDescription>
             </CardHeader>
             <CardContent>
