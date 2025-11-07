@@ -491,6 +491,8 @@ export const userPurchasedFeatures = pgTable("user_purchased_features", {
   stripeProductId: text("stripe_product_id").notNull(),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   amountPaid: integer("amount_paid").notNull(), // in cents
+  isUsed: boolean("is_used").notNull().default(false), // Track if this credit has been consumed
+  usedAt: timestamp("used_at"), // When the credit was used
   purchasedAt: timestamp("purchased_at").notNull().default(sql`now()`),
 });
 
