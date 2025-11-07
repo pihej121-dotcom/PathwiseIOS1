@@ -3640,7 +3640,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
     try {
       const userId = req.user!.id;
       const user = await storage.getUser(userId);
-      const purchasedFeatures = await storage.getUserPurchasedFeatures(userId);
+      const unusedCredits = await storage.getUserUnusedCredits(userId);
 
       if (!user) {
         return res.status(404).json({ error: "User not found" });
@@ -3653,13 +3653,17 @@ Make your recommendations specific, actionable, and data-driven based on the act
 
       // Build feature access map
       const featureAccess: Record<string, boolean> = {};
+      const creditCounts: Record<string, number> = {};
+      
       for (const key in FEATURE_CATALOG) {
         const featureKey = key as FeatureKey;
         if (hasActiveSubscription) {
           featureAccess[featureKey] = true;
+          creditCounts[featureKey] = -1; // -1 means unlimited
         } else {
-          const purchased = purchasedFeatures.find(f => f.featureKey === featureKey);
-          featureAccess[featureKey] = !!purchased;
+          const credits = unusedCredits.filter(f => f.featureKey === featureKey);
+          featureAccess[featureKey] = credits.length > 0;
+          creditCounts[featureKey] = credits.length;
         }
       }
 
@@ -3667,12 +3671,68 @@ Make your recommendations specific, actionable, and data-driven based on the act
         subscriptionTier: user.subscriptionTier,
         subscriptionStatus: user.subscriptionStatus,
         hasActiveSubscription,
-        purchasedFeatures: purchasedFeatures.map(f => f.featureKey),
+        purchasedFeatures: unusedCredits.map(f => f.featureKey),
         featureAccess,
+        creditCounts,
       });
     } catch (err: any) {
       console.error('Feature access error:', err.message);
       res.status(500).json({ error: err.message || "Failed to fetch feature access" });
+    }
+  });
+
+  // Consume a feature credit (pay-per-use)
+  app.post("/api/features/consume", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const { featureKey } = req.body;
+
+      if (!featureKey) {
+        return res.status(400).json({ error: "Feature key is required" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Check if user has active subscription - subscribers don't consume credits
+      const hasActiveSubscription = 
+        (user.subscriptionTier === 'paid' || user.subscriptionTier === 'institutional') &&
+        (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing');
+
+      if (hasActiveSubscription) {
+        return res.json({ 
+          success: true, 
+          message: "Subscription user - unlimited access",
+          unlimited: true 
+        });
+      }
+
+      // Find and consume an unused credit
+      const unusedCredit = await storage.getUnusedFeatureCredit(userId, featureKey);
+      
+      if (!unusedCredit) {
+        return res.status(403).json({ 
+          error: "No available credits for this feature",
+          requiresUpgrade: true,
+          featureKey 
+        });
+      }
+
+      await storage.consumeFeatureCredit(unusedCredit.id);
+
+      console.log(`✅ Feature credit consumed: ${featureKey} for user ${userId}`);
+
+      res.json({ 
+        success: true, 
+        message: "Feature credit consumed",
+        creditId: unusedCredit.id,
+        unlimited: false
+      });
+    } catch (err: any) {
+      console.error('Consume feature error:', err.message);
+      res.status(500).json({ error: err.message || "Failed to consume feature credit" });
     }
   });
 
