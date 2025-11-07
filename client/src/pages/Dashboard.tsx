@@ -70,6 +70,14 @@ export default function Dashboard() {
           window.history.replaceState({}, "", "/dashboard");
           queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
         } else if (feature && sessionId) {
+          const processedKey = `purchase_verified_${sessionId}`;
+          const alreadyProcessed = sessionStorage.getItem(processedKey);
+          
+          if (alreadyProcessed) {
+            window.history.replaceState({}, "", "/dashboard");
+            return;
+          }
+
           try {
             const token = localStorage.getItem('auth_token');
             const response = await fetch('/api/stripe/verify-session', {
@@ -87,6 +95,8 @@ export default function Dashboard() {
               throw new Error(data.error || 'Payment verification failed');
             }
 
+            sessionStorage.setItem(processedKey, 'true');
+
             const featureName = FEATURE_CATALOG[feature as keyof typeof FEATURE_CATALOG]?.name;
             toast({
               title: "Purchase successful!",
@@ -94,13 +104,13 @@ export default function Dashboard() {
             });
             queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
             queryClient.invalidateQueries({ queryKey: ["/api/user/purchased-features"] });
+            window.history.replaceState({}, "", "/dashboard");
           } catch (error: any) {
             toast({
               title: "Verification failed",
               description: error.message || "Failed to verify your purchase. Please contact support if the issue persists.",
               variant: "destructive",
             });
-          } finally {
             window.history.replaceState({}, "", "/dashboard");
           }
         }
