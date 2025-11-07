@@ -483,6 +483,74 @@ export const tourCompletions = pgTable("tour_completions", {
   completedAt: timestamp("completed_at").notNull().default(sql`now()`),
 });
 
+// User purchased features for pay-per-feature model
+export const userPurchasedFeatures = pgTable("user_purchased_features", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  featureKey: text("feature_key").notNull(), // e.g., 'salary_negotiator', 'resume_analysis'
+  stripeProductId: text("stripe_product_id").notNull(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  amountPaid: integer("amount_paid").notNull(), // in cents
+  purchasedAt: timestamp("purchased_at").notNull().default(sql`now()`),
+});
+
+// Feature pricing constants
+export const FEATURE_CATALOG = {
+  salary_negotiator: {
+    key: 'salary_negotiator',
+    name: 'Salary Negotiator',
+    description: 'AI-powered salary negotiation guidance and scripts',
+    price: 600, // $6.00 in cents
+    stripeProductId: 'prod_TNQ19KzpxCxKZq',
+  },
+  micro_project_generator: {
+    key: 'micro_project_generator',
+    name: 'Micro-Project Generator',
+    description: 'Generate tailored portfolio projects based on skill gaps',
+    price: 300, // $3.00 in cents
+    stripeProductId: 'prod_TNQ07JZVlHX2dr',
+  },
+  career_roadmap_generator: {
+    key: 'career_roadmap_generator',
+    name: 'Career Roadmap Generator',
+    description: 'AI-generated 30-day, 3-month, and 6-month career plans',
+    price: 600, // $6.00 in cents
+    stripeProductId: 'prod_TNPxfiV3tWRyai',
+  },
+  job_match_assistant: {
+    key: 'job_match_assistant',
+    name: 'Job Match Assistant',
+    description: 'AI-powered job matching with compatibility scoring',
+    price: 1200, // $12.00 in cents
+    stripeProductId: 'prod_TNPk8JDrw4IGZT',
+  },
+  resume_analysis: {
+    key: 'resume_analysis',
+    name: 'Resume Analysis',
+    description: 'Comprehensive AI resume review with RMS scoring',
+    price: 300, // $3.00 in cents
+    stripeProductId: 'prod_TNPiaXvzWX9nWn',
+  },
+  interview_prep_assistant: {
+    key: 'interview_prep_assistant',
+    name: 'Interview Prep Assistant',
+    description: 'Personalized interview preparation and practice',
+    price: 500, // $5.00 in cents
+    stripeProductId: 'prod_TNQ2KQp5gOsqKG',
+  },
+} as const;
+
+export const SUBSCRIPTION_PRODUCT = {
+  key: 'pathwise_unlimited',
+  name: 'Pathwise Unlimited',
+  description: 'Unlimited access to all AI tools and beta features',
+  monthlyPrice: 1500, // $15.00 in cents
+  yearlyPrice: 12000, // $120.00 in cents
+  stripeProductId: 'prod_TFTi3DjdSitHEb',
+};
+
+export type FeatureKey = keyof typeof FEATURE_CATALOG;
+
 // Relations
 export const institutionsRelations = relations(institutions, ({ many, one }) => ({
   licenses: many(licenses),
@@ -513,6 +581,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   activities: many(activities),
   savedOpportunities: many(savedOpportunities),
   tourCompletions: many(tourCompletions),
+  purchasedFeatures: many(userPurchasedFeatures),
   sentInvitations: many(invitations, { relationName: "invitedBy" }),
   claimedInvitations: many(invitations, { relationName: "claimedBy" }),
 }));
@@ -576,6 +645,10 @@ export const savedOpportunitiesRelations = relations(savedOpportunities, ({ one 
 
 export const tourCompletionsRelations = relations(tourCompletions, ({ one }) => ({
   user: one(users, { fields: [tourCompletions.userId], references: [users.id] }),
+}));
+
+export const userPurchasedFeaturesRelations = relations(userPurchasedFeatures, ({ one }) => ({
+  user: one(users, { fields: [userPurchasedFeatures.userId], references: [users.id] }),
 }));
 
 export const activitiesRelations = relations(activities, ({ one }) => ({
@@ -849,6 +922,11 @@ export const insertSavedOpportunitySchema = createInsertSchema(savedOpportunitie
   savedAt: true,
 });
 
+export const insertUserPurchasedFeatureSchema = createInsertSchema(userPurchasedFeatures).omit({
+  id: true,
+  purchasedAt: true,
+});
+
 export const insertTourCompletionSchema = createInsertSchema(tourCompletions).omit({
   id: true,
   completedAt: true,
@@ -860,6 +938,8 @@ export type InsertSavedOpportunity = z.infer<typeof insertSavedOpportunitySchema
 export type SelectSavedOpportunity = typeof savedOpportunities.$inferSelect;
 export type TourCompletion = typeof tourCompletions.$inferSelect;
 export type InsertTourCompletion = z.infer<typeof insertTourCompletionSchema>;
+export type UserPurchasedFeature = typeof userPurchasedFeatures.$inferSelect;
+export type InsertUserPurchasedFeature = z.infer<typeof insertUserPurchasedFeatureSchema>;
 
 // Micro-Internship Marketplace types
 export type SkillGapAnalysis = typeof skillGapAnalyses.$inferSelect;
