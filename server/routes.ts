@@ -1076,10 +1076,6 @@ if (existingUser && !existingUser.isActive) {
       if (!extractedText) {
         return res.status(400).json({ error: "extractedText is required" });
       }
-      
-      if (!targetRole) {
-        return res.status(400).json({ error: "targetRole is required" });
-      }
 
       // Create resume record with the provided text
       const resume = await storage.createResume({
@@ -1097,8 +1093,8 @@ if (existingUser && !existingUser.isActive) {
         `Uploaded new resume: ${fileName || "resume.txt"}`
       );
 
-      // Trigger AI analysis with target role
-      if (extractedText) {
+      // Trigger AI analysis if target role is provided
+      if (extractedText && targetRole) {
         try {
           const analysis = await aiService.analyzeResume(
             req.user!.id,
