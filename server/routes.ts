@@ -3349,13 +3349,13 @@ Make your recommendations specific, actionable, and data-driven based on the act
               const subscriptionId = session.subscription as string;
               
               if (subscriptionId) {
-                // Update user subscription status - will be 'trialing' during trial period
+                // Update user subscription status - set to 'active' for immediate feature access
                 await storage.updateUser(userId, {
                   stripeSubscriptionId: subscriptionId,
-                  subscriptionStatus: 'trialing',
+                  subscriptionStatus: 'active',
                   subscriptionTier: 'paid',
                 });
-                console.log(`✅ Subscription created for user ${userId} (trial period active, tier upgraded to paid)`);
+                console.log(`✅ Subscription created for user ${userId} (status: active, tier: paid - full access granted)`);
               }
             }
           }
