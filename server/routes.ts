@@ -3515,16 +3515,41 @@ Make your recommendations specific, actionable, and data-driven based on the act
         return res.status(403).json({ error: "Session does not belong to this user" });
       }
 
-      // Update user subscription status
-      await storage.updateUser(userId, {
-        stripeSubscriptionId: session.subscription as string,
-        subscriptionTier: 'paid',
-        subscriptionStatus: 'active',
-      });
+      const purchaseType = session.metadata?.purchaseType;
 
-      console.log(`✅ Subscription activated for existing user ${userId}`);
+      // Check if this is a feature purchase or subscription
+      if (purchaseType === 'feature') {
+        const featureKey = session.metadata?.featureKey;
+        const paymentIntentId = session.payment_intent as string;
 
-      res.json({ success: true, message: "Subscription activated successfully" });
+        if (featureKey && (featureKey in FEATURE_CATALOG)) {
+          const feature = FEATURE_CATALOG[featureKey as FeatureKey];
+          
+          // Record the feature purchase immediately
+          await storage.createUserPurchasedFeature({
+            userId,
+            featureKey,
+            stripeProductId: feature.stripeProductId,
+            stripePaymentIntentId: paymentIntentId,
+            amountPaid: feature.price,
+          });
+          
+          console.log(`✅ Feature purchase recorded: ${featureKey} for user ${userId}`);
+          res.json({ success: true, message: "Feature purchase confirmed", featureKey });
+        } else {
+          return res.status(400).json({ error: "Invalid feature key" });
+        }
+      } else {
+        // Handle subscription
+        await storage.updateUser(userId, {
+          stripeSubscriptionId: session.subscription as string,
+          subscriptionTier: 'paid',
+          subscriptionStatus: 'active',
+        });
+
+        console.log(`✅ Subscription activated for existing user ${userId}`);
+        res.json({ success: true, message: "Subscription activated successfully" });
+      }
     } catch (err: any) {
       console.error('Verify session error:', err.message);
       res.status(500).json({ error: err.message || "Failed to verify payment" });
