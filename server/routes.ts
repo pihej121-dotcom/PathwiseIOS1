@@ -3353,8 +3353,9 @@ Make your recommendations specific, actionable, and data-driven based on the act
                 await storage.updateUser(userId, {
                   stripeSubscriptionId: subscriptionId,
                   subscriptionStatus: 'trialing',
+                  subscriptionTier: 'paid',
                 });
-                console.log(`✅ Subscription created for user ${userId} (trial period active)`);
+                console.log(`✅ Subscription created for user ${userId} (trial period active, tier upgraded to paid)`);
               }
             }
           }
