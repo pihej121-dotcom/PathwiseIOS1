@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { usePurchaseFeature, useSubscribe } from "@/hooks/use-payment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Lock, Sparkles, ShoppingCart, LogIn } from "lucide-react";
@@ -24,6 +25,9 @@ interface PaywallOverlayProps {
 export function PaywallOverlay({ children, showPaywall, onUpgrade, featureKey }: PaywallOverlayProps) {
   const [, navigate] = useLocation();
   const { user, isLoading: authLoading } = useAuth();
+  
+  const purchaseFeature = usePurchaseFeature();
+  const subscribe = useSubscribe();
   
   const { data: accessData, isLoading, error } = useQuery<FeatureAccessResponse>({
     queryKey: ["/api/user/feature-access"],
@@ -117,19 +121,27 @@ export function PaywallOverlay({ children, showPaywall, onUpgrade, featureKey }:
                     <ShoppingCart className="w-6 h-6 mx-auto mb-2 text-primary" />
                     <h4 className="font-bold text-lg mb-1">Buy Once</h4>
                     <p className="text-xs text-muted-foreground mb-2">
-                      Pay once, own forever
+                      Single use - purchase again to use more
                     </p>
                     <div className="text-2xl font-bold text-primary mb-3">
                       ${feature.price / 100}
                     </div>
                   </div>
                   <Button
-                    onClick={() => navigate(`/pricing?feature=${featureKey}`)}
+                    onClick={() => purchaseFeature.mutate(featureKey)}
+                    disabled={purchaseFeature.isPending || subscribe.isPending}
                     className="w-full"
                     variant="outline"
                     data-testid={`button-buy-feature-${featureKey}`}
                   >
-                    Buy This Feature
+                    {purchaseFeature.isPending ? (
+                      <>
+                        <span className="animate-spin mr-2">⏳</span>
+                        Processing...
+                      </>
+                    ) : (
+                      "Buy This Feature"
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -141,7 +153,7 @@ export function PaywallOverlay({ children, showPaywall, onUpgrade, featureKey }:
                     <Sparkles className="w-6 h-6 mx-auto mb-2 text-primary" />
                     <h4 className="font-bold text-lg mb-1">Unlimited Access</h4>
                     <p className="text-xs text-muted-foreground mb-2">
-                      All features + future updates
+                      Unlimited use + all features
                     </p>
                     <div className="text-2xl font-bold text-primary mb-1">
                       $15<span className="text-sm text-muted-foreground">/mo</span>
@@ -151,12 +163,22 @@ export function PaywallOverlay({ children, showPaywall, onUpgrade, featureKey }:
                     </div>
                   </div>
                   <Button
-                    onClick={() => navigate("/pricing")}
+                    onClick={() => subscribe.mutate()}
+                    disabled={purchaseFeature.isPending || subscribe.isPending}
                     className="w-full"
                     data-testid="button-subscribe-unlimited"
                   >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Start Free Trial
+                    {subscribe.isPending ? (
+                      <>
+                        <span className="animate-spin mr-2">⏳</span>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Start Free Trial
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>

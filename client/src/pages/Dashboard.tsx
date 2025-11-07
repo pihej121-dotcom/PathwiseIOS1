@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressRing } from "@/components/ProgressRing";
 import { TourButton } from "@/components/TourButton";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
+import { FEATURE_CATALOG } from "@shared/schema";
 import { 
   Send, 
   Route, 
@@ -36,6 +39,7 @@ import { InterviewPrep } from "./InterviewPrep";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   
@@ -48,6 +52,37 @@ export default function Dashboard() {
     refetchInterval: 60000,
     staleTime: 3000,
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const purchase = params.get("purchase");
+    const feature = params.get("feature");
+    const type = params.get("type");
+
+    if (purchase === "success") {
+      if (type === "subscription") {
+        toast({
+          title: "Subscription activated!",
+          description: "Welcome to Pathwise Unlimited! You now have access to all features.",
+        });
+      } else if (feature) {
+        const featureName = FEATURE_CATALOG[feature as keyof typeof FEATURE_CATALOG]?.name;
+        toast({
+          title: "Purchase successful!",
+          description: `You now have access to ${featureName}`,
+        });
+      }
+      window.history.replaceState({}, "", "/dashboard");
+      queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
+    } else if (purchase === "cancelled") {
+      toast({
+        title: "Purchase cancelled",
+        description: "Your payment was cancelled. No charges were made.",
+        variant: "destructive",
+      });
+      window.history.replaceState({}, "", "/dashboard");
+    }
+  }, [toast]);
 
   if (isLoading) {
     return (

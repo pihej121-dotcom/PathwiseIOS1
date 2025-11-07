@@ -3190,8 +3190,8 @@ Make your recommendations specific, actionable, and data-driven based on the act
             },
           },
         },
-        success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
+        success_url: `${baseUrl}/dashboard?purchase=success&type=subscription`,
+        cancel_url: `${baseUrl}/dashboard?purchase=cancelled`,
         metadata: {
           userId: user.id,
         },
@@ -3270,8 +3270,8 @@ Make your recommendations specific, actionable, and data-driven based on the act
             quantity: 1,
           },
         ],
-        success_url: `${baseUrl}/pricing?purchase=success&feature=${featureKey}`,
-        cancel_url: `${baseUrl}/pricing?purchase=cancelled`,
+        success_url: `${baseUrl}/dashboard?purchase=success&feature=${featureKey}`,
+        cancel_url: `${baseUrl}/dashboard?purchase=cancelled`,
         metadata: {
           userId: user.id,
           featureKey: featureKey,

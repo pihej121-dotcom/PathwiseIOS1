@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { usePurchaseFeature, useSubscribe } from "@/hooks/use-payment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Lock, Sparkles, ShoppingCart, LogIn } from "lucide-react";
@@ -24,6 +25,9 @@ interface FeatureGateProps {
 export function FeatureGate({ featureKey, children, loadingFallback }: FeatureGateProps) {
   const [, navigate] = useLocation();
   const { user, isLoading: authLoading } = useAuth();
+  
+  const purchaseFeature = usePurchaseFeature();
+  const subscribe = useSubscribe();
   
   const { data: accessData, isLoading } = useQuery<FeatureAccessResponse>({
     queryKey: ["/api/user/feature-access"],
@@ -118,20 +122,28 @@ export function FeatureGate({ featureKey, children, loadingFallback }: FeatureGa
                     <ShoppingCart className="w-8 h-8 mx-auto mb-2 text-primary" />
                     <h3 className="font-bold text-xl mb-1">Buy Once</h3>
                     <p className="text-sm text-muted-foreground mb-3">
-                      Pay once, own forever
+                      Single use - purchase again to use more
                     </p>
                     <div className="text-3xl font-bold text-primary mb-4">
                       ${feature.price / 100}
                     </div>
                   </div>
                   <Button
-                    onClick={() => navigate(`/pricing?feature=${featureKey}`)}
+                    onClick={() => purchaseFeature.mutate(featureKey)}
+                    disabled={purchaseFeature.isPending || subscribe.isPending}
                     className="w-full"
                     variant="outline"
                     size="lg"
                     data-testid={`button-buy-feature-${featureKey}`}
                   >
-                    Buy This Feature
+                    {purchaseFeature.isPending ? (
+                      <>
+                        <span className="animate-spin mr-2">⏳</span>
+                        Processing...
+                      </>
+                    ) : (
+                      "Buy This Feature"
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -143,7 +155,7 @@ export function FeatureGate({ featureKey, children, loadingFallback }: FeatureGa
                     <Sparkles className="w-8 h-8 mx-auto mb-2 text-primary" />
                     <h3 className="font-bold text-xl mb-1">Unlimited Access</h3>
                     <p className="text-sm text-muted-foreground mb-3">
-                      All features + future updates
+                      Unlimited use + all features
                     </p>
                     <div className="text-3xl font-bold text-primary mb-1">
                       $15<span className="text-lg text-muted-foreground">/mo</span>
@@ -153,13 +165,23 @@ export function FeatureGate({ featureKey, children, loadingFallback }: FeatureGa
                     </div>
                   </div>
                   <Button
-                    onClick={() => navigate("/pricing")}
+                    onClick={() => subscribe.mutate()}
+                    disabled={purchaseFeature.isPending || subscribe.isPending}
                     className="w-full"
                     size="lg"
                     data-testid="button-subscribe-unlimited"
                   >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Start Free Trial
+                    {subscribe.isPending ? (
+                      <>
+                        <span className="animate-spin mr-2">⏳</span>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Start Free Trial
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
