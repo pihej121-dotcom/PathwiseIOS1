@@ -180,7 +180,7 @@ export default function Dashboard() {
             </div>
             <h3 className="font-semibold mb-1">Job Match Assistant</h3>
             <p className="text-xs text-muted-foreground">
-              Analyze fit, tailor your resume, and draft your cover letter.
+             Analyze. Tailor. Apply.
             </p>
 
           </CardContent>
