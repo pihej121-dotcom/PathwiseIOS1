@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { authenticate, requireAdmin, requireSuperAdmin, requirePaidFeatures, hashPassword, verifyPassword, createSession, logout, generateToken, type AuthRequest } from "./auth";
+import { authenticate, requireAdmin, requireSuperAdmin, requirePaidFeatures, requireFeature, hashPassword, verifyPassword, createSession, logout, generateToken, type AuthRequest } from "./auth";
 import { aiService } from "./ai";
 import { jobsService } from "./jobs";
 import { beyondJobsService } from "./beyond-jobs";
@@ -1177,7 +1177,7 @@ if (existingUser && !existingUser.isActive) {
     }
   });
 
-  app.post("/api/resumes/:id/analyze", authenticate, async (req: AuthRequest, res) => {
+  app.post("/api/resumes/:id/analyze", authenticate, requireFeature('resume_analysis'), async (req: AuthRequest, res) => {
     try {
       const { id } = req.params;
       const { targetRole, targetIndustry, targetCompanies } = req.body;
@@ -1553,7 +1553,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
   });
 
   // Career roadmap routes
-  app.post("/api/roadmaps/generate", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+  app.post("/api/roadmaps/generate", authenticate, requireFeature('career_roadmap_generator'), async (req: AuthRequest, res) => {
     try {
       const { phase } = req.body;
       
@@ -1919,7 +1919,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
 
   // Old endpoint: Get detailed AI match analysis for a specific job
   // Old endpoint: Get detailed AI match analysis for a specific job
-  app.post("/api/jobs/match-analysis", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+  app.post("/api/jobs/match-analysis", authenticate, requireFeature('job_match_assistant'), async (req: AuthRequest, res) => {
     try {
       console.log("Match analysis request received from user:", req.user?.id);
       const { jobId, jobData } = req.body;
@@ -2119,7 +2119,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
   });
 
   // AI Copilot - Salary negotiation strategy
-  app.post("/api/copilot/salary-negotiation", authenticate, async (req: AuthRequest, res) => {
+  app.post("/api/copilot/salary-negotiation", authenticate, requireFeature('salary_negotiator'), async (req: AuthRequest, res) => {
     try {
       const { currentSalary, targetSalary, jobRole, location, yearsExperience } = req.body;
       
@@ -2183,7 +2183,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
     }
   });
 
-  app.post("/api/jobs/tailor-resume", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+  app.post("/api/jobs/tailor-resume", authenticate, requireFeature('job_match_assistant'), async (req: AuthRequest, res) => {
     try {
       const { jobData, baseResumeId, jobAnalysisId } = req.body;
       
@@ -2568,7 +2568,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
   });
 
   // Interview prep routes
-  app.post("/api/interview-prep/generate-questions", authenticate, async (req: AuthRequest, res) => {
+  app.post("/api/interview-prep/generate-questions", authenticate, requireFeature('interview_prep_assistant'), async (req: AuthRequest, res) => {
     try {
       const { applicationId, category, count = 10 } = req.body;
       
@@ -2788,7 +2788,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
   });
 
   // Micro-Projects routes
-  app.post("/api/micro-projects/generate", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+  app.post("/api/micro-projects/generate", authenticate, requireFeature('micro_project_generator'), async (req: AuthRequest, res) => {
     try {
       const { skillGapAnalysisId } = req.body;
       
@@ -2846,7 +2846,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
   });
 
   // NEW: Role-based project generation
-  app.post("/api/micro-projects/generate-from-role", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+  app.post("/api/micro-projects/generate-from-role", authenticate, requireFeature('micro_project_generator'), async (req: AuthRequest, res) => {
     try {
       const { targetRole, count, difficulty } = req.body;
       
@@ -2882,7 +2882,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
     }
   });
 
-  app.post("/api/micro-projects/generate-ai", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
+  app.post("/api/micro-projects/generate-ai", authenticate, requireFeature('micro_project_generator'), async (req: AuthRequest, res) => {
     try {
       const { microProjectsService } = await import("./micro-projects");
       
