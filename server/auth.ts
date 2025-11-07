@@ -115,25 +115,64 @@ export async function hasFeatureAccess(userId: string, featureKey: string): Prom
   return !!unusedCredit;
 }
 
-// Middleware to check if user has access to a specific feature
+// Middleware to check if user has access to a specific feature AND consume credit if pay-per-use
 export function requireFeature(featureKey: string) {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    const hasAccess = await hasFeatureAccess(req.user.id, featureKey);
-    
-    if (hasAccess) {
+    const userId = req.user.id;
+    const user = await storage.getUser(userId);
+
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    // Check if user has active subscription (unlimited access - no credit consumption)
+    const hasActiveSubscription = 
+      (user.subscriptionTier === 'paid' || user.subscriptionTier === 'institutional') &&
+      (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing');
+
+    if (hasActiveSubscription) {
+      // Subscription user - pass through without consuming credits
       return next();
     }
 
-    // User doesn't have access - send upgrade prompt
-    return res.status(403).json({ 
-      error: `This feature requires either purchasing it individually or subscribing to Pathwise Unlimited.`,
-      requiresUpgrade: true,
-      featureKey: featureKey
-    });
+    // Pay-per-use user - check for unused credit and consume it atomically
+    const unusedCredit = await storage.getUnusedFeatureCredit(userId, featureKey);
+    
+    if (!unusedCredit) {
+      // No available credits
+      return res.status(403).json({ 
+        error: `This feature requires either purchasing it individually or subscribing to Pathwise Unlimited.`,
+        requiresUpgrade: true,
+        featureKey: featureKey
+      });
+    }
+
+    // Consume the credit atomically (only succeeds if credit is still unused)
+    try {
+      const consumed = await storage.consumeFeatureCredit(unusedCredit.id);
+      
+      if (!consumed) {
+        // Credit was already consumed by another concurrent request
+        console.warn(`⚠️ Race condition detected: Credit ${unusedCredit.id} already consumed for ${featureKey} by user ${userId}`);
+        return res.status(403).json({ 
+          error: "This credit has already been used. Please purchase again to continue.",
+          requiresUpgrade: true,
+          featureKey: featureKey
+        });
+      }
+      
+      console.log(`✅ Credit consumed atomically: ${featureKey} for user ${userId}`);
+      
+      // Pass through to the protected route
+      return next();
+    } catch (error) {
+      console.error('Error consuming credit:', error);
+      return res.status(500).json({ error: "Failed to process feature access" });
+    }
   };
 }
 

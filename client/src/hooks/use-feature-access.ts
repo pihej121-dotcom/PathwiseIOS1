@@ -15,6 +15,7 @@ interface FeatureAccessResponse {
   hasActiveSubscription: boolean;
   purchasedFeatures: string[];
   featureAccess: Record<string, boolean>;
+  creditCounts: Record<string, number>;
 }
 
 export function useFeatureAccess() {
@@ -42,11 +43,18 @@ export function useFeatureAccess() {
     return featureAccessData.purchasedFeatures.includes(featureKey);
   };
 
+  const getCreditCount = (featureKey: FeatureKey): number => {
+    if (!featureAccessData) return 0;
+    return featureAccessData.creditCounts?.[featureKey] || 0;
+  };
+
   return {
     hasFeatureAccess,
     hasPurchased,
+    getCreditCount,
     purchasedFeatures: featureAccessData?.purchasedFeatures || [],
     hasActiveSubscription: featureAccessData?.hasActiveSubscription || false,
     isInstitutional: user?.subscriptionTier === "institutional",
+    creditCounts: featureAccessData?.creditCounts || {},
   };
 }

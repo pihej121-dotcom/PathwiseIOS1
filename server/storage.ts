@@ -146,7 +146,7 @@ export interface IStorage {
   getUnusedFeatureCredit(userId: string, featureKey: string): Promise<UserPurchasedFeature | undefined>;
   getUserUnusedCredits(userId: string): Promise<UserPurchasedFeature[]>;
   createUserPurchasedFeature(feature: InsertUserPurchasedFeature): Promise<UserPurchasedFeature>;
-  consumeFeatureCredit(creditId: string): Promise<UserPurchasedFeature>;
+  consumeFeatureCredit(creditId: string): Promise<UserPurchasedFeature | null>;
   
   // User management with licensing
   activateUser(userId: string): Promise<User>;
@@ -1182,17 +1182,21 @@ export class DatabaseStorage implements IStorage {
     return purchasedFeature;
   }
 
-  async consumeFeatureCredit(creditId: string): Promise<UserPurchasedFeature> {
+  async consumeFeatureCredit(creditId: string): Promise<UserPurchasedFeature | null> {
+    // Atomic update: only consume if credit is unused
     const [consumed] = await db
       .update(userPurchasedFeatures)
       .set({ 
         isUsed: true, 
         usedAt: sql`now()` 
       })
-      .where(eq(userPurchasedFeatures.id, creditId))
+      .where(and(
+        eq(userPurchasedFeatures.id, creditId),
+        eq(userPurchasedFeatures.isUsed, false)
+      ))
       .returning();
     
-    return consumed;
+    return consumed || null;
   }
 
   async getUserCompletedTours(userId: string): Promise<TourCompletion[]> {

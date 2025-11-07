@@ -3681,60 +3681,8 @@ Make your recommendations specific, actionable, and data-driven based on the act
     }
   });
 
-  // Consume a feature credit (pay-per-use)
-  app.post("/api/features/consume", authenticate, async (req: AuthRequest, res) => {
-    try {
-      const userId = req.user!.id;
-      const { featureKey } = req.body;
-
-      if (!featureKey) {
-        return res.status(400).json({ error: "Feature key is required" });
-      }
-
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      // Check if user has active subscription - subscribers don't consume credits
-      const hasActiveSubscription = 
-        (user.subscriptionTier === 'paid' || user.subscriptionTier === 'institutional') &&
-        (user.subscriptionStatus === 'active' || user.subscriptionStatus === 'trialing');
-
-      if (hasActiveSubscription) {
-        return res.json({ 
-          success: true, 
-          message: "Subscription user - unlimited access",
-          unlimited: true 
-        });
-      }
-
-      // Find and consume an unused credit
-      const unusedCredit = await storage.getUnusedFeatureCredit(userId, featureKey);
-      
-      if (!unusedCredit) {
-        return res.status(403).json({ 
-          error: "No available credits for this feature",
-          requiresUpgrade: true,
-          featureKey 
-        });
-      }
-
-      await storage.consumeFeatureCredit(unusedCredit.id);
-
-      console.log(`✅ Feature credit consumed: ${featureKey} for user ${userId}`);
-
-      res.json({ 
-        success: true, 
-        message: "Feature credit consumed",
-        creditId: unusedCredit.id,
-        unlimited: false
-      });
-    } catch (err: any) {
-      console.error('Consume feature error:', err.message);
-      res.status(500).json({ error: err.message || "Failed to consume feature credit" });
-    }
-  });
+  // Note: Credit consumption is now handled automatically by requireFeature middleware
+  // This endpoint is removed to prevent client-side credit manipulation
 
   // Delete user account endpoint
   app.delete("/api/users/delete-account", authenticate, async (req: AuthRequest, res) => {
