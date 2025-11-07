@@ -33,6 +33,7 @@ import {
 import { format, addDays, addMonths } from "date-fns";
 import type { Roadmap } from "@shared/schema";
 import { LoadingExperience } from "@/components/LoadingExperience";
+import { FeatureGate } from "@/components/FeatureGate";
 
 export default function CareerRoadmap({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
@@ -661,9 +662,15 @@ export default function CareerRoadmap({ embedded = false }: { embedded?: boolean
     </>
   );
 
-  return embedded ? content : (
-    <Layout title="Career Roadmap" subtitle="Your personalized path to career success">
+  const wrappedContent = (
+    <FeatureGate featureKey="career_roadmap_generator">
       {content}
+    </FeatureGate>
+  );
+
+  return embedded ? wrappedContent : (
+    <Layout title="Career Roadmap" subtitle="Your personalized path to career success">
+      {wrappedContent}
     </Layout>
   );
 }

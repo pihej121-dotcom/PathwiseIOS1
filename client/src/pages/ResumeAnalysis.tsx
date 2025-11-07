@@ -476,7 +476,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
 
             {/* Section Details */}
             {selectedSection && (activeResume as any)?.sectionAnalysis?.[selectedSection] && (
-              <PaywallOverlay showPaywall={isFreeUser} onUpgrade={handleUpgrade}>
+              <PaywallOverlay featureKey="resume_analysis">
                 <Card className="mt-6 border-none shadow-sm" data-testid="section-details">
                   <CardHeader>
                     <CardTitle className="text-base font-medium flex items-center gap-2 capitalize">
@@ -552,7 +552,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
 
             {/* Improvement Recommendations */}
             {(activeResume as any)?.gaps && Array.isArray((activeResume as any)?.gaps) && (activeResume as any)?.gaps.length > 0 && (
-              <PaywallOverlay showPaywall={isFreeUser} onUpgrade={handleUpgrade}>
+              <PaywallOverlay featureKey="resume_analysis">
                 <Card className="border-none shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-base font-medium flex items-center gap-2">

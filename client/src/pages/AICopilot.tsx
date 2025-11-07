@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { Layout } from '@/components/Layout';
 import { TourButton } from '@/components/TourButton';
+import { FeatureGate } from '@/components/FeatureGate';
 
 export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
   const [salaryForm, setSalaryForm] = useState({
@@ -221,5 +222,11 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
     </div>
   );
 
-  return embedded ? content : <Layout>{content}</Layout>;
+  const wrappedContent = (
+    <FeatureGate featureKey="salary_negotiator">
+      {content}
+    </FeatureGate>
+  );
+
+  return embedded ? wrappedContent : <Layout>{wrappedContent}</Layout>;
 }

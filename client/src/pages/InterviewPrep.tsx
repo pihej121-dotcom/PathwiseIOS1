@@ -22,6 +22,7 @@ import {
 import { Layout } from '@/components/Layout';
 import { TourButton } from '@/components/TourButton';
 import { LoadingExperience } from '@/components/LoadingExperience';
+import { FeatureGate } from '@/components/FeatureGate';
 
 interface MockQuestion {
   id: string;
@@ -349,9 +350,15 @@ export function InterviewPrep({ embedded = false }: { embedded?: boolean } = {})
     </>
   );
 
-  return embedded ? content : (
-    <Layout>
+  const wrappedContent = (
+    <FeatureGate featureKey="interview_prep_assistant">
       {content}
+    </FeatureGate>
+  );
+
+  return embedded ? wrappedContent : (
+    <Layout>
+      {wrappedContent}
     </Layout>
   );
 }

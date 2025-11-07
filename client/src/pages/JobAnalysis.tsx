@@ -13,6 +13,7 @@ import { FileText, Sparkles, Download, Loader2, Link as LinkIcon, Type } from "l
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { FeatureGate } from "@/components/FeatureGate";
 
 interface JobDetails {
   title: string;
@@ -541,9 +542,15 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     </div>
   );
 
-  return embedded ? content : (
-    <Layout>
+  const wrappedContent = (
+    <FeatureGate featureKey="job_match_assistant">
       {content}
+    </FeatureGate>
+  );
+
+  return embedded ? wrappedContent : (
+    <Layout>
+      {wrappedContent}
     </Layout>
   );
 }

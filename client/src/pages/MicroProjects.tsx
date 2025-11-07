@@ -22,6 +22,7 @@ import {
   Trash2
 } from "lucide-react";
 import { LoadingExperience } from "@/components/LoadingExperience";
+import { FeatureGate } from "@/components/FeatureGate";
 
 // Updated interface matching new schema
 interface MicroProject {
@@ -453,9 +454,15 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
     </>
   );
 
-  return embedded ? content : (
-    <Layout title="Micro-Projects" subtitle="Build portfolio-ready projects for your target role">
+  const wrappedContent = (
+    <FeatureGate featureKey="micro_project_generator">
       {content}
+    </FeatureGate>
+  );
+
+  return embedded ? wrappedContent : (
+    <Layout title="Micro-Projects" subtitle="Build portfolio-ready projects for your target role">
+      {wrappedContent}
     </Layout>
   );
 }
