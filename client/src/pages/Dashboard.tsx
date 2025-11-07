@@ -178,8 +178,11 @@ export default function Dashboard() {
             <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <Briefcase className="w-6 h-6 text-purple-600" />
             </div>
-            <h3 className="font-semibold mb-1">Jobs</h3>
-            <p className="text-xs text-muted-foreground">Find opportunities</p>
+            <h3 className="font-semibold mb-1">Job Match Assistant</h3>
+            <p className="text-xs text-muted-foreground">
+              Analyze fit, tailor your resume, and draft your cover letter.
+            </p>
+
           </CardContent>
         </Card>
 
@@ -206,8 +209,8 @@ export default function Dashboard() {
             <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <Brain className="w-6 h-6 text-indigo-600" />
             </div>
-            <h3 className="font-semibold mb-1">AI Copilot</h3>
-            <p className="text-xs text-muted-foreground">Get AI guidance</p>
+            <h3 className="font-semibold mb-1">Compensation Insights</h3>
+            <p className="text-xs text-muted-foreground">Compare salaries, assess your value, and strengthen your negotiation.</p>
           </CardContent>
         </Card>
 
