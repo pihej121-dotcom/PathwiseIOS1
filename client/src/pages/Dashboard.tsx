@@ -4,6 +4,7 @@ import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ProgressRing } from "@/components/ProgressRing";
 import { TourButton } from "@/components/TourButton";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +23,8 @@ import {
   Brain,
   ListTodo,
   MessageSquare,
-  Upload
+  Upload,
+  Loader2
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
@@ -42,6 +44,8 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [failedVerification, setFailedVerification] = useState<{sessionId: string, feature: string, error: string} | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
   
   const { data: stats = {}, isLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
@@ -53,8 +57,52 @@ export default function Dashboard() {
     staleTime: 3000,
   });
 
+  const verifyFeaturePurchase = async (sessionId: string, feature: string) => {
+    const processedKey = `purchase_verified_${sessionId}`;
+    const alreadyProcessed = sessionStorage.getItem(processedKey);
+    
+    if (alreadyProcessed) {
+      window.history.replaceState({}, "", "/dashboard");
+      setFailedVerification(null);
+      return true;
+    }
+
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/stripe/verify-session', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Payment verification failed');
+      }
+
+      sessionStorage.setItem(processedKey, 'true');
+
+      const featureName = data.featureKey ? FEATURE_CATALOG[data.featureKey as keyof typeof FEATURE_CATALOG]?.name : FEATURE_CATALOG[feature as keyof typeof FEATURE_CATALOG]?.name;
+      toast({
+        title: "Purchase successful!",
+        description: `You now have access to ${featureName}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/purchased-features"] });
+      window.history.replaceState({}, "", "/dashboard");
+      setFailedVerification(null);
+      return true;
+    } catch (error: any) {
+      return false;
+    }
+  };
+
   useEffect(() => {
-    const verifyPurchase = async () => {
+    const handlePurchaseReturn = async () => {
       const params = new URLSearchParams(window.location.search);
       const purchase = params.get("purchase");
       const feature = params.get("feature");
@@ -70,48 +118,9 @@ export default function Dashboard() {
           window.history.replaceState({}, "", "/dashboard");
           queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
         } else if (feature && sessionId) {
-          const processedKey = `purchase_verified_${sessionId}`;
-          const alreadyProcessed = sessionStorage.getItem(processedKey);
-          
-          if (alreadyProcessed) {
-            window.history.replaceState({}, "", "/dashboard");
-            return;
-          }
-
-          try {
-            const token = localStorage.getItem('auth_token');
-            const response = await fetch('/api/stripe/verify-session', {
-              method: 'POST',
-              headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({ sessionId }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-              throw new Error(data.error || 'Payment verification failed');
-            }
-
-            sessionStorage.setItem(processedKey, 'true');
-
-            const featureName = FEATURE_CATALOG[feature as keyof typeof FEATURE_CATALOG]?.name;
-            toast({
-              title: "Purchase successful!",
-              description: `You now have access to ${featureName}`,
-            });
-            queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
-            queryClient.invalidateQueries({ queryKey: ["/api/user/purchased-features"] });
-            window.history.replaceState({}, "", "/dashboard");
-          } catch (error: any) {
-            toast({
-              title: "Verification failed",
-              description: error.message || "Failed to verify your purchase. Please contact support if the issue persists.",
-              variant: "destructive",
-            });
-            window.history.replaceState({}, "", "/dashboard");
+          const success = await verifyFeaturePurchase(sessionId, feature);
+          if (!success) {
+            setFailedVerification({ sessionId, feature, error: "Failed to verify your purchase" });
           }
         }
       } else if (purchase === "cancelled") {
@@ -124,8 +133,29 @@ export default function Dashboard() {
       }
     };
 
-    verifyPurchase();
+    handlePurchaseReturn();
   }, [toast]);
+
+  const handleRetryVerification = async () => {
+    if (!failedVerification) return;
+    
+    setIsRetrying(true);
+    const success = await verifyFeaturePurchase(failedVerification.sessionId, failedVerification.feature);
+    
+    if (!success) {
+      toast({
+        title: "Verification failed",
+        description: "Still unable to verify your purchase. Please contact support for assistance.",
+        variant: "destructive",
+      });
+    }
+    setIsRetrying(false);
+  };
+
+  const handleDismissVerificationError = () => {
+    window.history.replaceState({}, "", "/dashboard");
+    setFailedVerification(null);
+  };
 
   if (isLoading) {
     return (
@@ -153,6 +183,34 @@ export default function Dashboard() {
           autoStart={true}
         />
       </div>
+
+      {failedVerification && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription className="flex items-center justify-between">
+            <div>
+              <strong>Purchase verification failed.</strong> Your payment was successful, but we couldn't record your purchase. Please retry.
+            </div>
+            <div className="flex gap-2 ml-4">
+              <Button 
+                onClick={handleRetryVerification} 
+                disabled={isRetrying}
+                size="sm"
+                data-testid="button-retry-verification"
+              >
+                {isRetrying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Retry"}
+              </Button>
+              <Button 
+                onClick={handleDismissVerificationError} 
+                variant="outline"
+                size="sm"
+                data-testid="button-dismiss-verification"
+              >
+                Dismiss
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
