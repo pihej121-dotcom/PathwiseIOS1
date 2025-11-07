@@ -501,42 +501,42 @@ export const FEATURE_CATALOG = {
     name: 'Salary Negotiator',
     description: 'AI-powered salary negotiation guidance and scripts',
     price: 600, // $6.00 in cents
-    stripeProductId: 'prod_TNQ19KzpxCxKZq',
+    stripeProductId: 'price_1SQfBWAKwoZwA01t3Dh3ca9F',
   },
   micro_project_generator: {
     key: 'micro_project_generator',
     name: 'Micro-Project Generator',
     description: 'Generate tailored portfolio projects based on skill gaps',
     price: 300, // $3.00 in cents
-    stripeProductId: 'prod_TNQ07JZVlHX2dr',
+    stripeProductId: 'price_1SQfAoAKwoZwA01tajtnxm9e',
   },
   career_roadmap_generator: {
     key: 'career_roadmap_generator',
     name: 'Career Roadmap Generator',
     description: 'AI-generated 30-day, 3-month, and 6-month career plans',
     price: 600, // $6.00 in cents
-    stripeProductId: 'prod_TNPxfiV3tWRyai',
+    stripeProductId: 'price_1SQf7bAKwoZwA01tLGwVEyFY',
   },
   job_match_assistant: {
     key: 'job_match_assistant',
     name: 'Job Match Assistant',
     description: 'AI-powered job matching with compatibility scoring',
     price: 1200, // $12.00 in cents
-    stripeProductId: 'prod_TNPk8JDrw4IGZT',
+    stripeProductId: 'price_1SQevNAKwoZwA01t0HCXpBWM',
   },
   resume_analysis: {
     key: 'resume_analysis',
     name: 'Resume Analysis',
     description: 'Comprehensive AI resume review with RMS scoring',
     price: 300, // $3.00 in cents
-    stripeProductId: 'prod_TNPiaXvzWX9nWn',
+    stripeProductId: 'price_1SQetFAKwoZwA01tFss9axqV',
   },
   interview_prep_assistant: {
     key: 'interview_prep_assistant',
     name: 'Interview Prep Assistant',
     description: 'Personalized interview preparation and practice',
     price: 500, // $5.00 in cents
-    stripeProductId: 'prod_TNQ2KQp5gOsqKG',
+    stripeProductId: 'price_1SQfCSAKwoZwA01tevhrxOAQ',
   },
 } as const;
 
