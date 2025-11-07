@@ -3248,7 +3248,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
       const baseUrl = `${url.protocol}//${url.host}`;
 
       // Get Price ID from environment variables
-      const priceIdEnvKey = `STRIPE_PRICE_ID_${featureKey.split('_').map(word => 
+      const priceIdEnvKey = `STRIPE_PRICE_ID_${featureKey.split('_').map((word: string) => 
         word.charAt(0).toUpperCase() + word.slice(1)
       ).join('_')}`;
       const priceId = process.env[priceIdEnvKey];
@@ -3595,6 +3595,18 @@ Make your recommendations specific, actionable, and data-driven based on the act
     } catch (err: any) {
       console.error('Billing portal error:', err.message);
       res.status(500).json({ error: err.message || "Failed to create billing portal" });
+    }
+  });
+
+  // Get user's purchased features (simple list)
+  app.get("/api/user/purchased-features", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const userId = req.user!.id;
+      const purchasedFeatures = await storage.getUserPurchasedFeatures(userId);
+      res.json(purchasedFeatures);
+    } catch (err: any) {
+      console.error('Error fetching purchased features:', err.message);
+      res.status(500).json({ error: err.message || "Failed to fetch purchased features" });
     }
   });
 
