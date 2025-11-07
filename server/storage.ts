@@ -4,6 +4,7 @@ import {
   licenses, invitations, emailVerifications, promoCodes, passwordResetTokens,
   skillGapAnalyses, microProjects, projectCompletions, portfolioArtifacts,
   opportunities, savedOpportunities, tourCompletions, resumeAnalysisHistory,
+  userPurchasedFeatures,
   type User, type InsertUser, type Resume, type InsertResume,
   type Roadmap, type InsertRoadmap, type JobMatch, type InsertJobMatch,
   type JobAnalysis, type InsertJobAnalysis,
@@ -19,7 +20,8 @@ import {
   type InsertMicroProject, type ProjectCompletion, type InsertProjectCompletion,
   type PortfolioArtifact, type InsertPortfolioArtifact,
   type TourCompletion, type InsertTourCompletion,
-  type ResumeAnalysisHistory, type InsertResumeAnalysisHistory
+  type ResumeAnalysisHistory, type InsertResumeAnalysisHistory,
+  type UserPurchasedFeature, type InsertUserPurchasedFeature
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, or, sql } from "drizzle-orm";
@@ -137,6 +139,11 @@ export interface IStorage {
   // Promo Codes
   getPromoCodeByCode(code: string): Promise<any>;
   incrementPromoCodeUsage(id: string): Promise<void>;
+  
+  // User Purchased Features
+  getUserPurchasedFeature(userId: string, featureKey: string): Promise<UserPurchasedFeature | undefined>;
+  getUserPurchasedFeatures(userId: string): Promise<UserPurchasedFeature[]>;
+  createUserPurchasedFeature(feature: InsertUserPurchasedFeature): Promise<UserPurchasedFeature>;
   
   // User management with licensing
   activateUser(userId: string): Promise<User>;
@@ -1115,6 +1122,35 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(savedOpportunities.savedAt));
 
     return saved;
+  }
+
+  async getUserPurchasedFeature(userId: string, featureKey: string): Promise<UserPurchasedFeature | undefined> {
+    const [feature] = await db
+      .select()
+      .from(userPurchasedFeatures)
+      .where(and(
+        eq(userPurchasedFeatures.userId, userId),
+        eq(userPurchasedFeatures.featureKey, featureKey)
+      ));
+    
+    return feature || undefined;
+  }
+
+  async getUserPurchasedFeatures(userId: string): Promise<UserPurchasedFeature[]> {
+    return await db
+      .select()
+      .from(userPurchasedFeatures)
+      .where(eq(userPurchasedFeatures.userId, userId))
+      .orderBy(desc(userPurchasedFeatures.purchasedAt));
+  }
+
+  async createUserPurchasedFeature(feature: InsertUserPurchasedFeature): Promise<UserPurchasedFeature> {
+    const [purchasedFeature] = await db
+      .insert(userPurchasedFeatures)
+      .values(feature)
+      .returning();
+    
+    return purchasedFeature;
   }
 
   async getUserCompletedTours(userId: string): Promise<TourCompletion[]> {

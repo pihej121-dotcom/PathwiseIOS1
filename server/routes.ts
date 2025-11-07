@@ -18,7 +18,9 @@ import {
   insertSkillGapAnalysisSchema,
   insertMicroProjectSchema,
   insertProjectCompletionSchema,
-  insertPortfolioArtifactSchema
+  insertPortfolioArtifactSchema,
+  FEATURE_CATALOG,
+  FeatureKey
 } from "@shared/schema";
 import crypto from "crypto";
 import { z } from "zod";
@@ -3206,6 +3208,80 @@ Make your recommendations specific, actionable, and data-driven based on the act
     }
   });
 
+  // Create Stripe checkout session for individual feature purchase
+  app.post("/api/stripe/purchase-feature", authenticate, async (req: AuthRequest, res) => {
+    if (!stripe) {
+      return res.status(500).json({ error: "Stripe is not configured. Please add STRIPE_SECRET_KEY to your environment variables." });
+    }
+
+    try {
+      const user = req.user!;
+      const { featureKey } = req.body;
+
+      // Validate feature key
+      if (!featureKey || !(featureKey in FEATURE_CATALOG)) {
+        return res.status(400).json({ error: "Invalid feature key" });
+      }
+
+      const feature = FEATURE_CATALOG[featureKey as FeatureKey];
+
+      // Check if user already purchased this feature
+      const existingPurchase = await storage.getUserPurchasedFeature(user.id, featureKey);
+      if (existingPurchase) {
+        return res.status(400).json({ error: "You have already purchased this feature" });
+      }
+
+      // Create or get Stripe customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            userId: user.id,
+          },
+        });
+        customerId = customer.id;
+        
+        // Update user with Stripe customer ID
+        await storage.updateUser(user.id, { stripeCustomerId: customerId });
+      }
+
+      // Construct base URL with proper scheme
+      const referer = req.get("referer") || "http://localhost:5000";
+      const url = new URL(referer);
+      const baseUrl = `${url.protocol}//${url.host}`;
+
+      // Create checkout session for one-time payment
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        mode: 'payment', // One-time payment
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product: feature.stripeProductId,
+              unit_amount: feature.price, // in cents
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${baseUrl}/pricing?purchase=success&feature=${featureKey}`,
+        cancel_url: `${baseUrl}/pricing?purchase=cancelled`,
+        metadata: {
+          userId: user.id,
+          featureKey: featureKey,
+          purchaseType: 'feature',
+        },
+      });
+
+      res.json({ url: session.url });
+    } catch (error: any) {
+      console.error('Stripe feature purchase error:', error);
+      res.status(500).json({ error: error.message || "Failed to create checkout session" });
+    }
+  });
+
   // Stripe webhook handler
   app.post("/api/stripe/webhook", async (req, res) => {
     if (!stripe) {
@@ -3230,15 +3306,41 @@ Make your recommendations specific, actionable, and data-driven based on the act
         case 'checkout.session.completed': {
           const session = event.data.object as Stripe.Checkout.Session;
           const userId = session.metadata?.userId;
-          const subscriptionId = session.subscription as string;
+          const purchaseType = session.metadata?.purchaseType;
 
-          if (userId && subscriptionId) {
-            // Update user subscription status - will be 'trialing' during trial period
-            await storage.updateUser(userId, {
-              stripeSubscriptionId: subscriptionId,
-              subscriptionStatus: 'trialing',
-            });
-            console.log(`✅ Subscription created for user ${userId} (trial period active)`);
+          if (userId) {
+            // Check if this is a feature purchase or subscription
+            if (purchaseType === 'feature') {
+              const featureKey = session.metadata?.featureKey;
+              const paymentIntentId = session.payment_intent as string;
+
+              if (featureKey && (featureKey in FEATURE_CATALOG)) {
+                const feature = FEATURE_CATALOG[featureKey as FeatureKey];
+                
+                // Record the feature purchase
+                await storage.createUserPurchasedFeature({
+                  userId,
+                  featureKey,
+                  stripeProductId: feature.stripeProductId,
+                  stripePaymentIntentId: paymentIntentId,
+                  amountPaid: feature.price,
+                });
+                
+                console.log(`✅ Feature purchase completed: ${featureKey} for user ${userId}`);
+              }
+            } else {
+              // Handle subscription
+              const subscriptionId = session.subscription as string;
+              
+              if (subscriptionId) {
+                // Update user subscription status - will be 'trialing' during trial period
+                await storage.updateUser(userId, {
+                  stripeSubscriptionId: subscriptionId,
+                  subscriptionStatus: 'trialing',
+                });
+                console.log(`✅ Subscription created for user ${userId} (trial period active)`);
+              }
+            }
           }
           break;
         }
