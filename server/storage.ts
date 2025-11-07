@@ -145,6 +145,7 @@ export interface IStorage {
   getUserPurchasedFeatures(userId: string): Promise<UserPurchasedFeature[]>;
   getUnusedFeatureCredit(userId: string, featureKey: string): Promise<UserPurchasedFeature | undefined>;
   getUserUnusedCredits(userId: string): Promise<UserPurchasedFeature[]>;
+  findPurchaseByStripeRefs(userId: string, paymentIntentId?: string | null, checkoutSessionId?: string | null): Promise<UserPurchasedFeature | undefined>;
   createUserPurchasedFeature(feature: InsertUserPurchasedFeature): Promise<UserPurchasedFeature>;
   consumeFeatureCredit(creditId: string): Promise<UserPurchasedFeature | null>;
   
@@ -1197,6 +1198,34 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return consumed || null;
+  }
+
+  async findPurchaseByStripeRefs(userId: string, paymentIntentId?: string | null, checkoutSessionId?: string | null): Promise<UserPurchasedFeature | undefined> {
+    // Find purchase by either payment intent ID or checkout session ID
+    // This provides robust idempotency protection
+    const conditions = [eq(userPurchasedFeatures.userId, userId)];
+    
+    // Add conditions for either payment intent or session ID if provided
+    if (paymentIntentId || checkoutSessionId) {
+      const refConditions: any[] = [];
+      if (paymentIntentId) {
+        refConditions.push(eq(userPurchasedFeatures.stripePaymentIntentId, paymentIntentId));
+      }
+      if (checkoutSessionId) {
+        refConditions.push(eq(userPurchasedFeatures.stripeCheckoutSessionId, checkoutSessionId));
+      }
+      if (refConditions.length > 0) {
+        conditions.push(or(...refConditions)!);
+      }
+    }
+    
+    const [purchase] = await db
+      .select()
+      .from(userPurchasedFeatures)
+      .where(and(...conditions))
+      .limit(1);
+    
+    return purchase || undefined;
   }
 
   async getUserCompletedTours(userId: string): Promise<TourCompletion[]> {

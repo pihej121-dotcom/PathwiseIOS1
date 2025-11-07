@@ -490,6 +490,7 @@ export const userPurchasedFeatures = pgTable("user_purchased_features", {
   featureKey: text("feature_key").notNull(), // e.g., 'salary_negotiator', 'resume_analysis'
   stripeProductId: text("stripe_product_id").notNull(),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeCheckoutSessionId: text("stripe_checkout_session_id").notNull().default(''), // For idempotency
   amountPaid: integer("amount_paid").notNull(), // in cents
   isUsed: boolean("is_used").notNull().default(false), // Track if this credit has been consumed
   usedAt: timestamp("used_at"), // When the credit was used

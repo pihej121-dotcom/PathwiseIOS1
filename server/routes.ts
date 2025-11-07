@@ -3221,10 +3221,13 @@ Make your recommendations specific, actionable, and data-driven based on the act
 
       const feature = FEATURE_CATALOG[featureKey as FeatureKey];
 
-      // Check if user already purchased this feature
-      const existingPurchase = await storage.getUserPurchasedFeature(user.id, featureKey);
-      if (existingPurchase) {
-        return res.status(400).json({ error: "You have already purchased this feature" });
+      // Check if user already has an UNUSED credit for this feature
+      // Allow purchase if all previous credits have been consumed
+      const unusedCredit = await storage.getUnusedFeatureCredit(user.id, featureKey);
+      if (unusedCredit) {
+        return res.status(400).json({ 
+          error: "You already have an unused credit for this feature. Please use it before purchasing again." 
+        });
       }
 
       // Create or get Stripe customer
@@ -3317,20 +3320,29 @@ Make your recommendations specific, actionable, and data-driven based on the act
             if (purchaseType === 'feature') {
               const featureKey = session.metadata?.featureKey;
               const paymentIntentId = session.payment_intent as string;
+              const checkoutSessionId = session.id;
 
               if (featureKey && (featureKey in FEATURE_CATALOG)) {
                 const feature = FEATURE_CATALOG[featureKey as FeatureKey];
                 
-                // Record the feature purchase
-                await storage.createUserPurchasedFeature({
-                  userId,
-                  featureKey,
-                  stripeProductId: feature.stripeProductId,
-                  stripePaymentIntentId: paymentIntentId,
-                  amountPaid: feature.price,
-                });
+                // Check for duplicate purchase (idempotency) using robust multi-ref check
+                const existingPurchase = await storage.findPurchaseByStripeRefs(userId, paymentIntentId, checkoutSessionId);
                 
-                console.log(`✅ Feature purchase completed: ${featureKey} for user ${userId}`);
+                if (existingPurchase) {
+                  console.log(`ℹ️ Webhook: Feature purchase already recorded: ${featureKey} for user ${userId}`);
+                } else {
+                  // Record the feature purchase with both payment intent and session ID
+                  await storage.createUserPurchasedFeature({
+                    userId,
+                    featureKey,
+                    stripeProductId: feature.stripeProductId,
+                    stripePaymentIntentId: paymentIntentId,
+                    stripeCheckoutSessionId: checkoutSessionId,
+                    amountPaid: feature.price,
+                  });
+                  
+                  console.log(`✅ Feature purchase completed: ${featureKey} for user ${userId}`);
+                }
               }
             } else {
               // Handle subscription
@@ -3548,19 +3560,21 @@ Make your recommendations specific, actionable, and data-driven based on the act
 
         const feature = FEATURE_CATALOG[featureKey as FeatureKey];
         
-        // Check for duplicate purchase (idempotency)
-        const existingPurchase = await storage.getUserPurchasedFeature(userId, featureKey);
+        // Check for duplicate purchase (idempotency) using robust multi-ref check
+        const existingPurchase = await storage.findPurchaseByStripeRefs(userId, paymentIntentId, sessionId);
+        
         if (existingPurchase) {
-          console.log(`ℹ️ Feature purchase already recorded: ${featureKey} for user ${userId}`);
+          console.log(`ℹ️ Feature purchase already recorded: ${featureKey} for user ${userId} (payment: ${paymentIntentId}, session: ${sessionId})`);
           return res.json({ success: true, message: "Feature purchase already confirmed", featureKey, duplicate: true });
         }
         
-        // Record the feature purchase
+        // Record the feature purchase with both payment intent and session ID for robust idempotency
         await storage.createUserPurchasedFeature({
           userId,
           featureKey,
           stripeProductId: feature.stripeProductId,
           stripePaymentIntentId: paymentIntentId,
+          stripeCheckoutSessionId: sessionId,
           amountPaid: feature.price,
         });
         
