@@ -54,34 +54,67 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const purchase = params.get("purchase");
-    const feature = params.get("feature");
-    const type = params.get("type");
+    const verifyPurchase = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const purchase = params.get("purchase");
+      const feature = params.get("feature");
+      const type = params.get("type");
+      const sessionId = params.get("session_id");
 
-    if (purchase === "success") {
-      if (type === "subscription") {
+      if (purchase === "success") {
+        if (type === "subscription") {
+          toast({
+            title: "Subscription activated!",
+            description: "Welcome to Pathwise Unlimited! You now have access to all features.",
+          });
+          window.history.replaceState({}, "", "/dashboard");
+          queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
+        } else if (feature && sessionId) {
+          try {
+            const token = localStorage.getItem('auth_token');
+            const response = await fetch('/api/stripe/verify-session', {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ sessionId }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.error || 'Payment verification failed');
+            }
+
+            const featureName = FEATURE_CATALOG[feature as keyof typeof FEATURE_CATALOG]?.name;
+            toast({
+              title: "Purchase successful!",
+              description: `You now have access to ${featureName}`,
+            });
+            queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/user/purchased-features"] });
+          } catch (error: any) {
+            toast({
+              title: "Verification failed",
+              description: error.message || "Failed to verify your purchase. Please contact support if the issue persists.",
+              variant: "destructive",
+            });
+          } finally {
+            window.history.replaceState({}, "", "/dashboard");
+          }
+        }
+      } else if (purchase === "cancelled") {
         toast({
-          title: "Subscription activated!",
-          description: "Welcome to Pathwise Unlimited! You now have access to all features.",
+          title: "Purchase cancelled",
+          description: "Your payment was cancelled. No charges were made.",
+          variant: "destructive",
         });
-      } else if (feature) {
-        const featureName = FEATURE_CATALOG[feature as keyof typeof FEATURE_CATALOG]?.name;
-        toast({
-          title: "Purchase successful!",
-          description: `You now have access to ${featureName}`,
-        });
+        window.history.replaceState({}, "", "/dashboard");
       }
-      window.history.replaceState({}, "", "/dashboard");
-      queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
-    } else if (purchase === "cancelled") {
-      toast({
-        title: "Purchase cancelled",
-        description: "Your payment was cancelled. No charges were made.",
-        variant: "destructive",
-      });
-      window.history.replaceState({}, "", "/dashboard");
-    }
+    };
+
+    verifyPurchase();
   }, [toast]);
 
   if (isLoading) {
