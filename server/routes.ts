@@ -3503,8 +3503,10 @@ Make your recommendations specific, actionable, and data-driven based on the act
         return res.status(400).json({ error: "Session ID is required" });
       }
 
-      // Retrieve the checkout session from Stripe
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      // Retrieve the checkout session from Stripe with line items expanded
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['line_items', 'line_items.data.price.product']
+      });
 
       if (session.payment_status !== 'paid') {
         return res.status(400).json({ error: "Payment not completed" });
@@ -3516,29 +3518,54 @@ Make your recommendations specific, actionable, and data-driven based on the act
       }
 
       const purchaseType = session.metadata?.purchaseType;
+      const paymentIntentId = session.payment_intent as string;
 
       // Check if this is a feature purchase or subscription
-      if (purchaseType === 'feature') {
-        const featureKey = session.metadata?.featureKey;
-        const paymentIntentId = session.payment_intent as string;
+      if (purchaseType === 'feature' || session.mode === 'payment') {
+        // Derive feature key from line items, with metadata as fallback
+        let featureKey = session.metadata?.featureKey;
+        let priceId: string | null = null;
 
-        if (featureKey && (featureKey in FEATURE_CATALOG)) {
-          const feature = FEATURE_CATALOG[featureKey as FeatureKey];
+        if (session.line_items && session.line_items.data.length > 0) {
+          const lineItem = session.line_items.data[0];
+          priceId = lineItem.price?.id || null;
           
-          // Record the feature purchase immediately
-          await storage.createUserPurchasedFeature({
-            userId,
-            featureKey,
-            stripeProductId: feature.stripeProductId,
-            stripePaymentIntentId: paymentIntentId,
-            amountPaid: feature.price,
-          });
-          
-          console.log(`✅ Feature purchase recorded: ${featureKey} for user ${userId}`);
-          res.json({ success: true, message: "Feature purchase confirmed", featureKey });
-        } else {
-          return res.status(400).json({ error: "Invalid feature key" });
+          // Find feature by matching stripe product ID
+          if (priceId) {
+            for (const [key, feature] of Object.entries(FEATURE_CATALOG)) {
+              if (feature.stripeProductId === priceId) {
+                featureKey = key;
+                break;
+              }
+            }
+          }
         }
+
+        if (!featureKey || !(featureKey in FEATURE_CATALOG)) {
+          console.error(`Could not derive feature from session ${sessionId}. Metadata: ${JSON.stringify(session.metadata)}, Line items: ${session.line_items?.data.length || 0}`);
+          return res.status(400).json({ error: "Could not identify purchased feature" });
+        }
+
+        const feature = FEATURE_CATALOG[featureKey as FeatureKey];
+        
+        // Check for duplicate purchase (idempotency)
+        const existingPurchase = await storage.getUserPurchasedFeature(userId, featureKey);
+        if (existingPurchase) {
+          console.log(`ℹ️ Feature purchase already recorded: ${featureKey} for user ${userId}`);
+          return res.json({ success: true, message: "Feature purchase already confirmed", featureKey, duplicate: true });
+        }
+        
+        // Record the feature purchase
+        await storage.createUserPurchasedFeature({
+          userId,
+          featureKey,
+          stripeProductId: feature.stripeProductId,
+          stripePaymentIntentId: paymentIntentId,
+          amountPaid: feature.price,
+        });
+        
+        console.log(`✅ Feature purchase recorded: ${featureKey} for user ${userId}`);
+        res.json({ success: true, message: "Feature purchase confirmed", featureKey });
       } else {
         // Handle subscription
         await storage.updateUser(userId, {
