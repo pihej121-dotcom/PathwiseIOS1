@@ -435,7 +435,7 @@ export default function CareerRoadmap({ embedded = false }: { embedded?: boolean
                           <CollapsibleContent>
                             <CardContent className="pt-0">
                               {subsection.tasks && subsection.tasks.length > 0 ? (
-                                <div className="space-y-3">
+                                <div className="space-y-3" data-testid="roadmap-tasks-list">
                                   {subsection.tasks.map((task: any, taskIndex: number) => {
                                     const isCompleted = completedTasks.has(task.id);
                                     

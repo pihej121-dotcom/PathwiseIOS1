@@ -74,19 +74,33 @@ export const dashboardTour: TourConfig = {
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "streak",
-      title: "Daily Streak",
-      text: "Build momentum by logging in daily and completing career development tasks. Your streak helps you stay consistent!",
+      id: "applications-count",
+      title: "Applications Tracker",
+      text: "Track how many jobs you've applied to. Stay organized and monitor your job search progress from one central location.",
       attachTo: {
-        element: "[data-testid='streak-counter']",
-        on: "left",
+        element: "[data-testid='applications-count']",
+        on: "bottom",
       },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "quick-actions",
-      title: "Quick Actions",
-      text: "Use these quick action buttons to jump directly to key features like uploading your resume, generating roadmaps, or chatting with the AI Copilot.",
+      id: "roadmap-progress",
+      title: "Roadmap Progress",
+      text: "Your career roadmap completion percentage. Complete tasks to build momentum and advance toward your career goals!",
+      attachTo: {
+        element: "[data-testid='roadmap-progress']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "feature-cards",
+      title: "Career Tools",
+      text: "Click any card below to access powerful career development tools. Upload resumes, analyze jobs, build roadmaps, practice interviews, and more!",
+      attachTo: {
+        element: "[data-testid='card-upload']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.finish],
     },
   ],
@@ -99,54 +113,78 @@ export const resumeAnalysisTour: TourConfig = {
   description: "Learn how to analyze and improve your resume with AI",
   steps: [
     {
-      id: "upload-intro",
-      title: "Resume Analysis",
-      text: "Upload your resume here to get instant AI-powered feedback on how well it matches your target role. We support PDF and DOCX formats.",
+      id: "overall-score",
+      title: "Your Resume Score",
+      text: "This is your overall Resume Match Score. It reflects how well your resume aligns with your target role. Upload a resume and set your target to see your score!",
+      attachTo: {
+        element: "[data-testid='overall-score']",
+        on: "bottom",
+      },
       buttons: [buttons.skip, buttons.next],
     },
     {
-      id: "target-role",
-      title: "Target Role & Industry",
-      text: "Specify your target role and industry for more accurate, personalized analysis. This helps our AI compare your resume against real job requirements.",
+      id: "target-role-btn",
+      title: "Set Target Parameters",
+      text: "Click here to set or update your target role, industry, and companies. This helps our AI analyze your resume against specific job requirements.",
+      attachTo: {
+        element: "[data-testid='button-show-target-form']",
+        on: "left",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "analysis-results",
-      title: "Understanding Your Scores",
-      text: "After analysis, you'll see detailed scores for Skills, Experience, Keywords, Education, and Certifications. Each section includes specific recommendations for improvement.",
+      id: "category-scores",
+      title: "Category Breakdown",
+      text: "Review detailed scores across different categories like Skills, Experience, Education, and Keywords. Each category shows specific strengths and areas for improvement.",
+      attachTo: {
+        element: "[data-testid='card-skills']",
+        on: "right",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "gaps-insights",
-      title: "Skills Gaps & Action Plan",
-      text: "We'll identify specific gaps between your resume and target role, then provide actionable resources and steps to close those gaps.",
+      id: "section-details",
+      title: "Detailed Recommendations",
+      text: "Click any category to see specific feedback, identified gaps, and actionable improvement recommendations with helpful resources.",
+      attachTo: {
+        element: "[data-testid='section-details']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.finish],
     },
   ],
 };
 
-// AI Copilot Tour (FREE)
-export const aiCopilotTour: TourConfig = {
-  id: "ai-copilot",
-  title: "AI Career Copilot Guide",
-  description: "Learn how to get personalized career advice from your AI assistant",
+// Salary Negotiator Tour (PAID)
+export const salaryNegotiatorTour: TourConfig = {
+  id: "salary-negotiator",
+  title: "AI Salary Negotiation Guide",
+  description: "Learn how to get personalized salary negotiation strategies",
   steps: [
     {
-      id: "copilot-intro",
-      title: "Your AI Career Assistant",
-      text: "The AI Copilot provides personalized career advice, resume tips, interview prep, and salary negotiation strategies. Think of it as your 24/7 career coach!",
+      id: "negotiator-intro",
+      title: "AI Salary Negotiator",
+      text: "Get data-driven salary negotiation strategies based on your resume, experience, and target role. Our AI analyzes your qualifications to help you negotiate with confidence!",
       buttons: [buttons.skip, buttons.next],
     },
     {
-      id: "quick-actions",
-      title: "Quick Action Buttons",
-      text: "Use these quick action buttons to get instant help with common career tasks like resume tailoring, cover letters, and interview preparation.",
+      id: "salary-form",
+      title: "Enter Your Details",
+      text: "Fill in your current salary (optional), target salary, job role, location, and years of experience. The AI will use this along with your resume to create a personalized strategy.",
+      attachTo: {
+        element: "[data-testid='salary-form']",
+        on: "right",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "chat-input",
-      title: "Ask Anything",
-      text: "Type your career questions here. You can ask about resume improvements, career transitions, interview strategies, salary negotiations, and more!",
+      id: "generate-strategy",
+      title: "Generate Strategy",
+      text: "Click the generate button to receive a comprehensive negotiation strategy including: market data, talking points, leverage areas, and negotiation tactics tailored to your situation.",
+      attachTo: {
+        element: "[data-testid='button-generate-salary-strategy']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.finish],
     },
   ],
@@ -168,51 +206,85 @@ export const careerRoadmapTour: TourConfig = {
       id: "generate-roadmap",
       title: "Generate Your Roadmap",
       text: "Click here to generate a personalized roadmap based on your resume analysis and target role. Our AI creates a custom plan tailored to your needs.",
+      attachTo: {
+        element: "[data-testid='generate-roadmap-empty']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "track-progress",
-      title: "Track Your Progress",
-      text: "Check off tasks as you complete them. The progress bar shows how far you've come and helps you stay motivated!",
+      id: "phase-tabs",
+      title: "Roadmap Phases",
+      text: "Navigate between 30-day, 3-month, and 6-month phases. Each phase builds on the previous one with increasingly advanced goals.",
+      attachTo: {
+        element: "[data-testid='phase-30']",
+        on: "bottom",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "tasks-resources",
-      title: "Tasks & Resources",
-      text: "Each task includes specific actions to take and curated resources to help you succeed. Click on any task to see details and mark it complete.",
+      id: "tasks-checklist",
+      title: "Tasks & Progress",
+      text: "Check off tasks as you complete them. Each task includes specific actions, resources, and deadlines to keep you on track.",
+      attachTo: {
+        element: "[data-testid='roadmap-tasks-list']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.finish],
     },
   ],
 };
 
-// Job Matching Tour (PAID)
-export const jobMatchingTour: TourConfig = {
-  id: "job-matching",
-  title: "AI Job Matching Guide",
-  description: "Find jobs that match your skills and experience",
+// Job Analysis Tour (PAID)
+export const jobAnalysisTour: TourConfig = {
+  id: "job-analysis",
+  title: "Job Analysis Assistant Guide",
+  description: "Analyze jobs and tailor your application materials",
   steps: [
     {
-      id: "search-intro",
-      title: "Smart Job Search",
-      text: "Search for jobs using keywords, location, and filters. Our AI analyzes each job against your resume to show compatibility scores.",
+      id: "analysis-intro",
+      title: "Job Analysis Assistant",
+      text: "Paste a job URL or enter job details manually to get AI-powered match analysis, resume tailoring, and cover letter generation. All in one place!",
       buttons: [buttons.skip, buttons.next],
     },
     {
-      id: "search-filters",
-      title: "Refine Your Search",
-      text: "Use these filters to narrow down results by location, salary range, and other criteria. Find jobs that truly match what you're looking for.",
+      id: "job-details",
+      title: "Enter Job Details",
+      text: "Fill in the job title, company, and description. You can paste a URL to auto-extract details, or enter them manually for complete control.",
+      attachTo: {
+        element: "[data-testid='input-job-title']",
+        on: "right",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "compatibility-score",
-      title: "AI Compatibility Score",
-      text: "Each job shows a compatibility percentage. Higher scores mean your resume is a better match. Click 'AI Match Analysis' for detailed insights.",
+      id: "analyze-button",
+      title: "Get Match Analysis",
+      text: "Click here to get a detailed compatibility analysis between your resume and the job. See skills match, experience alignment, and improvement suggestions.",
+      attachTo: {
+        element: "[data-testid='button-analyze']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "job-actions",
-      title: "Job Actions",
-      text: "Bookmark interesting jobs to review later. You can also tailor your resume specifically for high-match positions.",
+      id: "tailor-resume",
+      title: "Tailor Your Resume",
+      text: "Generate a job-specific resume optimized for this position. Our AI highlights relevant experience and skills that match the job requirements.",
+      attachTo: {
+        element: "[data-testid='button-tailor-resume']",
+        on: "top",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "cover-letter",
+      title: "Generate Cover Letter",
+      text: "Create a personalized cover letter that emphasizes your relevant qualifications and explains why you're a great fit for this specific role.",
+      attachTo: {
+        element: "[data-testid='button-generate-cover-letter']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.finish],
     },
   ],
@@ -231,21 +303,33 @@ export const microProjectsTour: TourConfig = {
       buttons: [buttons.skip, buttons.next],
     },
     {
-      id: "project-recommendations",
-      title: "Personalized Recommendations",
-      text: "Projects are recommended based on your resume analysis and target role. They're designed to address your specific skills gaps.",
+      id: "generate-form",
+      title: "Generate Projects",
+      text: "Enter your target role, select how many projects you want, and choose a difficulty level. Our AI will generate personalized projects tailored to your career goals.",
+      attachTo: {
+        element: "[data-testid='input-target-role']",
+        on: "right",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "project-details",
-      title: "Step-by-Step Instructions",
-      text: "Each project includes detailed steps, estimated time, required skills, and curated resources to help you succeed.",
+      id: "generate-button",
+      title: "Create Projects",
+      text: "Click here to generate projects based on your inputs. Each project includes detailed instructions, resources, and skills you'll gain.",
+      attachTo: {
+        element: "[data-testid='button-generate-projects']",
+        on: "top",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "track-completion",
-      title: "Track Your Progress",
-      text: "Mark projects as started, in progress, or completed. Build a portfolio of finished work to showcase to employers!",
+      id: "project-list",
+      title: "Your Projects",
+      text: "View all your generated projects here. Each card shows the title, description, difficulty level, estimated hours, skills gained, and helpful resources.",
+      attachTo: {
+        element: "[data-testid='projects-section-title']",
+        on: "bottom",
+      },
       buttons: [buttons.back, buttons.skip, buttons.finish],
     },
   ],
@@ -260,25 +344,92 @@ export const applicationsTour: TourConfig = {
     {
       id: "tracker-intro",
       title: "Application Tracker",
-      text: "Keep all your job applications organized in one place. Track status, add notes, and never lose track of where you applied.",
+      text: "Keep all your job applications organized in one place. Track status, add notes, and monitor your job search progress with detailed stats.",
       buttons: [buttons.skip, buttons.next],
+    },
+    {
+      id: "application-stats",
+      title: "Track Your Stats",
+      text: "See your total applications, how many are at each stage (Applied, Interviewed, Offered, Rejected). Use these stats to understand your job search performance.",
+      attachTo: {
+        element: "[data-testid='total-applications']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
       id: "add-application",
       title: "Add New Applications",
-      text: "Click here to manually add an application, or apply directly through matched jobs to automatically track them.",
+      text: "Click here to add a new job application. Track the company, position, date applied, and add any relevant notes.",
+      attachTo: {
+        element: "[data-testid='button-add-application']",
+        on: "left",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "status-updates",
-      title: "Update Application Status",
-      text: "Update application status as you progress: Applied → Interviewed → Offered or Rejected. This helps you track your success rate.",
+      id: "status-filter",
+      title: "Filter by Status",
+      text: "Use this dropdown to filter applications by status. Focus on active applications or review your rejected ones to learn and improve.",
+      attachTo: {
+        element: "[data-testid='status-filter']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.finish],
+    },
+  ],
+};
+
+// Interview Prep Tour (PAID)
+export const interviewPrepTour: TourConfig = {
+  id: "interview-prep",
+  title: "Interview Prep Assistant Guide",
+  description: "Practice with AI-generated interview questions",
+  steps: [
+    {
+      id: "prep-intro",
+      title: "Interview Prep Assistant",
+      text: "Practice interviews with AI-generated questions tailored to your job applications. Get question-specific tips and curated resources to ace your interviews!",
+      buttons: [buttons.skip, buttons.next],
+    },
+    {
+      id: "select-application",
+      title: "Choose Your Application",
+      text: "Select a job application from your tracker. The AI will generate interview questions based on that specific role and company.",
+      attachTo: {
+        element: "[data-testid='select-application']",
+        on: "bottom",
+      },
       buttons: [buttons.back, buttons.skip, buttons.next],
     },
     {
-      id: "application-notes",
-      title: "Add Notes & Reminders",
-      text: "Add notes about interviews, follow-ups, or any important details. Stay organized throughout your job search!",
+      id: "question-category",
+      title: "Filter by Category",
+      text: "Focus on specific question types: Technical, Behavioral, or Role-Specific. Practice the areas you need most help with.",
+      attachTo: {
+        element: "[data-testid='select-question-category']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "generate-questions",
+      title: "Generate Questions",
+      text: "Click here to generate interview questions. Each question includes helpful tips to structure your answer and resources to learn more.",
+      attachTo: {
+        element: "[data-testid='button-generate-questions']",
+        on: "top",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "resources-tab",
+      title: "Learning Resources",
+      text: "Switch to the Resources tab to access curated interview prep materials, including guides, videos, and practice platforms.",
+      attachTo: {
+        element: "[data-testid='tab-resources']",
+        on: "bottom",
+      },
       buttons: [buttons.back, buttons.skip, buttons.finish],
     },
   ],
@@ -288,9 +439,10 @@ export const applicationsTour: TourConfig = {
 export const tours: Record<string, TourConfig> = {
   "dashboard-welcome": dashboardTour,
   "resume-analysis": resumeAnalysisTour,
-  "ai-copilot": aiCopilotTour,
+  "salary-negotiator": salaryNegotiatorTour,
   "career-roadmap": careerRoadmapTour,
-  "job-matching": jobMatchingTour,
+  "job-analysis": jobAnalysisTour,
   "micro-projects": microProjectsTour,
   "applications-tracker": applicationsTour,
+  "interview-prep": interviewPrepTour,
 };

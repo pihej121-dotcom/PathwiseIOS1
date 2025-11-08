@@ -122,7 +122,7 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
             )}
 
             {/* Form */}
-            <div className="space-y-4">
+            <div className="space-y-4" data-testid="salary-form">
               <div>
                 <Label htmlFor="currentSalary">Current Salary (Optional)</Label>
                 <Input
@@ -130,6 +130,7 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                   placeholder="e.g., $75,000"
                   value={salaryForm.currentSalary}
                   onChange={(e) => setSalaryForm((prev) => ({ ...prev, currentSalary: e.target.value }))}
+                  data-testid="input-current-salary"
                 />
               </div>
 
@@ -140,6 +141,7 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                   placeholder="e.g., $95,000"
                   value={salaryForm.targetSalary}
                   onChange={(e) => setSalaryForm((prev) => ({ ...prev, targetSalary: e.target.value }))}
+                  data-testid="input-target-salary"
                 />
               </div>
 
@@ -182,6 +184,7 @@ export function AICopilot({ embedded = false }: { embedded?: boolean } = {}) {
                 disabled={
                   salaryNegotiationMutation.isPending || !(activeResume as any)?.extractedText
                 }
+                data-testid="button-generate-salary-strategy"
               >
                 {salaryNegotiationMutation.isPending ? (
                   <>
