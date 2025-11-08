@@ -2841,13 +2841,14 @@ Make your recommendations specific, actionable, and data-driven based on the act
   app.get("/api/micro-projects", authenticate, requirePaidFeatures, async (req: AuthRequest, res) => {
     try {
       const { skills, limit = 20, offset = 0 } = req.query;
+      const userId = req.user!.id;
       
       let projects;
       if (skills) {
         const skillsArray = Array.isArray(skills) ? skills : [skills];
-        projects = await storage.getMicroProjectsBySkills(skillsArray as string[]);
+        projects = await storage.getMicroProjectsBySkills(skillsArray as string[], userId);
       } else {
-        projects = await storage.getAllMicroProjects(Number(limit), Number(offset));
+        projects = await storage.getMicroProjectsByUser(userId, Number(limit), Number(offset));
       }
       
       res.json(projects);
@@ -2885,7 +2886,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
       const { microProjectsService } = await import("./micro-projects");
       
       console.log(`Generating ${projectCount} ${projectDifficulty} projects for role: ${targetRole}`);
-      const newProjects = await microProjectsService.generateProjectsForRole(targetRole, projectCount, projectDifficulty);
+      const newProjects = await microProjectsService.generateProjectsForRole(req.user!.id, targetRole, projectCount, projectDifficulty);
       
       // Create activity for project generation
       if (newProjects.length > 0) {
@@ -2990,11 +2991,13 @@ Make your recommendations specific, actionable, and data-driven based on the act
   // Clear all projects for the current user (must come before /:id route)
   app.delete("/api/micro-projects/clear", authenticate, async (req: AuthRequest, res) => {
     try {
-      // Delete all micro projects from the database
-      await storage.clearAllMicroProjects();
+      const userId = req.user!.id;
+      
+      // Delete all micro projects for this user
+      await storage.clearAllMicroProjects(userId);
       
       // Delete all project completions for this user
-      await storage.clearAllProjectCompletions(req.user!.id);
+      await storage.clearAllProjectCompletions(userId);
       
       res.json({ message: "All projects cleared successfully" });
     } catch (error) {

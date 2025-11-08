@@ -593,22 +593,22 @@ export class MicroProjectsService {
   }
 
   // NEW: Generate projects based on target role
-  async generateProjectsForRole(targetRole: string, count: number = 2, difficulty: 'beginner' | 'intermediate' | 'advanced' = 'intermediate'): Promise<MicroProject[]> {
+  async generateProjectsForRole(userId: string, targetRole: string, count: number = 2, difficulty: 'beginner' | 'intermediate' | 'advanced' = 'intermediate'): Promise<MicroProject[]> {
     try {
-      console.log(`Generating ${count} ${difficulty} projects for role: ${targetRole}`);
+      console.log(`Generating ${count} ${difficulty} projects for user ${userId}, role: ${targetRole}`);
       
       const projectsData = await openaiProjectService.generateProjectsFromRole({
         targetRole,
-        count,
-        difficulty
+        count
       });
       
-      // Store the generated projects
+      // Store the generated projects with userId
       const storedProjects = await Promise.all(
         projectsData.map(async (projectData) => {
-          const projectId = await storage.createMicroProject(projectData);
+          const projectWithUser = { ...projectData, userId };
+          const projectId = await storage.createMicroProject(projectWithUser);
           return {
-            ...projectData,
+            ...projectWithUser,
             id: projectId,
             createdAt: new Date(),
             updatedAt: new Date()

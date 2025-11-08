@@ -163,10 +163,11 @@ export interface IStorage {
   
   createMicroProject(project: InsertMicroProject): Promise<string>;
   getMicroProjectById(id: string): Promise<MicroProject | undefined>;
-  getMicroProjectsBySkills(skills: string[]): Promise<MicroProject[]>;
+  getMicroProjectsBySkills(skills: string[], userId?: string): Promise<MicroProject[]>;
+  getMicroProjectsByUser(userId: string, limit?: number, offset?: number): Promise<MicroProject[]>;
   updateMicroProject(id: string, updates: Partial<InsertMicroProject>): Promise<MicroProject>;
   deleteMicroProject(id: string): Promise<void>;
-  clearAllMicroProjects(): Promise<void>;
+  clearAllMicroProjects(userId: string): Promise<void>;
   getAllMicroProjects(limit?: number, offset?: number): Promise<MicroProject[]>;
   
   createProjectCompletion(completion: InsertProjectCompletion): Promise<string>;
@@ -978,7 +979,7 @@ export class DatabaseStorage implements IStorage {
     return project || undefined;
   }
 
-  async getMicroProjectsBySkills(skills: string[]): Promise<MicroProject[]> {
+  async getMicroProjectsBySkills(skills: string[], userId?: string): Promise<MicroProject[]> {
     if (skills.length === 0) return [];
     
     const conditions = skills.map(skill => 
@@ -989,15 +990,34 @@ export class DatabaseStorage implements IStorage {
       )
     );
 
+    const whereConditions = [
+      eq(microProjects.isActive, true),
+      or(...conditions)
+    ];
+
+    if (userId) {
+      whereConditions.push(eq(microProjects.userId, userId));
+    }
+
+    return await db
+      .select()
+      .from(microProjects)
+      .where(and(...whereConditions))
+      .orderBy(desc(microProjects.createdAt))
+      .limit(10);
+  }
+
+  async getMicroProjectsByUser(userId: string, limit: number = 50, offset: number = 0): Promise<MicroProject[]> {
     return await db
       .select()
       .from(microProjects)
       .where(and(
-        eq(microProjects.isActive, true),
-        or(...conditions)
+        eq(microProjects.userId, userId),
+        eq(microProjects.isActive, true)
       ))
       .orderBy(desc(microProjects.createdAt))
-      .limit(10);
+      .limit(limit)
+      .offset(offset);
   }
 
   async updateMicroProject(id: string, updates: Partial<InsertMicroProject>): Promise<MicroProject> {
@@ -1013,8 +1033,8 @@ export class DatabaseStorage implements IStorage {
     await db.delete(microProjects).where(eq(microProjects.id, id));
   }
 
-  async clearAllMicroProjects(): Promise<void> {
-    await db.delete(microProjects);
+  async clearAllMicroProjects(userId: string): Promise<void> {
+    await db.delete(microProjects).where(eq(microProjects.userId, userId));
   }
 
   async getAllMicroProjects(limit: number = 50, offset: number = 0): Promise<MicroProject[]> {

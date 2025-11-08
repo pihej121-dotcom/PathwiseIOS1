@@ -365,6 +365,7 @@ export const skillGapAnalyses = pgTable("skill_gap_analyses", {
 // Role-focused micro-projects for portfolio building
 export const microProjects = pgTable("micro_projects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   title: text("title").notNull(), // Resume-friendly title
   description: text("description").notNull(), // 2-3 sentence project summary
   targetRole: text("target_role").notNull(), // e.g., "Data Scientist", "Product Manager"
