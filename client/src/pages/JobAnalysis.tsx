@@ -68,6 +68,8 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
   const [tailoredResume, setTailoredResume] = useState<TailoredResumeResult | null>(null);
   const [coverLetter, setCoverLetter] = useState<string | null>(null);
 
+  console.log("JobAnalysis render - analysis:", !!analysis, "tailoredResume:", !!tailoredResume, "coverLetter:", !!coverLetter);
+
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
   });
@@ -118,6 +120,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
       return response.json();
     },
     onSuccess: (data: any) => {
+      console.log("Job Analysis Response:", data);
       setAnalysis(data);
       toast({
         title: "Analysis complete",
@@ -145,6 +148,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
       return response.json();
     },
     onSuccess: (data: any) => {
+      console.log("Tailored Resume Response:", data);
       setTailoredResume(data);
       toast({
         title: "Resume tailored",
@@ -172,6 +176,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
       return response.json();
     },
     onSuccess: (data: any) => {
+      console.log("Cover Letter Response:", data);
       setCoverLetter(data.coverLetter);
       toast({
         title: "Cover letter generated",
