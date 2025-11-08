@@ -3483,6 +3483,7 @@ Make your recommendations specific, actionable, and data-driven based on the act
         await storage.updateUser(userId, {
           stripeSubscriptionId: session.subscription as string,
           subscriptionStatus: 'active',
+          subscriptionTier: 'paid',
         });
       }
 
