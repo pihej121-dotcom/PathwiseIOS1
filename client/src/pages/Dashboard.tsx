@@ -116,6 +116,7 @@ export default function Dashboard() {
             description: "Welcome to Pathwise Unlimited! You now have access to all features.",
           });
           window.history.replaceState({}, "", "/dashboard");
+          queryClient.invalidateQueries({ queryKey: ["/api/user"] });
           queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
         } else if (feature && sessionId) {
           const success = await verifyFeaturePurchase(sessionId, feature);

@@ -45,8 +45,9 @@ export default function CheckoutSuccess() {
             throw new Error(data.error || 'Payment verification failed');
           }
 
-          // Invalidate user query to refresh subscription status
+          // Invalidate user queries to refresh subscription status and feature access
           queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/user/feature-access'] });
           
           // Show success briefly before redirect to dashboard
           setTimeout(() => {
