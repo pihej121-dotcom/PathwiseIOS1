@@ -622,70 +622,167 @@ Be realistic with scores (40-80 range). Focus on identifying actual gaps between
   console.log(`Generating AI-powered career roadmap for phase: ${phase}`);
 
   try {
-    // Phase-specific guidance
+    // Extract detailed gap information
+    const topSkillGaps = resumeAnalysis?.gaps?.slice(0, 3).map(g => g.category).join(', ') || 'None identified';
+    const specificStrengths = resumeAnalysis?.sectionAnalysis?.skills?.strengths?.slice(0, 3).join('; ') || 'Professional skills';
+    
+    // Phase-specific guidance with progressive difficulty
     const phaseInstructions: Record<string, string> = {
       "30_days": `
-Focus on **quick wins and immediate actions**:
-- Resume tailoring and LinkedIn optimization
-- Apply to target jobs immediately
-- Short, fast online courses or tutorials (1–2 weeks max)
-- Network outreach to 5–10 people
-- Prepare for upcoming interviews
+DIFFICULTY LEVEL: EASY - Quick Wins & Immediate Actions
+Create 4-6 HIGHLY SPECIFIC, ACTIONABLE tasks that can be completed in 1-2 hours each. NO generic advice.
+
+REQUIRED ACTION TYPES (choose from these):
+✅ Resume Optimization:
+   - "Update resume to highlight [SPECIFIC SKILL from their resume] for [TARGET COMPANY] [TARGET ROLE] positions"
+   - "Add quantified metrics to [SPECIFIC EXPERIENCE] section (e.g., 'increased efficiency by X%')"
+   
+✅ LinkedIn Quick Wins:
+   - "Update LinkedIn headline to '[TARGET ROLE] specializing in [THEIR TOP SKILL]'"
+   - "Write a LinkedIn post about [SPECIFIC PROJECT/EXPERIENCE from resume] with #[INDUSTRY] hashtags"
+
+✅ Local/School Networking (if location/school provided):
+   - "Reach out to 3 [SCHOOL] alumni working at [TARGET COMPANY] via LinkedIn"
+   - "Attend [LOCATION]-based [INDUSTRY] meetup this week (search Eventbrite/Meetup.com)"
+
+✅ Immediate Job Applications:
+   - "Apply to 5 [TARGET ROLE] positions at [TARGET COMPANIES] this week"
+   - "Set up job alerts for '[TARGET ROLE]' in [LOCATION] on LinkedIn, Indeed, Glassdoor"
+
+✅ Fast Skill Development:
+   - "Complete [SPECIFIC SKILL GAP] tutorial on YouTube/FreeCodeCamp (2-3 hours max)"
+   - "Practice [SKILL] for 30 minutes daily using [FREE RESOURCE]"
+
+PERSONALIZATION RULES:
+- Reference their ACTUAL location for networking events
+- Name SPECIFIC companies from their target list
+- Address their TOP 1-2 skill gaps only (not all gaps)
+- Leverage their school alumni network if school is provided
+- Use their existing strengths to get quick wins
 `,
       "3_months": `
-Focus on **medium-term development and momentum**:
-- Complete 1–2 structured online courses or certifications
-- Build a consistent weekly job application + networking system
-- Start 1 small side project or portfolio addition
-- Conduct 10–15 informational interviews
-- Develop measurable improvements in interview performance
+DIFFICULTY LEVEL: MEDIUM - Skill Building & Consistent Systems
+Create 4-6 MEDIUM-EFFORT tasks requiring weekly commitment. Build on 1-month foundation.
+
+REQUIRED ACTION TYPES (choose from these):
+✅ Structured Skill Development:
+   - "Complete [SPECIFIC CERTIFICATION] for [SKILL GAP] on Coursera/Udemy (8-12 weeks, 3-5 hours/week)"
+   - "Build a [SPECIFIC PROJECT] using [TECHNOLOGY] to demonstrate [SKILL GAP] mastery"
+
+✅ Portfolio Development:
+   - "Create a GitHub portfolio showcasing [SKILL] project solving [INDUSTRY]-specific problem"
+   - "Write 2 technical blog posts about [THEIR STRENGTH] on Medium/Dev.to"
+
+✅ Strategic Networking:
+   - "Conduct 2 informational interviews per week with [TARGET ROLE] professionals at [TARGET COMPANIES]"
+   - "Join [INDUSTRY] Slack/Discord community and actively contribute 3x/week"
+   - "Attend [LOCATION] [INDUSTRY] conferences or workshops (if available)"
+
+✅ Application System:
+   - "Apply to 10 jobs per week, tracking applications in spreadsheet with follow-up dates"
+   - "Customize cover letter template specifically for [TOP 3 TARGET COMPANIES]"
+
+✅ Interview Preparation:
+   - "Practice [TARGET ROLE] interview questions using Pramp/Interviewing.io (2x/week)"
+   - "Record and review 3 mock interviews focusing on [SKILL GAP] questions"
+
+PERSONALIZATION RULES:
+- Address 2-3 of their key skill gaps with specific certifications/courses
+- Reference location-based events, meetups, or conferences
+- Suggest projects relevant to their target industry
+- Build on strengths identified in resume analysis
+- Name specific tools/technologies needed for target role
 `,
       "6_months": `
-Focus on **long-term strategy and positioning**:
-- Complete advanced certifications or bootcamps
-- Lead or contribute to a significant project/portfolio
-- Deep industry research and thought leadership (blog posts, talks, communities)
-- Develop specialized or leadership skills
-- Build sustained mentorship relationships in the industry
+DIFFICULTY LEVEL: ADVANCED - High-Impact Career Positioning
+Create 4-6 AMBITIOUS, CAREER-DEFINING goals. These should be transformative, not incremental.
+
+REQUIRED ACTION TYPES (choose from these):
+✅ Advanced Credentials:
+   - "Complete [ADVANCED BOOTCAMP/CERTIFICATION] in [MAJOR SKILL GAP] (3-6 months intensive)"
+   - "Earn [INDUSTRY-SPECIFIC CERTIFICATION] required by [TARGET COMPANIES]"
+
+✅ Leadership & Thought Leadership:
+   - "Lead an open-source project in [TECHNOLOGY] with 50+ GitHub stars"
+   - "Speak at [LOCATION] tech meetup or [INDUSTRY] conference about [EXPERTISE AREA]"
+   - "Publish comprehensive guide/tutorial on [SKILL] reaching 1000+ readers"
+
+✅ Major Portfolio Achievement:
+   - "Build and launch a full-scale [PROJECT TYPE] solving [INDUSTRY PROBLEM]"
+   - "Contribute to 3+ major open-source projects in [TECHNOLOGY ECOSYSTEM]"
+
+✅ Strategic Career Positioning:
+   - "Build mentorship relationship with senior [TARGET ROLE] at [TARGET COMPANY]"
+   - "Develop specialized expertise in [EMERGING SKILL] to differentiate from competitors"
+   - "Create a personal brand as [TARGET ROLE] expert in [NICHE AREA]"
+
+✅ Target Company Strategy:
+   - "Establish contact with hiring managers at top 3 target companies: [LIST COMPANIES]"
+   - "Attend [TARGET COMPANY] recruiting events, open houses, or tech talks"
+   - "Build relationships with 5+ employees at [TOP TARGET COMPANY] through informational interviews"
+
+PERSONALIZATION RULES:
+- Focus on closing their TOP 3 skill gaps completely
+- Suggest industry-recognized certifications for their target role
+- Reference specific technologies/tools used at target companies
+- Leverage their location for major conferences/events
+- Build thought leadership in their specific niche
+- Create differentiation based on their unique strengths
 `
     };
 
-    // Build personalized prompt
-    const prompt = `You are an expert career coach creating a personalized ${phase.replace('_', ' ')} career roadmap.
+    // Build highly personalized prompt
+    const prompt = `You are an expert career coach creating a HIGHLY PERSONALIZED ${phase.replace('_', ' ')} career roadmap.
 
 USER PROFILE:
 - Target Role: ${userProfile?.targetRole || 'Career advancement'}
-- Industries: ${userProfile?.industries?.join(', ') || 'General'}
+- Target Industries: ${userProfile?.industries?.join(', ') || 'General'}
+- Location: ${userProfile?.location || 'Not specified'}
 - Education: ${userProfile?.major || 'Not specified'} at ${userProfile?.school || 'Not specified'}
-- Experience Level: ${userProfile?.gradYear ? `Graduating ${userProfile.gradYear}` : 'Professional'}
+- Graduation Year: ${userProfile?.gradYear || 'Not specified'}
 - Target Companies: ${userProfile?.targetCompanies?.join(', ') || 'Various'}
 
 ${resumeAnalysis ? `RESUME ANALYSIS:
-- Overall Score: ${resumeAnalysis.rmsScore}/100
-- Key Skills Gaps: ${resumeAnalysis.gaps?.slice(0, 5).map(g => g.category).join(', ') || 'None identified'}
-- Strengths: ${resumeAnalysis.overallInsights?.strengthsOverview || 'Professional background'}
+- Overall Resume Score: ${resumeAnalysis.rmsScore}/100
+- Top 3 Skill Gaps to Address: ${topSkillGaps}
+- Key Strengths to Leverage: ${specificStrengths}
+- Skills Analysis: ${resumeAnalysis.sectionAnalysis?.skills?.explanation || 'Not available'}
+- Experience Level: ${resumeAnalysis.sectionAnalysis?.experience?.explanation || 'Not available'}
 ` : ''}
 
-INSTRUCTIONS FOR THIS TIMEFRAME:
+${phase.replace('_', ' ').toUpperCase()} PHASE REQUIREMENTS:
 ${phaseInstructions[phase]}
+
+CRITICAL PERSONALIZATION REQUIREMENTS:
+1. **Location-Specific**: If location is provided, include local networking events, meetups, or job opportunities
+2. **School-Specific**: If school is provided, mention alumni networks, career services, or campus recruiting
+3. **Company-Specific**: Reference their ACTUAL target companies by name in action items
+4. **Skill-Specific**: Address their TOP skill gaps identified in resume analysis
+5. **Role-Specific**: Every action must clearly advance them toward their specific target role
+6. **Progressive Difficulty**: Ensure actions match the difficulty level for this phase
+7. **Measurable Outcomes**: Include specific metrics, timelines, or deliverables
+
+AVOID GENERIC ACTIONS LIKE:
+❌ "Update your resume" → ✅ "Update resume to highlight Python automation projects for Google SWE roles"
+❌ "Network with people" → ✅ "Connect with 5 Microsoft alumni from Stanford on LinkedIn this week"
+❌ "Learn a new skill" → ✅ "Complete AWS Solutions Architect certification to close cloud infrastructure gap"
 
 Return JSON in this structure:
 {
-  "title": "Personalized title for their career plan",
-  "description": "Brief description of what this plan will accomplish",
+  "title": "Specific, personalized title mentioning their target role or key goal",
+  "description": "Brief description explaining what this plan will accomplish for THEIR specific situation",
   "actions": [
     {
-      "title": "Specific action step",
-      "description": "Detailed description of how to complete this step",
-      "rationale": "Why this step is important for their career goals",
+      "title": "Ultra-specific action with company/skill/location names",
+      "description": "Step-by-step instructions with concrete details, timelines, and resources",
+      "rationale": "Why THIS specific action matters for THEIR career goals and gap closure",
       "icon": "📄",
       "completed": false
     }
   ]
 }
 
-Each action must clearly align with the ${phase.replace('_', ' ')} horizon. 
-Do not just repeat the same actions for all phases.`;
+Generate 4-6 actions. Each action MUST be unique to this user and this phase.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
