@@ -808,13 +808,21 @@ Do not just repeat the same actions for all phases.`;
 
 Your ONLY job is to reword and reorganize the candidate's REAL experiences to be more relevant to this specific job posting.
 
+FORMATTING REQUIREMENTS:
+- Use proper line breaks between sections (use \\n)
+- Put section headers in ALL CAPS (e.g., PROFESSIONAL SUMMARY, EXPERIENCE, EDUCATION, SKILLS)
+- Each section header should be on its own line
+- Add a blank line before each section header
+- Format contact information clearly at the top
+- Use bullet points or clear line breaks for list items
+
 Resume: ${baseResumeText}
 Job: ${jobDescription}
 Keywords: ${targetKeywords.join(", ")}
 
 Provide JSON:
 {
-  "tailoredContent": "Updated resume text with ONLY reworded existing content",
+  "tailoredContent": "Updated resume text with ONLY reworded existing content. Use \\n for line breaks. Format with clear sections like:\\n\\nName\\nContact Info\\n\\nPROFESSIONAL SUMMARY\\nYour summary here\\n\\nEXPERIENCE\\nJob 1\\nDetails\\n\\nJob 2\\nDetails\\n\\nEDUCATION\\nDegree details\\n\\nSKILLS\\nSkill list",
   "jobSpecificScore": 85,
   "keywordsCovered": ["keyword1", "keyword2"],
   "remainingGaps": [{"skill": "Python", "importance": "high", "resources": [{"title": "Course Name", "provider": "Provider Name", "url": "", "cost": "Free"}]}],

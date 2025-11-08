@@ -26,7 +26,44 @@ import crypto from "crypto";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import PDFParse from "pdf-parse";
-import { Document, Packer, Paragraph, TextRun } from "docx";
+import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel } from "docx";
+
+function parseResumeContentToDocx(resumeText: string): Paragraph[] {
+  const paragraphs: Paragraph[] = [];
+  const lines = resumeText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    const isSectionHeader = 
+      line === line.toUpperCase() && line.length > 2 && line.length < 50 ||
+      /^(PROFESSIONAL SUMMARY|SUMMARY|EXPERIENCE|EDUCATION|SKILLS|CERTIFICATIONS|PROJECTS|ACHIEVEMENTS|CONTACT|OBJECTIVE)/i.test(line);
+    
+    if (isSectionHeader) {
+      paragraphs.push(
+        new Paragraph({
+          text: line,
+          heading: HeadingLevel.HEADING_2,
+          spacing: {
+            before: 200,
+            after: 100,
+          },
+        })
+      );
+    } else {
+      paragraphs.push(
+        new Paragraph({
+          text: line,
+          spacing: {
+            after: 100,
+          },
+        })
+      );
+    }
+  }
+  
+  return paragraphs;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
@@ -2204,15 +2241,12 @@ Make your recommendations specific, actionable, and data-driven based on the act
         req.user!
       );
 
-      // Generate DOCX file
+      // Generate DOCX file with proper formatting
+      const resumeParagraphs = parseResumeContentToDocx(tailoredResult.tailoredContent);
       const doc = new Document({
         sections: [{
           properties: {},
-          children: [
-            new Paragraph({
-              children: [new TextRun(tailoredResult.tailoredContent)],
-            }),
-          ],
+          children: resumeParagraphs,
         }],
       });
 
