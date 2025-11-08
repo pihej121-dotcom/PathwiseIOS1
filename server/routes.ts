@@ -3478,14 +3478,12 @@ Make your recommendations specific, actionable, and data-driven based on the act
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Update subscription status if needed
-      if (user.subscriptionStatus !== 'active') {
-        await storage.updateUser(userId, {
-          stripeSubscriptionId: session.subscription as string,
-          subscriptionStatus: 'active',
-          subscriptionTier: 'paid',
-        });
-      }
+      // Update subscription to paid tier
+      await storage.updateUser(userId, {
+        stripeSubscriptionId: session.subscription as string,
+        subscriptionStatus: 'active',
+        subscriptionTier: 'paid',
+      });
 
       // Create session token for login
       const token = generateToken();
