@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web", "swift-5.8", "postgresql-16"]
+modules = ["nodejs-20", "web", "swift-5.8"]
 [agent]
 expertMode = true
 integrations = ["resend:1.0.0"]
@@ -53,6 +53,10 @@ externalPort = 3002
 [[ports]]
 localPort = 43367
 externalPort = 3000
+
+[[ports]]
+localPort = 43493
+externalPort = 5173
 
 [[ports]]
 localPort = 43521
