@@ -468,19 +468,33 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Selected Card Content */}
-      {selectedCard && (
-        <div className="mt-6">
-          {selectedCard === 'upload' && <ResumeUpload embedded={true} />}
-          {selectedCard === 'resume' && <ResumeAnalysis embedded={true} />}
-          {selectedCard === 'roadmap' && <CareerRoadmap embedded={true} />}
-          {selectedCard === 'jobs' && <JobAnalysis embedded={true} />}
-          {selectedCard === 'projects' && <MicroProjects embedded={true} />}
-          {selectedCard === 'copilot' && <AICopilot embedded={true} />}
-          {selectedCard === 'applications' && <Applications embedded={true} />}
-          {selectedCard === 'interview' && <InterviewPrep embedded={true} />}
+      {/* Selected Card Content - Keep mounted to preserve state */}
+      <div className="mt-6">
+        <div className={selectedCard === 'upload' ? '' : 'hidden'}>
+          <ResumeUpload embedded={true} />
         </div>
-      )}
+        <div className={selectedCard === 'resume' ? '' : 'hidden'}>
+          <ResumeAnalysis embedded={true} />
+        </div>
+        <div className={selectedCard === 'roadmap' ? '' : 'hidden'}>
+          <CareerRoadmap embedded={true} />
+        </div>
+        <div className={selectedCard === 'jobs' ? '' : 'hidden'}>
+          <JobAnalysis embedded={true} />
+        </div>
+        <div className={selectedCard === 'projects' ? '' : 'hidden'}>
+          <MicroProjects embedded={true} />
+        </div>
+        <div className={selectedCard === 'copilot' ? '' : 'hidden'}>
+          <AICopilot embedded={true} />
+        </div>
+        <div className={selectedCard === 'applications' ? '' : 'hidden'}>
+          <Applications embedded={true} />
+        </div>
+        <div className={selectedCard === 'interview' ? '' : 'hidden'}>
+          <InterviewPrep embedded={true} />
+        </div>
+      </div>
     </>
   );
 
