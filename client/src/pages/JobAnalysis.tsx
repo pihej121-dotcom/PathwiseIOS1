@@ -72,31 +72,40 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
   });
   const [analysis, setAnalysis] = useState<JobAnalysisResult | null>(() => {
     if (embedded) {
-      const saved = localStorage.getItem('jobAnalysis_analysis');
-      if (saved) return JSON.parse(saved);
+      try {
+        const saved = localStorage.getItem('jobAnalysis_analysis');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved analysis:', e);
+      }
     }
     return null;
   });
   const [tailoredResume, setTailoredResume] = useState<TailoredResumeResult | null>(() => {
     if (embedded) {
-      const saved = localStorage.getItem('jobAnalysis_tailoredResume');
-      if (saved) return JSON.parse(saved);
+      try {
+        const saved = localStorage.getItem('jobAnalysis_tailoredResume');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved tailored resume:', e);
+      }
     }
     return null;
   });
   const [coverLetter, setCoverLetter] = useState<string | null>(() => {
     if (embedded) {
-      const saved = localStorage.getItem('jobAnalysis_coverLetter');
-      if (saved) return JSON.parse(saved);
+      try {
+        const saved = localStorage.getItem('jobAnalysis_coverLetter');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse saved cover letter:', e);
+      }
     }
     return null;
   });
 
   console.log("JobAnalysis render - analysis:", !!analysis, "tailoredResume:", !!tailoredResume, "coverLetter:", !!coverLetter);
 
-  // Persist jobDetails to localStorage when changed (for embedded mode)
-  const [, forceUpdate] = useState({});
-  
   const updateJobDetails = (details: JobDetails) => {
     setJobDetails(details);
     if (embedded) {
@@ -156,9 +165,13 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     },
     onSuccess: (data: any) => {
       console.log("Job Analysis Response:", data);
+      console.log("Setting analysis state, embedded:", embedded);
       setAnalysis(data);
+      console.log("Analysis state set, now:", data);
       if (embedded) {
-        localStorage.setItem('jobAnalysis_analysis', JSON.stringify(data));
+        const saved = JSON.stringify(data);
+        localStorage.setItem('jobAnalysis_analysis', saved);
+        console.log("Saved to localStorage, length:", saved.length);
       }
       toast({
         title: "Analysis complete",
