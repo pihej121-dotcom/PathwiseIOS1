@@ -27,7 +27,7 @@ export default function Register() {
   const [error, setError] = useState<string>("");
   const [, setLocation] = useLocation();
 
-  // Extract invitation token from URL query parameters
+  // Extract invitation token from URL
   const urlParams = new URLSearchParams(window.location.search);
   const invitationToken =
     urlParams.get("invitationToken") || urlParams.get("token");
@@ -44,7 +44,6 @@ export default function Register() {
     },
   });
 
-  // Set invitation token when component mounts
   useEffect(() => {
     if (invitationToken) {
       setValue("invitationToken", invitationToken);
@@ -54,7 +53,6 @@ export default function Register() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       setError("");
-
       const registrationData = {
         ...data,
         selectedPlan: invitationToken ? undefined : "free",
@@ -68,9 +66,7 @@ export default function Register() {
 
       const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.error || "Registration failed");
-      }
+      if (!response.ok) throw new Error(result.error || "Registration failed");
 
       if (result.token) {
         localStorage.setItem("auth_token", result.token);
@@ -83,12 +79,12 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl space-y-6">
+      <div className="w-full max-w-4xl">
         {/* Back Button */}
         <Link href="/">
           <Button
             variant="ghost"
-            className="mb-2"
+            className="mb-4"
             data-testid="button-back-home"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -96,31 +92,33 @@ export default function Register() {
           </Button>
         </Link>
 
-        {/* Logo */}
-        <div className="text-center mb-4">
-          <Logo size="lg" className="mx-auto" />
-
-          {/* Subtle tagline */}
-          <p className="text-sm text-muted-foreground mt-2 tracking-wide">
-            From <span className="text-primary font-medium">Uncertainty</span>{" "}
-            to <span className="text-primary font-medium">Opportunity</span>
-          </p>
-        </div>
-
-        {/* Registration Form */}
+        {/* Registration Card */}
         <Card className="max-w-md mx-auto shadow-md border border-border/60">
-          <CardHeader>
-            <CardTitle data-testid="register-title" className="text-lg">
-              Create Account
-            </CardTitle>
-            <CardDescription>
-              {invitationToken
-                ? "Complete your registration"
-                : "Start your free account"}
-            </CardDescription>
+          <CardHeader className="flex flex-col items-center text-center space-y-2 pt-8 pb-4">
+            {/* Logo and slogan inside the card */}
+            <Logo size="lg" className="mb-1" />
+            <p className="text-sm text-muted-foreground tracking-wide">
+              From{" "}
+              <span className="text-primary font-medium">Uncertainty</span> to{" "}
+              <span className="text-primary font-medium">Opportunity</span>
+            </p>
+
+            <div className="pt-4">
+              <CardTitle
+                data-testid="register-title"
+                className="text-lg font-semibold"
+              >
+                Create Account
+              </CardTitle>
+              <CardDescription className="text-sm">
+                {invitationToken
+                  ? "Complete your registration"
+                  : "Start your free account"}
+              </CardDescription>
+            </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="pt-4 pb-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {invitationToken && (
                 <Alert
@@ -303,4 +301,5 @@ export default function Register() {
     </div>
   );
 }
+
 
