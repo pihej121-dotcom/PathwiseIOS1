@@ -110,15 +110,8 @@ export default function Dashboard() {
       const sessionId = params.get("session_id");
 
       if (purchase === "success") {
-        if (type === "subscription") {
-          toast({
-            title: "Subscription activated!",
-            description: "Welcome to Pathwise Unlimited! You now have access to all features.",
-          });
-          window.history.replaceState({}, "", "/dashboard");
-          queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/user/feature-access"] });
-        } else if (feature && sessionId) {
+        // Only handle feature purchases here - subscriptions go through /checkout/success
+        if (feature && sessionId) {
           const success = await verifyFeaturePurchase(sessionId, feature);
           if (!success) {
             setFailedVerification({ sessionId, feature, error: "Failed to verify your purchase" });

@@ -3172,11 +3172,12 @@ Make your recommendations specific, actionable, and data-driven based on the act
             quantity: 1,
           },
         ],
-        success_url: `${baseUrl}/dashboard?purchase=success&type=subscription`,
+        success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/dashboard?purchase=cancelled`,
         metadata: {
           userId: user.id,
         },
+        allow_promotion_codes: true,
       });
 
       res.json({ url: session.url });

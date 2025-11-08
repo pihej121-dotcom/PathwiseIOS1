@@ -27,9 +27,10 @@ export default function CheckoutSuccess() {
 
         // Check if user is already logged in (existing user upgrading)
         const existingToken = localStorage.getItem('auth_token');
+        const isExistingUser = !!(existingToken && user);
         
-        if (existingToken && user) {
-          // Existing user upgrading - just verify payment and refresh auth
+        if (isExistingUser) {
+          // Existing user upgrading - verify payment and refresh auth
           const response = await fetch('/api/stripe/verify-session', {
             method: 'POST',
             headers: { 
@@ -46,10 +47,12 @@ export default function CheckoutSuccess() {
           }
 
           // Invalidate user queries to refresh subscription status and feature access
-          queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-          queryClient.invalidateQueries({ queryKey: ['/api/user/feature-access'] });
+          await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+          await queryClient.invalidateQueries({ queryKey: ['/api/user/feature-access'] });
           
-          // Show success briefly before redirect to dashboard
+          setIsProcessing(false);
+          
+          // Redirect to dashboard after brief success message
           setTimeout(() => {
             setLocation('/dashboard');
           }, 2000);
@@ -70,10 +73,11 @@ export default function CheckoutSuccess() {
           // Save token and redirect to dashboard
           if (data.token) {
             localStorage.setItem('auth_token', data.token);
+            setIsProcessing(false);
             
-            // Show success briefly before redirect
+            // Redirect to home/dashboard after brief success message
             setTimeout(() => {
-              window.location.href = '/';
+              window.location.href = '/dashboard';
             }, 2000);
           } else {
             setError("Login failed after payment");
