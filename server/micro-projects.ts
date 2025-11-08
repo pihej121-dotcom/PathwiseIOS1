@@ -67,15 +67,22 @@ export class MicroProjectsService {
     this.realDatasets.set('web-development', [
       {
         title: 'JSONPlaceholder API',
-        description: 'Fake REST API for testing and prototyping',
+        description: 'Free fake REST API for testing and prototyping',
         url: 'https://jsonplaceholder.typicode.com/',
         type: 'api',
         license: 'Open Source'
       },
       {
-        title: 'Free Code Camp Weather API',
-        description: 'Real weather data API for front-end projects',
-        url: 'https://weather-proxy.freecodecamp.rocks/',
+        title: 'REST Countries API',
+        description: 'Free API with country data including flags, currencies, languages',
+        url: 'https://restcountries.com/',
+        type: 'api',
+        license: 'Open Source'
+      },
+      {
+        title: 'The Cat API',
+        description: 'Free public API for cat images and facts',
+        url: 'https://thecatapi.com/',
         type: 'api',
         license: 'Public'
       }
@@ -83,12 +90,12 @@ export class MicroProjectsService {
 
     this.realDatasets.set('machine-learning', [
       {
-        title: 'Iris Dataset',
+        title: 'UCI Iris Dataset',
         description: 'Classic dataset for classification problems',
-        url: 'https://archive.ics.uci.edu/ml/datasets/iris',
+        url: 'https://archive.ics.uci.edu/dataset/53/iris',
         type: 'csv',
         size: '5KB',
-        license: 'Public Domain'
+        license: 'CC BY 4.0'
       },
       {
         title: 'Boston Housing Dataset',
@@ -97,6 +104,14 @@ export class MicroProjectsService {
         type: 'csv',
         size: '25KB',
         license: 'Public Domain'
+      },
+      {
+        title: 'MNIST Handwritten Digits',
+        description: 'Dataset of 70,000 handwritten digits for image classification',
+        url: 'https://www.kaggle.com/datasets/hojjatk/mnist-dataset',
+        type: 'csv',
+        size: '~50MB',
+        license: 'CC BY-SA 3.0'
       }
     ]);
 
