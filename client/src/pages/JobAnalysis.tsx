@@ -57,18 +57,52 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
   const { toast } = useToast();
   const [inputMethod, setInputMethod] = useState<"url" | "manual">("manual");
   const [jobUrl, setJobUrl] = useState("");
-  const [jobDetails, setJobDetails] = useState<JobDetails>({
-    title: "",
-    company: "",
-    location: "",
-    description: "",
-    requirements: "",
+  const [jobDetails, setJobDetails] = useState<JobDetails>(() => {
+    if (embedded) {
+      const saved = localStorage.getItem('jobAnalysis_jobDetails');
+      if (saved) return JSON.parse(saved);
+    }
+    return {
+      title: "",
+      company: "",
+      location: "",
+      description: "",
+      requirements: "",
+    };
   });
-  const [analysis, setAnalysis] = useState<JobAnalysisResult | null>(null);
-  const [tailoredResume, setTailoredResume] = useState<TailoredResumeResult | null>(null);
-  const [coverLetter, setCoverLetter] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<JobAnalysisResult | null>(() => {
+    if (embedded) {
+      const saved = localStorage.getItem('jobAnalysis_analysis');
+      if (saved) return JSON.parse(saved);
+    }
+    return null;
+  });
+  const [tailoredResume, setTailoredResume] = useState<TailoredResumeResult | null>(() => {
+    if (embedded) {
+      const saved = localStorage.getItem('jobAnalysis_tailoredResume');
+      if (saved) return JSON.parse(saved);
+    }
+    return null;
+  });
+  const [coverLetter, setCoverLetter] = useState<string | null>(() => {
+    if (embedded) {
+      const saved = localStorage.getItem('jobAnalysis_coverLetter');
+      if (saved) return JSON.parse(saved);
+    }
+    return null;
+  });
 
   console.log("JobAnalysis render - analysis:", !!analysis, "tailoredResume:", !!tailoredResume, "coverLetter:", !!coverLetter);
+
+  // Persist jobDetails to localStorage when changed (for embedded mode)
+  const [, forceUpdate] = useState({});
+  
+  const updateJobDetails = (details: JobDetails) => {
+    setJobDetails(details);
+    if (embedded) {
+      localStorage.setItem('jobAnalysis_jobDetails', JSON.stringify(details));
+    }
+  };
 
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
@@ -86,14 +120,15 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
       return response.json();
     },
     onSuccess: (data: any) => {
-      setJobDetails({
+      const newDetails = {
         title: data.title || "",
         company: data.company || "",
         location: data.location || "",
         description: data.description || "",
         requirements: data.requirements || "",
         url: jobUrl,
-      });
+      };
+      updateJobDetails(newDetails);
       toast({
         title: "Job details extracted",
         description: "Review and edit the details before analyzing",
@@ -122,6 +157,9 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     onSuccess: (data: any) => {
       console.log("Job Analysis Response:", data);
       setAnalysis(data);
+      if (embedded) {
+        localStorage.setItem('jobAnalysis_analysis', JSON.stringify(data));
+      }
       toast({
         title: "Analysis complete",
         description: `${data.competitivenessBand} match - ${data.overallMatch}% compatibility`,
@@ -150,6 +188,9 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     onSuccess: (data: any) => {
       console.log("Tailored Resume Response:", data);
       setTailoredResume(data);
+      if (embedded) {
+        localStorage.setItem('jobAnalysis_tailoredResume', JSON.stringify(data));
+      }
       toast({
         title: "Resume tailored",
         description: `Job-specific score: ${data.jobSpecificScore}%`,
@@ -178,6 +219,9 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
     onSuccess: (data: any) => {
       console.log("Cover Letter Response:", data);
       setCoverLetter(data.coverLetter);
+      if (embedded) {
+        localStorage.setItem('jobAnalysis_coverLetter', JSON.stringify(data.coverLetter));
+      }
       toast({
         title: "Cover letter generated",
         description: "Review and customize as needed",
@@ -299,7 +343,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
                   data-testid="input-job-title"
                   placeholder="Software Engineer"
                   value={jobDetails.title}
-                  onChange={(e) => setJobDetails({ ...jobDetails, title: e.target.value })}
+                  onChange={(e) => updateJobDetails({ ...jobDetails, title: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -309,7 +353,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
                   data-testid="input-company"
                   placeholder="Tech Corp"
                   value={jobDetails.company}
-                  onChange={(e) => setJobDetails({ ...jobDetails, company: e.target.value })}
+                  onChange={(e) => updateJobDetails({ ...jobDetails, company: e.target.value })}
                 />
               </div>
             </div>
@@ -321,7 +365,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
                 data-testid="input-location"
                 placeholder="San Francisco, CA or Remote"
                 value={jobDetails.location}
-                onChange={(e) => setJobDetails({ ...jobDetails, location: e.target.value })}
+                onChange={(e) => updateJobDetails({ ...jobDetails, location: e.target.value })}
               />
             </div>
 
@@ -332,7 +376,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
                 data-testid="input-description"
                 placeholder="Paste the full job description here..."
                 value={jobDetails.description}
-                onChange={(e) => setJobDetails({ ...jobDetails, description: e.target.value })}
+                onChange={(e) => updateJobDetails({ ...jobDetails, description: e.target.value })}
                 rows={8}
               />
             </div>
@@ -344,7 +388,7 @@ export default function JobAnalysis({ embedded = false }: { embedded?: boolean }
                 data-testid="input-requirements"
                 placeholder="Required skills, experience, education..."
                 value={jobDetails.requirements}
-                onChange={(e) => setJobDetails({ ...jobDetails, requirements: e.target.value })}
+                onChange={(e) => updateJobDetails({ ...jobDetails, requirements: e.target.value })}
                 rows={4}
               />
             </div>
