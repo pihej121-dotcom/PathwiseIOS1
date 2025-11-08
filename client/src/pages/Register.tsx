@@ -4,7 +4,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Logo } from "@/components/Logo";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@shared/schema";
 import type { z } from "zod";
-import { Check, Sparkles, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -20,14 +26,12 @@ export default function Register() {
   const { register: registerUser } = useAuth();
   const [error, setError] = useState<string>("");
   const [, setLocation] = useLocation();
-  
+
   // Extract invitation token from URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
-  const invitationToken = urlParams.get('invitationToken') || urlParams.get('token');
-  
-  // Default everyone to free tier
-  const selectedPlan = 'free';
-  
+  const invitationToken =
+    urlParams.get("invitationToken") || urlParams.get("token");
+
   const {
     register,
     handleSubmit,
@@ -43,38 +47,34 @@ export default function Register() {
   // Set invitation token when component mounts
   useEffect(() => {
     if (invitationToken) {
-      setValue('invitationToken', invitationToken);
+      setValue("invitationToken", invitationToken);
     }
   }, [invitationToken, setValue]);
 
   const onSubmit = async (data: RegisterForm) => {
     try {
       setError("");
-      
-      // Add selected plan to registration data (always free for new signups)
-      // Note: Backend ignores selectedPlan when invitationToken is provided (sets to "institutional")
+
       const registrationData = {
         ...data,
-        selectedPlan: invitationToken ? undefined : selectedPlan,
+        selectedPlan: invitationToken ? undefined : "free",
       };
-      
-      // Call register API directly to get the response
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registrationData),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Registration failed');
+        throw new Error(result.error || "Registration failed");
       }
 
-      // Save token and login (no payment required for registration)
       if (result.token) {
-        localStorage.setItem('auth_token', result.token);
-        window.location.href = '/';
+        localStorage.setItem("auth_token", result.token);
+        window.location.href = "/";
       }
     } catch (err: any) {
       setError(err.message || "Registration failed");
@@ -97,179 +97,210 @@ export default function Register() {
         </Link>
 
         {/* Logo */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-4">
           <Logo size="lg" className="mx-auto" />
+
+          {/* Subtle tagline */}
+          <p className="text-sm text-muted-foreground mt-2 tracking-wide">
+            From <span className="text-primary font-medium">Uncertainty</span>{" "}
+            to <span className="text-primary font-medium">Opportunity</span>
+          </p>
         </div>
 
         {/* Registration Form */}
-        <Card className="max-w-md mx-auto">
-            <CardHeader>
-              <CardTitle data-testid="register-title">Create Account</CardTitle>
-              <CardDescription>
-                {invitationToken ? "Complete your registration" : "Start your free account"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {invitationToken && (
-                  <Alert className="border-green-200 bg-green-50 text-green-800" data-testid="invitation-banner">
-                    <AlertDescription>
-                      ✅ You're registering with an invitation. Complete the form below to create your account.
-                    </AlertDescription>
-                  </Alert>
-                )}
+        <Card className="max-w-md mx-auto shadow-md border border-border/60">
+          <CardHeader>
+            <CardTitle data-testid="register-title" className="text-lg">
+              Create Account
+            </CardTitle>
+            <CardDescription>
+              {invitationToken
+                ? "Complete your registration"
+                : "Start your free account"}
+            </CardDescription>
+          </CardHeader>
 
-                {selectedPlan && !invitationToken && (
-                  <Alert className="border-blue-200 bg-blue-50 text-blue-800">
-                    <AlertDescription>
-                      Selected plan: <strong>Pro ($15/month) - 14 days free trial</strong>
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {error && (
-                  <Alert variant="destructive" data-testid="register-error">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Hidden field for invitation token */}
-                <input type="hidden" {...register('invitationToken')} data-testid="input-invitation-token" />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      placeholder="John"
-                      {...register("firstName")}
-                      data-testid="input-first-name"
-                    />
-                    {errors.firstName && (
-                      <p className="text-sm text-destructive">{errors.firstName.message}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      placeholder="Doe"
-                      {...register("lastName")}
-                      data-testid="input-last-name"
-                    />
-                    {errors.lastName && (
-                      <p className="text-sm text-destructive">{errors.lastName.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="john.doe@university.edu"
-                    {...register("email")}
-                    data-testid="input-email"
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Create a strong password"
-                    {...register("password")}
-                    data-testid="input-password"
-                  />
-                  {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    {...register("confirmPassword")}
-                    data-testid="input-confirm-password"
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-                  )}
-                </div>
-
-                {/* Optional Profile Fields */}
-                <div className="space-y-2">
-                  <Label htmlFor="school">School (Optional)</Label>
-                  <Input
-                    id="school"
-                    placeholder="University of Example"
-                    {...register("school")}
-                    data-testid="input-school"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="major">Major (Optional)</Label>
-                  <Input
-                    id="major"
-                    placeholder="Computer Science"
-                    {...register("major")}
-                    data-testid="input-major"
-                  />
-                </div>
-
-                {/* Terms Checkbox */}
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" required data-testid="checkbox-terms" />
-                  <Label 
-                    htmlFor="terms" 
-                    className="text-sm text-muted-foreground cursor-pointer"
-                  >
-                    I agree to the{" "}
-                    <a
-                      href="/terms"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                      data-testid="link-terms"
-                    >
-                      Terms of Service
-                    </a>{" "}
-                    and Privacy Policy
-                  </Label>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                  data-testid="button-register"
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {invitationToken && (
+                <Alert
+                  className="border-green-200 bg-green-50 text-green-800"
+                  data-testid="invitation-banner"
                 >
-                  {isSubmitting ? "Creating account..." : invitationToken ? "Create Account" : "Continue to Payment"}
-                </Button>
-              </form>
+                  <AlertDescription>
+                    ✅ You're registering with an invitation. Complete the form
+                    below to create your account.
+                  </AlertDescription>
+                </Alert>
+              )}
 
-              <div className="mt-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Already have an account?{" "}
-                  <Link href="/login" className="text-primary hover:underline" data-testid="link-login-form">
-                    Sign in here
-                  </Link>
-                </p>
+              {error && (
+                <Alert variant="destructive" data-testid="register-error">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Hidden field for invitation token */}
+              <input
+                type="hidden"
+                {...register("invitationToken")}
+                data-testid="input-invitation-token"
+              />
+
+              {/* Form Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    placeholder="John"
+                    {...register("firstName")}
+                    data-testid="input-first-name"
+                  />
+                  {errors.firstName && (
+                    <p className="text-sm text-destructive">
+                      {errors.firstName.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Doe"
+                    {...register("lastName")}
+                    data-testid="input-last-name"
+                  />
+                  {errors.lastName && (
+                    <p className="text-sm text-destructive">
+                      {errors.lastName.message}
+                    </p>
+                  )}
+                </div>
               </div>
-            </CardContent>
-          </Card>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="john.doe@university.edu"
+                  {...register("email")}
+                  data-testid="input-email"
+                />
+                {errors.email && (
+                  <p className="text-sm text-destructive">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a strong password"
+                  {...register("password")}
+                  data-testid="input-password"
+                />
+                {errors.password && (
+                  <p className="text-sm text-destructive">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  {...register("confirmPassword")}
+                  data-testid="input-confirm-password"
+                />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Optional Profile Fields */}
+              <div className="space-y-2">
+                <Label htmlFor="school">School (Optional)</Label>
+                <Input
+                  id="school"
+                  placeholder="University of Example"
+                  {...register("school")}
+                  data-testid="input-school"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="major">Major (Optional)</Label>
+                <Input
+                  id="major"
+                  placeholder="Computer Science"
+                  {...register("major")}
+                  data-testid="input-major"
+                />
+              </div>
+
+              {/* Terms Checkbox */}
+              <div className="flex items-center space-x-2">
+                <Checkbox id="terms" required data-testid="checkbox-terms" />
+                <Label
+                  htmlFor="terms"
+                  className="text-sm text-muted-foreground cursor-pointer"
+                >
+                  I agree to the{" "}
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                    data-testid="link-terms"
+                  >
+                    Terms of Service
+                  </a>{" "}
+                  and Privacy Policy
+                </Label>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isSubmitting}
+                data-testid="button-register"
+              >
+                {isSubmitting
+                  ? "Creating account..."
+                  : invitationToken
+                  ? "Create Account"
+                  : "Continue"}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-primary hover:underline"
+                  data-testid="link-login-form"
+                >
+                  Sign in here
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 }
+
