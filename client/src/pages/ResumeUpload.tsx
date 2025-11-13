@@ -21,6 +21,7 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
   const queryClient = useQueryClient();
   const [resumeText, setResumeText] = useState("");
   const [fileName, setFileName] = useState("");
+  const [extractorResetKey, setExtractorResetKey] = useState(0);
 
   const { data: resumes = [], isLoading } = useQuery<Resume[]>({
     queryKey: ["/api/resumes"],
@@ -54,6 +55,7 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
       });
       setResumeText("");
       setFileName("");
+      setExtractorResetKey(prev => prev + 1);
     },
     onError: (error: any) => {
       toast({
@@ -68,9 +70,14 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
     setResumeText(text);
     setFileName(extractedFileName);
     toast({
-      title: "Text extracted successfully",
-      description: `Extracted text from ${extractedFileName}. Fill in details and save.`,
+      title: "Resume processed successfully",
+      description: `${extractedFileName} is ready to save. Click "Save Resume" to continue.`,
     });
+  };
+
+  const handleClearFile = () => {
+    setResumeText("");
+    setFileName("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -120,40 +127,16 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Upload Resume File</Label>
+                  <Label>Select Your Resume File</Label>
                   <FileUploadExtractor
                     onTextExtracted={handleFileTextExtracted}
+                    onClear={handleClearFile}
                     disabled={uploadMutation.isPending}
+                    autoExtractAndSave={true}
+                    resetKey={extractorResetKey}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Upload a PDF or DOCX file to automatically extract the text
-                  </p>
-                </div>
-
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or paste text manually
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="resume-text">Resume Content *</Label>
-                  <Textarea
-                    id="resume-text"
-                    value={resumeText}
-                    onChange={(e) => setResumeText(e.target.value)}
-                    placeholder="Copy and paste your resume content here..."
-                    className="min-h-[300px] font-mono text-sm"
-                    required
-                    data-testid="textarea-resume-content"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Paste the full text of your resume
+                    Upload a PDF or DOCX file. We'll automatically extract and process the content.
                   </p>
                 </div>
               </div>
