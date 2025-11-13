@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiRequest, APIError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { FileUploadExtractor } from "@/components/FileUploadExtractor";
-import { FileText, Upload, CheckCircle, ArrowRight } from "lucide-react";
+import { FileText, Upload, CheckCircle, ArrowRight, Trash2, LogIn } from "lucide-react";
 import { format } from "date-fns";
 import { Link, useLocation } from "wouter";
 import type { Resume } from "@shared/schema";
@@ -20,7 +20,6 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
-
   const [resumeText, setResumeText] = useState("");
   const [fileName, setFileName] = useState("");
   const [extractorResetKey, setExtractorResetKey] = useState(0);
@@ -44,53 +43,63 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
       const res = await apiRequest("POST", "/api/resumes", {
         fileName,
         filePath: "/text-input",
-        extractedText: resumeText || "", // allow empty text
+        extractedText: resumeText,
       });
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/resumes"] });
       queryClient.invalidateQueries({ queryKey: ["/api/resumes/active"] });
-
       toast({
-        title: "Resume saved!",
-        description: "Your resume has been uploaded successfully.",
+        title: "Resume uploaded successfully!",
+        description: "Your resume has been saved. Switch to Resume Analysis to analyze it.",
       });
-
       setResumeText("");
       setFileName("");
-      setExtractorResetKey((prev) => prev + 1);
+      setExtractorResetKey(prev => prev + 1);
     },
     onError: (error: any) => {
+      console.log('Upload error:', error);
+      
+      // Handle session expiry specially - check if it's an APIError with 401 status
       if (error instanceof APIError && error.status === 401) {
         toast({
           title: "Session Expired",
-          description: "Redirecting you to sign in...",
+          description: "Your session has expired. Redirecting to sign in...",
           variant: "destructive",
         });
-
+        
+        // Redirect to login after a short delay
         setTimeout(() => {
           const returnTo = encodeURIComponent(window.location.pathname);
           setLocation(`/login?returnTo=${returnTo}`);
         }, 2000);
-      } else {
+      } else if (error instanceof Error) {
+        // Handle other errors with the error message
         toast({
           title: "Upload failed",
-          description: error.message || "Something went wrong.",
+          description: error.message || "An error occurred while saving your resume.",
+          variant: "destructive",
+        });
+      } else {
+        // Handle unexpected error types (network failures, etc.)
+        toast({
+          title: "Upload failed",
+          description: "A network error occurred. Please check your connection and try again.",
           variant: "destructive",
         });
       }
     },
   });
 
-  /** When the extractor finishes — but saving no longer requires this */
   const handleFileTextExtracted = (text: string, extractedFileName: string) => {
-    setResumeText(text || ""); // allow empty/no extracted content
+    console.log('Text extracted:', { length: text.length, fileName: extractedFileName });
+    setResumeText(text);
     setFileName(extractedFileName);
-
+    console.log('State updated - resumeText length:', text.length);
     toast({
-      title: "Resume uploaded",
-      description: "Click 'Save Resume' to continue.",
+      title: "Resume processed successfully",
+      description: `${extractedFileName} is ready to save. Click "Save Resume" to continue.`,
     });
   };
 
@@ -99,22 +108,24 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
     setFileName("");
   };
 
-  /** Save button no longer requires extracted text */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Only requirement now: a file must be uploaded
-    if (!fileName) {
+    console.log('Submit clicked - resumeText length:', resumeText.length);
+    
+    if (!resumeText.trim()) {
+      console.log('Resume text is empty or whitespace only');
       toast({
-        title: "Upload required",
-        description: "Please upload a resume file before saving.",
+        title: "Resume text required",
+        description: "Please paste your resume content or upload a file.",
         variant: "destructive",
       });
       return;
     }
 
+    console.log('Submitting resume...');
     uploadMutation.mutate({
-      resumeText: resumeText || "",
+      resumeText: resumeText.trim(),
       fileName: fileName || "resume.txt",
     });
   };
@@ -127,9 +138,7 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
   );
 
   if (isLoading) {
-    return embedded ? (
-      loadingContent
-    ) : (
+    return embedded ? loadingContent : (
       <Layout title="Resume Upload" subtitle="Upload and manage your resumes">
         {loadingContent}
       </Layout>
@@ -138,110 +147,132 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
 
   const content = (
     <div className="space-y-6">
-      <Card className="border-none shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-            <Upload className="w-4 h-4" />
-            Upload Your Resume
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <Label>Select Your Resume File</Label>
-
-              <FileUploadExtractor
-                onTextExtracted={handleFileTextExtracted}
-                onClear={handleClearFile}
-                disabled={uploadMutation.isPending}
-                autoExtractAndSave={true}
-                resetKey={extractorResetKey}
-              />
-
-              <p className="text-xs text-muted-foreground">
-                Upload a PDF or DOCX. We'll extract your content in the background.
-              </p>
-            </div>
-
-            {/* No need to show extracted text */}
-
-            <Button
-              type="submit"
-              className="w-full h-10"
-              disabled={!fileName || uploadMutation.isPending} // ONLY requires a file
-              data-testid="button-save-resume"
-            >
-              {uploadMutation.isPending ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Save Resume
-                </>
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Success Notice */}
-      {uploadMutation.isSuccess && !embedded && (
-        <Alert className="border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950">
-          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
-            Resume saved!{" "}
-            <Link href="/resume">
-              <a className="font-medium underline inline-flex items-center gap-1 hover:text-green-900 dark:hover:text-green-100">
-                Go to Resume Analysis <ArrowRight className="w-3 h-3" />
-              </a>
-            </Link>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Resume list (unchanged) */}
-      <Card className="border-none shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            Your Resumes
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          {resumes.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No resumes uploaded yet</p>
-              <p className="text-sm mt-1">Upload your first resume above</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {resumes.map((resume) => (
-                <div
-                  key={resume.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-medium truncate">{resume.fileName}</p>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {resume.createdAt
-                        ? format(new Date(resume.createdAt), "MMM d, yyyy 'at' h:mm a")
-                        : "Unknown date"}
-                    </p>
-                  </div>
+        {/* Upload Form */}
+        <Card className="border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <Upload className="w-4 h-4" />
+              Upload Your Resume
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Select Your Resume File</Label>
+                  <FileUploadExtractor
+                    onTextExtracted={handleFileTextExtracted}
+                    onClear={handleClearFile}
+                    disabled={uploadMutation.isPending}
+                    autoExtractAndSave={true}
+                    resetKey={extractorResetKey}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Upload a PDF or DOCX file. We'll automatically extract and process the content.
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </div>
+
+              {resumeText && (
+                <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
+                  <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <AlertDescription className="text-blue-800 dark:text-blue-200">
+                    Resume text extracted ({resumeText.length} characters). Ready to save!
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full h-10"
+                disabled={!resumeText.trim() || uploadMutation.isPending}
+                data-testid="button-save-resume"
+              >
+                {uploadMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Save Resume
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Success Message */}
+        {uploadMutation.isSuccess && !embedded && (
+          <Alert className="border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950">
+            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <AlertDescription className="text-green-800 dark:text-green-200">
+              Resume saved successfully!{" "}
+              <Link href="/resume">
+                <a className="font-medium underline inline-flex items-center gap-1 hover:text-green-900 dark:hover:text-green-100">
+                  Go to Resume Analysis <ArrowRight className="w-3 h-3" />
+                </a>
+              </Link>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Resume List */}
+        <Card className="border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Your Resumes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {resumes.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>No resumes uploaded yet</p>
+                <p className="text-sm mt-1">Upload your first resume above</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {resumes.map((resume) => (
+                  <div
+                    key={resume.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    data-testid={`resume-item-${resume.id}`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium truncate">{resume.fileName}</p>
+                        {activeResume?.id === resume.id && (
+                          <Badge variant="default" className="text-xs">
+                            Active
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {resume.createdAt ? format(new Date(resume.createdAt), "MMM d, yyyy 'at' h:mm a") : "Unknown date"}
+                      </p>
+                      {resume.targetRole && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Target: {resume.targetRole}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {resume.rmsScore && (
+                        <Badge variant="outline" className="text-xs">
+                          Score: {resume.rmsScore}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
     </div>
   );
 
@@ -251,4 +282,3 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
     </Layout>
   );
 }
-
