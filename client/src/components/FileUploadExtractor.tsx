@@ -72,11 +72,6 @@ export function FileUploadExtractor({ onTextExtracted, onClear, disabled, autoEx
       return;
     }
 
-    // Clear parent state immediately when new file is selected
-    if (autoExtractAndSave && onClear) {
-      onClear();
-    }
-
     setSelectedFile(file);
     setError(null);
     setExtractionComplete(false);
@@ -107,8 +102,6 @@ export function FileUploadExtractor({ onTextExtracted, onClear, disabled, autoEx
         throw new Error('No text could be extracted from the file');
       }
 
-      console.log('Extracted text length:', extractedText.length);
-      console.log('Calling onTextExtracted with fileName:', file.name);
       onTextExtracted(extractedText, file.name);
       setExtractionComplete(true);
       
@@ -119,11 +112,9 @@ export function FileUploadExtractor({ onTextExtracted, onClear, disabled, autoEx
         }
       }
     } catch (err: any) {
-      console.error('Text extraction error:', err);
       setError(err.message || 'Failed to extract text from file');
       setExtractionComplete(false);
-      // Clear parent state on extraction failure to prevent saving stale data
-      if (autoExtractAndSave && onClear) {
+      if (onClear) {
         onClear();
       }
     } finally {

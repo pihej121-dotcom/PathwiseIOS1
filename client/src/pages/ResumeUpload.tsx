@@ -67,11 +67,8 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
   });
 
   const handleFileTextExtracted = (text: string, extractedFileName: string) => {
-    console.log('handleFileTextExtracted called with text length:', text.length);
-    console.log('Setting resumeText and fileName');
     setResumeText(text);
     setFileName(extractedFileName);
-    console.log('State updated, showing toast');
     toast({
       title: "Resume processed successfully",
       description: `${extractedFileName} is ready to save. Click "Save Resume" to continue.`,
@@ -149,10 +146,6 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
                 className="w-full h-10"
                 disabled={!resumeText.trim() || uploadMutation.isPending}
                 data-testid="button-save-resume"
-                onClick={() => {
-                  console.log('Save button clicked, resumeText length:', resumeText.length);
-                  console.log('uploadMutation.isPending:', uploadMutation.isPending);
-                }}
               >
                 {uploadMutation.isPending ? (
                   <>
