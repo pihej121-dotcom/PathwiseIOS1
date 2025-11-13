@@ -1099,9 +1099,19 @@ if (existingUser && !existingUser.isActive) {
 
   app.post("/api/resumes", authenticate, async (req: AuthRequest, res) => {
     try {
+      console.log('=== POST /api/resumes CALLED ===');
+      console.log('User ID:', req.user?.id);
+      console.log('Request body:', { 
+        fileName: req.body.fileName, 
+        filePath: req.body.filePath, 
+        extractedTextLength: req.body.extractedText?.length,
+        hasTargetRole: !!req.body.targetRole
+      });
+      
       const { fileName, filePath, extractedText, targetRole, targetIndustry, targetCompanies } = req.body;
       
       if (!extractedText) {
+        console.log('ERROR: extractedText is missing or empty');
         return res.status(400).json({ error: "extractedText is required" });
       }
 
@@ -1198,6 +1208,8 @@ if (existingUser && !existingUser.isActive) {
         }
       }
 
+      console.log('=== Resume created successfully ===');
+      console.log('Resume ID:', resume.id);
       res.status(201).json(resume);
     } catch (error) {
       console.error("Resume creation error:", error);
