@@ -107,6 +107,8 @@ export function FileUploadExtractor({ onTextExtracted, onClear, disabled, autoEx
         throw new Error('No text could be extracted from the file');
       }
 
+      console.log('Extracted text length:', extractedText.length);
+      console.log('Calling onTextExtracted with fileName:', file.name);
       onTextExtracted(extractedText, file.name);
       setExtractionComplete(true);
       
