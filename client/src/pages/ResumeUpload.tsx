@@ -97,10 +97,6 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
     setResumeText(text);
     setFileName(extractedFileName);
     console.log('State updated - resumeText length:', text.length);
-    toast({
-      title: "Resume processed successfully",
-      description: `${extractedFileName} is ready to save. Click "Save Resume" to continue.`,
-    });
   };
 
   const handleClearFile = () => {
@@ -159,28 +155,49 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Select Your Resume File</Label>
+                  <Label>Upload Resume File (Optional)</Label>
                   <FileUploadExtractor
                     onTextExtracted={handleFileTextExtracted}
                     onClear={handleClearFile}
                     disabled={uploadMutation.isPending}
-                    autoExtractAndSave={true}
+                    autoExtractAndSave={false}
                     resetKey={extractorResetKey}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Upload a PDF or DOCX file. We'll automatically extract and process the content.
+                    Upload a PDF or DOCX file to auto-fill the text below, or manually paste your resume.
                   </p>
                 </div>
-              </div>
 
-              {resumeText && (
-                <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
-                  <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  <AlertDescription className="text-blue-800 dark:text-blue-200">
-                    Resume text extracted ({resumeText.length} characters). Ready to save!
-                  </AlertDescription>
-                </Alert>
-              )}
+                <div className="space-y-2">
+                  <Label htmlFor="resume-text">Resume Content</Label>
+                  <Textarea
+                    id="resume-text"
+                    placeholder="Paste your resume text here or upload a file above..."
+                    value={resumeText}
+                    onChange={(e) => setResumeText(e.target.value)}
+                    disabled={uploadMutation.isPending}
+                    rows={15}
+                    className="font-mono text-sm"
+                    data-testid="textarea-resume-content"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {resumeText.length > 0 ? `${resumeText.length} characters` : 'No content yet'}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="file-name">File Name (Optional)</Label>
+                  <Input
+                    id="file-name"
+                    type="text"
+                    placeholder="e.g., John_Doe_Resume.pdf"
+                    value={fileName}
+                    onChange={(e) => setFileName(e.target.value)}
+                    disabled={uploadMutation.isPending}
+                    data-testid="input-file-name"
+                  />
+                </div>
+              </div>
 
               <Button
                 type="submit"
