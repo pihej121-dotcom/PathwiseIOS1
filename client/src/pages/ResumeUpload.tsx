@@ -8,17 +8,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, APIError } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { FileUploadExtractor } from "@/components/FileUploadExtractor";
-import { FileText, Upload, CheckCircle, ArrowRight, Trash2 } from "lucide-react";
+import { FileText, Upload, CheckCircle, ArrowRight, Trash2, LogIn } from "lucide-react";
 import { format } from "date-fns";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import type { Resume } from "@shared/schema";
 
 export default function ResumeUpload({ embedded = false }: { embedded?: boolean }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [resumeText, setResumeText] = useState("");
   const [fileName, setFileName] = useState("");
   const [extractorResetKey, setExtractorResetKey] = useState(0);
@@ -58,17 +59,44 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
       setExtractorResetKey(prev => prev + 1);
     },
     onError: (error: any) => {
-      toast({
-        title: "Upload failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      console.log('Upload error:', error);
+      
+      // Handle session expiry specially - check if it's an APIError with 401 status
+      if (error instanceof APIError && error.status === 401) {
+        toast({
+          title: "Session Expired",
+          description: "Your session has expired. Redirecting to sign in...",
+          variant: "destructive",
+        });
+        
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          const returnTo = encodeURIComponent(window.location.pathname);
+          setLocation(`/login?returnTo=${returnTo}`);
+        }, 2000);
+      } else if (error instanceof Error) {
+        // Handle other errors with the error message
+        toast({
+          title: "Upload failed",
+          description: error.message || "An error occurred while saving your resume.",
+          variant: "destructive",
+        });
+      } else {
+        // Handle unexpected error types (network failures, etc.)
+        toast({
+          title: "Upload failed",
+          description: "A network error occurred. Please check your connection and try again.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
   const handleFileTextExtracted = (text: string, extractedFileName: string) => {
+    console.log('Text extracted:', { length: text.length, fileName: extractedFileName });
     setResumeText(text);
     setFileName(extractedFileName);
+    console.log('State updated - resumeText length:', text.length);
     toast({
       title: "Resume processed successfully",
       description: `${extractedFileName} is ready to save. Click "Save Resume" to continue.`,
@@ -83,7 +111,10 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('Submit clicked - resumeText length:', resumeText.length);
+    
     if (!resumeText.trim()) {
+      console.log('Resume text is empty or whitespace only');
       toast({
         title: "Resume text required",
         description: "Please paste your resume content or upload a file.",
@@ -92,6 +123,7 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
       return;
     }
 
+    console.log('Submitting resume...');
     uploadMutation.mutate({
       resumeText: resumeText.trim(),
       fileName: fileName || "resume.txt",
@@ -140,6 +172,15 @@ export default function ResumeUpload({ embedded = false }: { embedded?: boolean 
                   </p>
                 </div>
               </div>
+
+              {resumeText && (
+                <Alert className="border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950">
+                  <CheckCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <AlertDescription className="text-blue-800 dark:text-blue-200">
+                    Resume text extracted ({resumeText.length} characters). Ready to save!
+                  </AlertDescription>
+                </Alert>
+              )}
 
               <Button
                 type="submit"

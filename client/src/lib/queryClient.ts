@@ -1,9 +1,23 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+export class APIError extends Error {
+  constructor(public status: number, public statusText: string, message: string) {
+    super(message);
+    this.name = 'APIError';
+  }
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    
+    // Handle 401 specially - clear auth and suggest re-login
+    if (res.status === 401) {
+      localStorage.removeItem('auth_token');
+      throw new APIError(401, res.statusText, 'Your session has expired. Please sign in again.');
+    }
+    
+    throw new APIError(res.status, res.statusText, `${res.status}: ${text}`);
   }
 }
 
