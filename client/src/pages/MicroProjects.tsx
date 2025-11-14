@@ -86,13 +86,11 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
   // Role-based project generation mutation
   const generateProjects = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/micro-projects/generate-from-role', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetRole, count: projectCount, difficulty }),
-        credentials: 'include',
+      const response = await apiRequest('POST', '/api/micro-projects/generate-from-role', {
+        targetRole,
+        count: projectCount,
+        difficulty
       });
-      if (!response.ok) throw new Error('Failed to generate projects');
       return await response.json();
     },
     onSuccess: (data: any) => {
