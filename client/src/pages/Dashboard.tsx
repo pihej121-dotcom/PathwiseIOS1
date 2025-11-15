@@ -1072,27 +1072,158 @@ export default function Dashboard() {
     const isPublicFeature = selectedCard === 'about' || selectedCard === 'contact';
     
     if (!user && !isPublicFeature) {
+      // Feature information mapping
+      const featureInfo: Record<string, {
+        title: string;
+        tagline: string;
+        icon: React.ElementType;
+        benefits: string[];
+      }> = {
+        'resume': {
+          title: 'Resume Analysis',
+          tagline: 'Get professional feedback on your resume in seconds',
+          icon: FileText,
+          benefits: [
+            'Comprehensive RMS scoring with detailed analysis',
+            'Specific, actionable suggestions for improvement',
+            'Industry best practices and ATS optimization',
+            'Compare against successful resumes in your field'
+          ]
+        },
+        'roadmap': {
+          title: 'Career Roadmap',
+          tagline: 'Get a personalized career development plan from AI',
+          icon: Route,
+          benefits: [
+            '30-day, 3-month, and 6-month actionable plans',
+            'Customized to your goals and current experience',
+            'Skills to learn, projects to build, and milestones to hit',
+            'Track your progress and stay motivated'
+          ]
+        },
+        'jobs': {
+          title: 'Job Match Assistant',
+          tagline: 'Discover the perfect job opportunities matched to your profile',
+          icon: Briefcase,
+          benefits: [
+            'AI-powered compatibility scoring for every position',
+            'Smart matching based on skills, experience, and goals',
+            'Tailored application materials for each opportunity',
+            'Real-time alerts for new matching positions'
+          ]
+        },
+        'projects': {
+          title: 'Micro-Projects',
+          tagline: 'Build portfolio projects that showcase your skills to employers',
+          icon: Lightbulb,
+          benefits: [
+            'Personalized project ideas based on your skill gaps',
+            'Detailed implementation guides and timelines',
+            'Industry-relevant projects that employers value',
+            'Stand out from other candidates with unique work'
+          ]
+        },
+        'copilot': {
+          title: 'Compensation Insights',
+          tagline: 'Master the art of negotiation and maximize your earning potential',
+          icon: Brain,
+          benefits: [
+            'AI-generated negotiation scripts tailored to your situation',
+            'Market salary data and compensation benchmarks',
+            'Step-by-step guidance for every negotiation stage',
+            'Proven tactics from industry experts'
+          ]
+        },
+        'interview': {
+          title: 'Interview Prep',
+          tagline: 'Practice interviews and master your answers with AI feedback',
+          icon: MessageSquare,
+          benefits: [
+            'Personalized questions based on the role and company',
+            'Real-time feedback on your answers',
+            'Common and behavioral question practice',
+            'Build confidence before the real interview'
+          ]
+        },
+        'applications': {
+          title: 'Application Tracker',
+          tagline: 'Organize and monitor your job applications with ease',
+          icon: ListTodo,
+          benefits: [
+            'Track all applications in one centralized dashboard',
+            'Set reminders for follow-ups and deadlines',
+            'Monitor application status and progress',
+            'Analyze your success rate and improve your strategy'
+          ]
+        },
+        'upload': {
+          title: 'Resume Upload',
+          tagline: 'Securely upload and manage your resume files',
+          icon: Upload,
+          benefits: [
+            'Store multiple resume versions',
+            'Easy access to your documents anytime',
+            'Secure cloud storage',
+            'Seamless integration with analysis tools'
+          ]
+        }
+      };
+
+      const info = featureInfo[selectedCard || ''];
+      if (!info) return null;
+
+      const FeatureIcon = info.icon;
+
       return (
-        <Card className="p-8 text-center">
-          <CardContent className="space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-primary" />
+        <Card className="max-w-3xl mx-auto">
+          <CardContent className="pt-8 pb-8 space-y-8">
+            <div className="text-center space-y-3">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-2">
+                <FeatureIcon className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-3xl font-bold">{info.title}</h3>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                {info.tagline}
+              </p>
             </div>
-            <h3 className="text-2xl font-bold">Login Required</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Please create an account or log in to access this feature and unlock all the powerful tools Pathwise has to offer.
-            </p>
-            <div className="flex gap-4 justify-center pt-4">
-              <Link href="/register">
-                <Button size="lg" data-testid="button-register-prompt">
-                  Create Account
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button size="lg" variant="outline" data-testid="button-login-prompt">
-                  Log In
-                </Button>
-              </Link>
+
+            <div className="space-y-3 max-w-2xl mx-auto">
+              {info.benefits.map((benefit, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-start gap-3"
+                >
+                  <div className="flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed">{benefit}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4 pt-4">
+              <div className="w-full h-px bg-border" />
+              
+              <div className="text-center space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Sign in to unlock this feature and start advancing your career
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Link href="/register">
+                    <Button size="lg" data-testid="button-register-prompt">
+                      Create Account
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button size="lg" variant="outline" data-testid="button-login-prompt">
+                      Log In
+                    </Button>
+                  </Link>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Join thousands of students advancing their careers with Pathwise
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
