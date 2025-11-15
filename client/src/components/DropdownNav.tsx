@@ -25,6 +25,7 @@ import {
   MessageSquare,
   Settings,
   LogOut,
+  LogIn,
   Shield,
   UserPlus,
   Crown,
@@ -84,7 +85,9 @@ export function DropdownNav() {
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
 
-  const displayName = isAdmin && institution?.name ? institution.name : `${user?.firstName} ${user?.lastName}`;
+  const displayName = user 
+    ? (isAdmin && institution?.name ? institution.name : `${user?.firstName} ${user?.lastName}`)
+    : "Guest";
 
   const navigationItems = isStudent 
     ? studentNavigation.filter((item) => {
@@ -159,7 +162,7 @@ export function DropdownNav() {
                 <div className="flex items-center space-x-3">
                   <Avatar className="w-10 h-10">
                     <AvatarFallback className="bg-gradient-to-br from-accent to-primary text-white font-semibold text-sm">
-                      {getInitials(user?.firstName, user?.lastName, institution?.name)}
+                      {user ? getInitials(user?.firstName, user?.lastName, institution?.name) : "G"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
@@ -167,9 +170,9 @@ export function DropdownNav() {
                       {displayName}
                     </p>
                     <p className="text-xs text-muted-foreground truncate" data-testid="user-major">
-                      {isAdmin 
+                      {user ? (isAdmin 
                         ? userRole === "super_admin" ? "Super Admin" : "Admin"
-                        : user?.major || "Student"}
+                        : user?.major || "Student") : "Not signed in"}
                     </p>
                   </div>
                 </div>
@@ -177,26 +180,56 @@ export function DropdownNav() {
               
               <DropdownMenuSeparator />
 
-              {/* Settings */}
-              <DropdownMenuItem
-                onClick={() => {
-                  setSettingsOpen(true);
-                  setMenuOpen(false);
-                }}
-                data-testid="button-settings"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </DropdownMenuItem>
+              {user ? (
+                <>
+                  {/* Settings - Only for authenticated users */}
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSettingsOpen(true);
+                      setMenuOpen(false);
+                    }}
+                    data-testid="button-settings"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Settings
+                  </DropdownMenuItem>
 
-              {/* Logout */}
-              <DropdownMenuItem
-                onClick={logout}
-                data-testid="button-logout"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </DropdownMenuItem>
+                  {/* Logout - Only for authenticated users */}
+                  <DropdownMenuItem
+                    onClick={logout}
+                    data-testid="button-logout"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  {/* Register - Only for guests */}
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setLocation("/register");
+                      setMenuOpen(false);
+                    }}
+                    data-testid="button-register"
+                  >
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Register
+                  </DropdownMenuItem>
+
+                  {/* Login - Only for guests */}
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setLocation("/login");
+                      setMenuOpen(false);
+                    }}
+                    data-testid="button-login"
+                  >
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Login
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           </div>
