@@ -1262,28 +1262,6 @@ export default function Dashboard() {
       
       {selectedCard && (
         <div className="mt-8 pt-8 border-t">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">
-              {selectedCard === 'upload' && 'Resume Upload'}
-              {selectedCard === 'resume' && 'Resume Analysis'}
-              {selectedCard === 'roadmap' && 'Career Roadmap'}
-              {selectedCard === 'jobs' && 'Job Match Assistant'}
-              {selectedCard === 'projects' && 'Projects'}
-              {selectedCard === 'copilot' && 'AI Copilot'}
-              {selectedCard === 'applications' && 'Applications'}
-              {selectedCard === 'interview' && 'Interview Prep'}
-              {selectedCard === 'about' && 'About Us'}
-              {selectedCard === 'contact' && 'Contact Us'}
-            </h2>
-            <Button 
-              variant="ghost" 
-              onClick={() => setSelectedCard(null)} 
-              data-testid="button-close-feature"
-              className="gap-2"
-            >
-              Close
-            </Button>
-          </div>
           {renderSelectedFeature()}
         </div>
       )}
