@@ -918,19 +918,22 @@ export default function Dashboard() {
   return (
     <Layout title={user ? `Welcome back, ${user.firstName}!` : "Welcome to Pathwise!"} subtitle="Your career command center">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-11 mb-6">
-          <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
-          <TabsTrigger value="upload" data-testid="tab-upload">Upload</TabsTrigger>
-          <TabsTrigger value="resume" data-testid="tab-resume">Resume</TabsTrigger>
-          <TabsTrigger value="roadmap" data-testid="tab-roadmap">Roadmap</TabsTrigger>
-          <TabsTrigger value="jobs" data-testid="tab-jobs">Jobs</TabsTrigger>
-          <TabsTrigger value="projects" data-testid="tab-projects">Projects</TabsTrigger>
-          <TabsTrigger value="copilot" data-testid="tab-copilot">Copilot</TabsTrigger>
-          <TabsTrigger value="applications" data-testid="tab-applications">Apps</TabsTrigger>
-          <TabsTrigger value="interview" data-testid="tab-interview">Interview</TabsTrigger>
-          <TabsTrigger value="about" data-testid="tab-about">About</TabsTrigger>
-          <TabsTrigger value="contact" data-testid="tab-contact">Contact</TabsTrigger>
-        </TabsList>
+        {/* Hide tabs when viewing About or Contact sections */}
+        {activeTab !== 'about' && activeTab !== 'contact' && (
+          <TabsList className="grid w-full grid-cols-11 mb-6">
+            <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
+            <TabsTrigger value="upload" data-testid="tab-upload">Upload</TabsTrigger>
+            <TabsTrigger value="resume" data-testid="tab-resume">Resume</TabsTrigger>
+            <TabsTrigger value="roadmap" data-testid="tab-roadmap">Roadmap</TabsTrigger>
+            <TabsTrigger value="jobs" data-testid="tab-jobs">Jobs</TabsTrigger>
+            <TabsTrigger value="projects" data-testid="tab-projects">Projects</TabsTrigger>
+            <TabsTrigger value="copilot" data-testid="tab-copilot">Copilot</TabsTrigger>
+            <TabsTrigger value="applications" data-testid="tab-applications">Apps</TabsTrigger>
+            <TabsTrigger value="interview" data-testid="tab-interview">Interview</TabsTrigger>
+            <TabsTrigger value="about" data-testid="tab-about">About</TabsTrigger>
+            <TabsTrigger value="contact" data-testid="tab-contact">Contact</TabsTrigger>
+          </TabsList>
+        )}
 
         <TabsContent value="overview">{<OverviewContent />}</TabsContent>
         <TabsContent value="upload">{selectedCard === 'upload' ? <ResumeUpload /> : <OverviewContent />}</TabsContent>
@@ -941,8 +944,284 @@ export default function Dashboard() {
         <TabsContent value="copilot">{selectedCard === 'copilot' ? <AICopilot /> : <OverviewContent />}</TabsContent>
         <TabsContent value="applications">{selectedCard === 'applications' ? <Applications /> : <OverviewContent />}</TabsContent>
         <TabsContent value="interview">{selectedCard === 'interview' ? <InterviewPrep /> : <OverviewContent />}</TabsContent>
-        <TabsContent value="about">{selectedCard === 'about' ? <AboutUsContent /> : <OverviewContent />}</TabsContent>
-        <TabsContent value="contact">{selectedCard === 'contact' ? <ContactUsContent /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="about">
+          {selectedCard === 'about' ? (
+            <div className="space-y-8">
+              <AboutUsContent />
+              <div className="border-t pt-8">
+                <h2 className="text-2xl font-bold mb-6">Explore Our Features</h2>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('upload')} 
+                    data-testid="card-upload-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Upload className="w-6 h-6 text-cyan-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Resume Upload</h3>
+                      <p className="text-xs text-muted-foreground">Upload & manage</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('resume')} 
+                    data-testid="card-resume-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <FileText className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Resume Analysis</h3>
+                      <p className="text-xs text-muted-foreground">Analyze & optimize</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('roadmap')} 
+                    data-testid="card-roadmap-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Route className="w-6 h-6 text-green-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Roadmap</h3>
+                      <p className="text-xs text-muted-foreground">Career planning</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('jobs')} 
+                    data-testid="card-jobs-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Briefcase className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Job Match Assistant</h3>
+                      <p className="text-xs text-muted-foreground">Analyze. Tailor. Apply.</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('projects')} 
+                    data-testid="card-projects-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Lightbulb className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Projects</h3>
+                      <p className="text-xs text-muted-foreground">Build portfolio</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('copilot')} 
+                    data-testid="card-copilot-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Brain className="w-6 h-6 text-indigo-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Compensation Insights</h3>
+                      <p className="text-xs text-muted-foreground">Salary negotiation coach</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('applications')} 
+                    data-testid="card-applications-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <ListTodo className="w-6 h-6 text-pink-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Applications</h3>
+                      <p className="text-xs text-muted-foreground">Track progress</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('interview')} 
+                    data-testid="card-interview-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <MessageSquare className="w-6 h-6 text-amber-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Interview Prep</h3>
+                      <p className="text-xs text-muted-foreground">Practice & prepare</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('contact')} 
+                    data-testid="card-contact-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Send className="w-6 h-6 text-rose-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Contact Us</h3>
+                      <p className="text-xs text-muted-foreground">Get in touch</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <OverviewContent />
+          )}
+        </TabsContent>
+        <TabsContent value="contact">
+          {selectedCard === 'contact' ? (
+            <div className="space-y-8">
+              <ContactUsContent />
+              <div className="border-t pt-8">
+                <h2 className="text-2xl font-bold mb-6">Explore Our Features</h2>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('upload')} 
+                    data-testid="card-upload-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Upload className="w-6 h-6 text-cyan-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Resume Upload</h3>
+                      <p className="text-xs text-muted-foreground">Upload & manage</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('resume')} 
+                    data-testid="card-resume-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <FileText className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Resume Analysis</h3>
+                      <p className="text-xs text-muted-foreground">Analyze & optimize</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('roadmap')} 
+                    data-testid="card-roadmap-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Route className="w-6 h-6 text-green-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Roadmap</h3>
+                      <p className="text-xs text-muted-foreground">Career planning</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('jobs')} 
+                    data-testid="card-jobs-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Briefcase className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Job Match Assistant</h3>
+                      <p className="text-xs text-muted-foreground">Analyze. Tailor. Apply.</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('projects')} 
+                    data-testid="card-projects-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Lightbulb className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Projects</h3>
+                      <p className="text-xs text-muted-foreground">Build portfolio</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('copilot')} 
+                    data-testid="card-copilot-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Brain className="w-6 h-6 text-indigo-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Compensation Insights</h3>
+                      <p className="text-xs text-muted-foreground">Salary negotiation coach</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('applications')} 
+                    data-testid="card-applications-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <ListTodo className="w-6 h-6 text-pink-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Applications</h3>
+                      <p className="text-xs text-muted-foreground">Track progress</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('interview')} 
+                    data-testid="card-interview-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <MessageSquare className="w-6 h-6 text-amber-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">Interview Prep</h3>
+                      <p className="text-xs text-muted-foreground">Practice & prepare</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card 
+                    className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]`} 
+                    onClick={() => handleCardSelect('about')} 
+                    data-testid="card-about-embedded"
+                  >
+                    <CardContent className="pt-6 text-center">
+                      <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Sparkles className="w-6 h-6 text-teal-600" />
+                      </div>
+                      <h3 className="font-semibold mb-1">About Us</h3>
+                      <p className="text-xs text-muted-foreground">Learn more</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <OverviewContent />
+          )}
+        </TabsContent>
       </Tabs>
     </Layout>
   );
