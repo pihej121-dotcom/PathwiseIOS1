@@ -511,7 +511,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<string | null>('about');
   const [failedVerification, setFailedVerification] = useState<{sessionId: string, feature: string, error: string} | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -917,6 +917,37 @@ export default function Dashboard() {
 
   // Render the selected feature component below the overview cards
   const renderSelectedFeature = () => {
+    // Allow "about" and "contact" for everyone, require login for other features
+    const isPublicFeature = selectedCard === 'about' || selectedCard === 'contact';
+    
+    if (!user && !isPublicFeature) {
+      return (
+        <Card className="p-8 text-center">
+          <CardContent className="space-y-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-2xl font-bold">Login Required</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Please create an account or log in to access this feature and unlock all the powerful tools Pathwise has to offer.
+            </p>
+            <div className="flex gap-4 justify-center pt-4">
+              <Link href="/register">
+                <Button size="lg" data-testid="button-register-prompt">
+                  Create Account
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button size="lg" variant="outline" data-testid="button-login-prompt">
+                  Log In
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
     switch (selectedCard) {
       case 'upload':
         return <ResumeUpload />;
