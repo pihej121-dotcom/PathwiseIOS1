@@ -1,15 +1,36 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Link } from "wouter";
 import { Layout } from "@/components/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Logo } from "@/components/Logo";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ProgressRing } from "@/components/ProgressRing";
 import { TourButton } from "@/components/TourButton";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { FEATURE_CATALOG } from "@shared/schema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Send, 
   Route, 
@@ -24,10 +45,18 @@ import {
   ListTodo,
   MessageSquare,
   Upload,
-  Loader2
+  Loader2,
+  TrendingUp,
+  GraduationCap,
+  Sparkles,
+  Star,
+  Quote,
+  CheckCircle2,
+  User
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
+import demoVideo from "@assets/Pathwise Your Career Powered by AI_1080p_1760659870596.mp4";
 
 // Import feature components
 import ResumeUpload from "./ResumeUpload";
@@ -39,6 +68,422 @@ import { AICopilot } from "./AICopilot";
 import Applications from "./Applications";
 import { InterviewPrep } from "./InterviewPrep";
 
+const contactFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  subject: z.string().min(5, "Subject must be at least 5 characters"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type ContactFormData = z.infer<typeof contactFormSchema>;
+
+// Public Experience Component for non-authenticated users
+function PublicExperience() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const onContactSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      await apiRequest("POST", "/api/contact", data);
+      toast({
+        title: "Message sent successfully!",
+        description: "We'll get back to you as soon as possible.",
+      });
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Failed to send message",
+        description:
+          "Please try again later or email us directly at patrick@pathwiseinstitutions.org",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10">
+      {/* Public Navigation */}
+      <nav className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Logo size="sm" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" data-testid="button-auth-menu">
+                <User className="mr-2 h-4 w-4" />
+                Get Started
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/register" data-testid="link-register">
+                  <span className="cursor-pointer">Register</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/login" data-testid="link-login">
+                  <span className="cursor-pointer">Sign In</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </nav>
+
+      <div className="container mx-auto px-4 py-12">
+        {/* About Us Section */}
+        <section id="about" className="mb-16">
+          <Card className="mb-8">
+            <CardContent className="pt-8">
+              {/* Hero */}
+              <div className="text-center space-y-6 mb-12">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                  <Sparkles className="w-4 h-4" />
+                  AI-Powered Career Development
+                </div>
+                
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+                  Navigate Your Career Path
+                  <br />
+                  With Confidence
+                </h1>
+                
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Transform your career journey with AI-powered insights, personalized roadmaps, 
+                  and intelligent job matching designed specifically for students and new graduates.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                  <Link href="/register">
+                    <Button size="lg" data-testid="hero-button-getstarted">
+                      Get Started
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button size="lg" variant="outline" data-testid="hero-button-login">
+                      Sign In
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Demo Video */}
+                <div className="pt-12 max-w-4xl mx-auto">
+                  <div className="relative rounded-xl overflow-hidden shadow-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-1">
+                    <video 
+                      className="w-full h-auto rounded-lg"
+                      controls
+                      playsInline
+                      preload="metadata"
+                      data-testid="demo-video"
+                    >
+                      <source src={demoVideo} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="max-w-5xl mx-auto mb-12">
+                <h2 className="text-3xl font-bold text-center mb-8">
+                  Everything You Need to Launch Your Career
+                </h2>
+                
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="p-6 rounded-lg bg-muted/30">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <FileText className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">AI Resume Analysis</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Get instant feedback on your resume with AI-powered scoring and actionable suggestions.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-muted/30">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <TrendingUp className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Personalized Roadmaps</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Create custom career development plans tailored to your goals and timeline.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-muted/30">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <Briefcase className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Smart Job Matching</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Discover opportunities that align with your skills using AI-powered matching.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-muted/30">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <Lightbulb className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Micro-Projects</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Build your portfolio with AI-generated project ideas for your target role.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-muted/30">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <Target className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Application Tracking</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Organize and monitor your job applications with built-in progress tracking.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-lg bg-muted/30">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <GraduationCap className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Student-Focused</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Designed for institutions to support students throughout their career journey.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonials */}
+              <div className="max-w-5xl mx-auto">
+                <h2 className="text-3xl font-bold text-center mb-8">
+                  What Students Are Saying
+                </h2>
+                
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="p-6 rounded-lg border bg-card">
+                    <Quote className="w-6 h-6 text-primary/20 mb-3" />
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      "The AI resume analysis was a game-changer! I improved my score from 65 to 89 and landed three interviews in two weeks."
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                        SM
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold">Sarah Martinez</p>
+                        <p className="text-xs text-muted-foreground">CS, Class of 2024</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6 rounded-lg border bg-card">
+                    <Quote className="w-6 h-6 text-primary/20 mb-3" />
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      "The micro-projects feature helped me build a portfolio from scratch. Employers were really impressed!"
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                        JC
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold">James Chen</p>
+                        <p className="text-xs text-muted-foreground">Data Science, '25</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6 rounded-lg border bg-card">
+                    <Quote className="w-6 h-6 text-primary/20 mb-3" />
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      "Finally, a tool that understands career development! The roadmap gave me clear direction."
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                        EP
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold">Emily Park</p>
+                        <p className="text-xs text-muted-foreground">Business, '24</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Contact Us Section */}
+        <section id="contact">
+          <h2 className="text-3xl font-bold text-center mb-8">Contact Us</h2>
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* Info Card */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageSquare className="h-6 w-6 text-primary" />
+                  <CardTitle>Response Time</CardTitle>
+                </div>
+                <CardDescription>
+                  We aim to respond to all inquiries as quickly as possible.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="font-medium mb-2">Typically within 24–48 hours</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Monday – Friday, 9 AM – 5 PM EST
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  For urgent issues, please include "URGENT" in your subject line.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Contact Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Send us a message</CardTitle>
+                <CardDescription>
+                  Fill out the form below and we'll get back to you soon.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onContactSubmit)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Your name"
+                              {...field}
+                              data-testid="input-name"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="your.email@example.com"
+                              {...field}
+                              data-testid="input-email"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="subject"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Subject</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="What is this regarding?"
+                              {...field}
+                              data-testid="input-subject"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="message"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Message</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Please describe your question or issue..."
+                              className="min-h-[120px]"
+                              {...field}
+                              data-testid="input-message"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isSubmitting}
+                      data-testid="button-submit"
+                    >
+                      {isSubmitting ? "Sending..." : (
+                        <>
+                          Send Message
+                          <Send className="ml-2 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="mt-16 pt-8 border-t text-center text-sm text-muted-foreground">
+          <p>© {new Date().getFullYear()} Pathwise Institution Edition. Empowering students to navigate their career paths.</p>
+          <p className="mt-2 font-medium">Pathwise LLC</p>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+// Main Dashboard Component
 export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -47,15 +492,23 @@ export default function Dashboard() {
   const [failedVerification, setFailedVerification] = useState<{sessionId: string, feature: string, error: string} | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   
+  // Guard queries with user authentication
   const { data: stats = {}, isLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
+    enabled: !!user,
   });
 
   const { data: activities = [] } = useQuery({
     queryKey: ["/api/activities?limit=4"],
     refetchInterval: 60000,
     staleTime: 3000,
+    enabled: !!user,
   });
+
+  // If not authenticated, show public experience
+  if (!user) {
+    return <PublicExperience />;
+  }
 
   const verifyFeaturePurchase = async (sessionId: string, feature: string) => {
     const processedKey = `purchase_verified_${sessionId}`;
@@ -110,7 +563,6 @@ export default function Dashboard() {
       const sessionId = params.get("session_id");
 
       if (purchase === "success") {
-        // Only handle feature purchases here - subscriptions go through /checkout/success
         if (feature && sessionId) {
           const success = await verifyFeaturePurchase(sessionId, feature);
           if (!success) {
@@ -373,137 +825,66 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Activity Feed & Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-blue-500" />
-              <span>Recent Activity</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {(activities as any[]).slice(0, 5).map((activity: any) => (
-                <div key={activity.id} className="flex items-start space-x-3 p-2 bg-muted/50 rounded-lg">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-blue-600" />
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5" />
+            Recent Activity
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {Array.isArray(activities) && activities.length > 0 ? (
+            <div className="space-y-4">
+              {activities.map((activity: any) => (
+                <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-0">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 text-primary" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{activity.title}</p>
-                    <p className="text-xs text-muted-foreground">{activity.description}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(activity.createdAt), 'MMM d, h:mm a')}
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {format(new Date(activity.createdAt), "MMM d, yyyy 'at' h:mm a")}
                     </p>
                   </div>
                 </div>
               ))}
-              {(activities as any[]).length === 0 && (
-                <div className="text-center text-muted-foreground py-8">
-                  <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No recent activity</p>
-                </div>
-              )}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Wand2 className="w-5 h-5 text-purple-500" />
-              <span>AI Insights</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {(stats as any)?.aiInsights?.topRecommendations ? (
-                (stats as any).aiInsights.topRecommendations.map((rec: any, index: number) => (
-                  <div key={index} className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-sm font-medium mb-1">
-                      <Target className="inline w-4 h-4 mr-1" />
-                      {rec.category}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{rec.rationale}</p>
-                    <span className={`inline-block mt-2 px-2 py-1 rounded text-xs ${
-                      rec.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300' :
-                      rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300' :
-                      'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300'
-                    }`}>
-                      {rec.priority.toUpperCase()} (+{rec.impact} pts)
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm mb-2">
-                    {(stats as any)?.rmsScore >= 70 
-                      ? `Excellent score! Keep applying to opportunities.`
-                      : (stats as any)?.rmsScore >= 50 
-                      ? `Good progress! Adding skills could boost your score.` 
-                      : `Upload your resume to get personalized recommendations.`
-                    }
-                  </p>
-                  {(stats as any)?.rmsScore === 0 && (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => setSelectedCard('resume')}
-                    >
-                      Upload Resume
-                    </Button>
-                  )}
-                </div>
-              )}
-              <Button 
-                variant="outline" 
-                className="w-full" 
-                onClick={() => setSelectedCard('copilot')}
-              >
-                <Brain className="w-4 h-4 mr-2" />
-                Ask AI Copilot
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Selected Card Content - Keep all mounted to preserve state */}
-      <div className="mt-6">
-        <div className={selectedCard === 'upload' ? 'block' : 'hidden'}>
-          <ResumeUpload embedded={true} />
-        </div>
-        <div className={selectedCard === 'resume' ? 'block' : 'hidden'}>
-          <ResumeAnalysis embedded={true} />
-        </div>
-        <div className={selectedCard === 'roadmap' ? 'block' : 'hidden'}>
-          <CareerRoadmap embedded={true} />
-        </div>
-        <div className={selectedCard === 'jobs' ? 'block' : 'hidden'}>
-          <JobAnalysis embedded={true} />
-        </div>
-        <div className={selectedCard === 'projects' ? 'block' : 'hidden'}>
-          <MicroProjects embedded={true} />
-        </div>
-        <div className={selectedCard === 'copilot' ? 'block' : 'hidden'}>
-          <AICopilot embedded={true} />
-        </div>
-        <div className={selectedCard === 'applications' ? 'block' : 'hidden'}>
-          <Applications embedded={true} />
-        </div>
-        <div className={selectedCard === 'interview' ? 'block' : 'hidden'}>
-          <InterviewPrep embedded={true} />
-        </div>
-      </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              No recent activity. Start using Pathwise to see your progress here!
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </>
   );
 
   return (
-    <Layout 
-      title={`Welcome back, ${user?.firstName}!`} 
-      subtitle="Your career command center"
-    >
-      <OverviewContent />
+    <Layout title={`Welcome back, ${user.firstName}!`} subtitle="Your career command center">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-9 mb-6">
+          <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
+          <TabsTrigger value="upload" data-testid="tab-upload">Upload</TabsTrigger>
+          <TabsTrigger value="resume" data-testid="tab-resume">Resume</TabsTrigger>
+          <TabsTrigger value="roadmap" data-testid="tab-roadmap">Roadmap</TabsTrigger>
+          <TabsTrigger value="jobs" data-testid="tab-jobs">Jobs</TabsTrigger>
+          <TabsTrigger value="projects" data-testid="tab-projects">Projects</TabsTrigger>
+          <TabsTrigger value="copilot" data-testid="tab-copilot">Copilot</TabsTrigger>
+          <TabsTrigger value="applications" data-testid="tab-applications">Apps</TabsTrigger>
+          <TabsTrigger value="interview" data-testid="tab-interview">Interview</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview">{<OverviewContent />}</TabsContent>
+        <TabsContent value="upload">{selectedCard === 'upload' ? <ResumeUpload /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="resume">{selectedCard === 'resume' ? <ResumeAnalysis /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="roadmap">{selectedCard === 'roadmap' ? <CareerRoadmap /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="jobs">{selectedCard === 'jobs' ? <JobAnalysis /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="projects">{selectedCard === 'projects' ? <MicroProjects /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="copilot">{selectedCard === 'copilot' ? <AICopilot /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="applications">{selectedCard === 'applications' ? <Applications /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="interview">{selectedCard === 'interview' ? <InterviewPrep /> : <OverviewContent />}</TabsContent>
+      </Tabs>
     </Layout>
   );
 }

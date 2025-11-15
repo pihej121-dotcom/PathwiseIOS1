@@ -9,7 +9,6 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 
 // Pages
 import Dashboard from "@/pages/Dashboard";
-import LandingPage from "@/pages/LandingPage";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ForgotPassword from "@/pages/ForgotPassword";
@@ -27,7 +26,6 @@ import { InterviewPrep } from "@/pages/InterviewPrep";
 import AdminDashboard from "@/pages/AdminDashboard";
 import SuperAdminDashboard from "@/pages/SuperAdminDashboard";
 import InstitutionAdminDashboard from "@/pages/InstitutionAdminDashboard";
-import Contact from "@/pages/Contact";
 import TermsOfService from "@/pages/TermsOfService";
 import NotFound from "@/pages/not-found";
 
@@ -74,8 +72,9 @@ function RoleBasedHome() {
     </div>;
   }
   
+  // If not authenticated, Dashboard will show public experience
   if (!user) {
-    return <LandingPage />;
+    return <Dashboard />;
   }
   
   const userRole = user.role;
@@ -121,7 +120,6 @@ function Router() {
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
-      <Route path="/contact" component={Contact} />
       <Route path="/terms" component={TermsOfService} />
       
       {/* Role-based home route */}
