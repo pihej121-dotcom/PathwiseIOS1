@@ -72,8 +72,9 @@ export function TourButton({ tourId, variant = "outline", size = "sm", className
       tourRef.current = null;
     });
 
-    // Handle tour cancellation
+    // Handle tour cancellation - also mark as completed to prevent auto-restart
     tour.on("cancel", () => {
+      completeTour(tourId);
       tourRef.current = null;
     });
 
