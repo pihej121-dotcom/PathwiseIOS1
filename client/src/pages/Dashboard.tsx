@@ -185,6 +185,94 @@ function AboutUsContent() {
         </div>
       </div>
 
+      {/* Where Our Users Are Placed */}
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-4">
+          Where Our Users Have Been Placed
+        </h2>
+        <p className="text-center text-muted-foreground mb-8">
+          Pathwise users have secured positions at leading companies across industries
+        </p>
+        
+        {/* Scrolling Company Logos */}
+        <div className="relative overflow-hidden py-8">
+          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10" />
+          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10" />
+          
+          <div className="flex animate-scroll gap-8 whitespace-nowrap">
+            {/* First set */}
+            <div className="flex gap-8 items-center">
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Google</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Microsoft</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Amazon</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Apple</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Meta</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">NVIDIA</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Deloitte</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Goldman Sachs</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Tesla</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Pfizer</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Boeing</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">JPMorgan Chase</div>
+            </div>
+            {/* Duplicate for seamless loop */}
+            <div className="flex gap-8 items-center">
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Google</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Microsoft</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Amazon</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Apple</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Meta</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">NVIDIA</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Deloitte</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Goldman Sachs</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Tesla</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Pfizer</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Boeing</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">JPMorgan Chase</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Second row scrolling opposite direction */}
+        <div className="relative overflow-hidden pb-8">
+          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10" />
+          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10" />
+          
+          <div className="flex animate-scroll-reverse gap-8 whitespace-nowrap">
+            {/* First set */}
+            <div className="flex gap-8 items-center">
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Oracle</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Salesforce</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">PwC</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">EY</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">KPMG</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Lockheed Martin</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Raytheon</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Moderna</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Intel</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">AMD</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Bank of America</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Morgan Stanley</div>
+            </div>
+            {/* Duplicate for seamless loop */}
+            <div className="flex gap-8 items-center">
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Oracle</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Salesforce</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">PwC</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">EY</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">KPMG</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Lockheed Martin</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Raytheon</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Moderna</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Intel</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">AMD</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Bank of America</div>
+              <div className="px-6 py-3 bg-muted/50 rounded-md font-semibold text-sm">Morgan Stanley</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Testimonials */}
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-8">
@@ -200,15 +288,15 @@ function AboutUsContent() {
               ))}
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              "The AI resume analysis was a game-changer! I improved my score from 65 to 89 and landed three interviews in two weeks."
+              "Honestly wasn't expecting much when my career advisor showed me this, but the resume feedback was actually spot-on. Fixed my bullet points and within like 10 days I had callbacks from Amazon and Microsoft. Still can't believe it worked that fast lol"
             </p>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
-                SM
+                DK
               </div>
               <div>
-                <p className="text-xs font-semibold">Sarah Martinez</p>
-                <p className="text-xs text-muted-foreground">CS, Class of 2024</p>
+                <p className="text-xs font-semibold">David Kim</p>
+                <p className="text-xs text-muted-foreground">Computer Engineering, '24</p>
               </div>
             </div>
           </div>
@@ -221,15 +309,15 @@ function AboutUsContent() {
               ))}
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              "The micro-projects feature helped me build a portfolio from scratch. Employers were really impressed!"
+              "The micro-projects thing is genius. I had zero portfolio work and needed something to talk about in interviews. Did 2 of the suggested projects over winter break and they came up in every single interview. Got an offer from Deloitte!"
             </p>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
-                JC
+                AL
               </div>
               <div>
-                <p className="text-xs font-semibold">James Chen</p>
-                <p className="text-xs text-muted-foreground">Data Science, '25</p>
+                <p className="text-xs font-semibold">Alex Liu</p>
+                <p className="text-xs text-muted-foreground">Information Systems, '25</p>
               </div>
             </div>
           </div>
@@ -242,15 +330,78 @@ function AboutUsContent() {
               ))}
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              "Finally, a tool that understands career development! The roadmap gave me clear direction."
+              "My school gave us access junior year. The career roadmap helped me figure out what certs to get and which internships to prioritize. Just accepted a return offer from Boeing. Thank you Pathwise!"
             </p>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
-                EP
+                MR
               </div>
               <div>
-                <p className="text-xs font-semibold">Emily Park</p>
-                <p className="text-xs text-muted-foreground">Business, '24</p>
+                <p className="text-xs font-semibold">Maya Rodriguez</p>
+                <p className="text-xs text-muted-foreground">Mechanical Engineering, '24</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border bg-card">
+            <Quote className="w-6 h-6 text-primary/20 mb-3" />
+            <div className="flex gap-1 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              "I was applying to everything and getting nowhere. The job match feature helped me focus on roles that actually fit my background. Way less stressful and I ended up at Google doing exactly what I wanted."
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                JT
+              </div>
+              <div>
+                <p className="text-xs font-semibold">Jordan Taylor</p>
+                <p className="text-xs text-muted-foreground">Data Analytics, '23</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border bg-card">
+            <Quote className="w-6 h-6 text-primary/20 mb-3" />
+            <div className="flex gap-1 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              "Tracking all my applications in one place was a lifesaver during recruiting season. No more forgetting to follow up or losing track of deadlines. Plus the interview prep scenarios were actually pretty similar to what I got asked at Goldman."
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                SC
+              </div>
+              <div>
+                <p className="text-xs font-semibold">Sophia Chen</p>
+                <p className="text-xs text-muted-foreground">Finance, '25</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border bg-card">
+            <Quote className="w-6 h-6 text-primary/20 mb-3" />
+            <div className="flex gap-1 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              "Career services told us about this and I'm glad they did. The AI suggestions for improving my resume were way more specific than the generic advice I'd been getting. Went from a 62 to 91 score and landed at Tesla."
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                RP
+              </div>
+              <div>
+                <p className="text-xs font-semibold">Ryan Patel</p>
+                <p className="text-xs text-muted-foreground">Electrical Engineering, '24</p>
               </div>
             </div>
           </div>
