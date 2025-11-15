@@ -56,7 +56,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
-import demoVideo from "@assets/Pathwise_Full_Covered_1763186409070.mp4";
+import demoVideo from "@assets/Pathwise_16_9_AspectRatio_2025_1763228723323.mp4";
 
 // Import feature components
 import ResumeUpload from "./ResumeUpload";
