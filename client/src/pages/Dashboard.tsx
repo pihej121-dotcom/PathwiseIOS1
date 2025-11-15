@@ -56,7 +56,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
-import demoVideo from "@assets/Pathwise Your Career Powered by AI_1080p_1760659870596.mp4";
+import demoVideo from "@assets/Pathwise_Full_Covered_1763186409070.mp4";
 
 // Import feature components
 import ResumeUpload from "./ResumeUpload";
