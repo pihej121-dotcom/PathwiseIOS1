@@ -534,11 +534,6 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
-  // If not authenticated, show public experience
-  if (!user) {
-    return <PublicExperience />;
-  }
-
   const verifyFeaturePurchase = async (sessionId: string, feature: string) => {
     const processedKey = `purchase_verified_${sessionId}`;
     const alreadyProcessed = sessionStorage.getItem(processedKey);
@@ -584,6 +579,9 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    // Only handle purchase verification for authenticated users
+    if (!user) return;
+    
     const handlePurchaseReturn = async () => {
       const params = new URLSearchParams(window.location.search);
       const purchase = params.get("purchase");
@@ -609,7 +607,7 @@ export default function Dashboard() {
     };
 
     handlePurchaseReturn();
-  }, [toast]);
+  }, [toast, user]);
 
   const handleRetryVerification = async () => {
     if (!failedVerification) return;
@@ -918,7 +916,7 @@ export default function Dashboard() {
   );
 
   return (
-    <Layout title={`Welcome back, ${user.firstName}!`} subtitle="Your career command center">
+    <Layout title={user ? `Welcome back, ${user.firstName}!` : "Welcome to Pathwise!"} subtitle="Your career command center">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-11 mb-6">
           <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
