@@ -915,9 +915,53 @@ export default function Dashboard() {
     </>
   );
 
+  // Render the selected feature component or overview
+  const renderContent = () => {
+    switch (selectedCard) {
+      case 'upload':
+        return <ResumeUpload />;
+      case 'resume':
+        return <ResumeAnalysis />;
+      case 'roadmap':
+        return <CareerRoadmap />;
+      case 'jobs':
+        return <JobAnalysis />;
+      case 'projects':
+        return <MicroProjects />;
+      case 'copilot':
+        return <AICopilot />;
+      case 'applications':
+        return <Applications />;
+      case 'interview':
+        return <InterviewPrep />;
+      case 'about':
+        return <AboutUsContent />;
+      case 'contact':
+        return <ContactUsContent />;
+      default:
+        return <OverviewContent />;
+    }
+  };
+
   return (
     <Layout title={user ? `Welcome back, ${user.firstName}!` : "Welcome to Pathwise!"} subtitle="Your career command center">
-      <OverviewContent />
+      {selectedCard && selectedCard !== 'overview' && (
+        <div className="mb-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => setSelectedCard(null)} 
+            data-testid="button-back-to-overview"
+            className="gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m12 19-7-7 7-7"/>
+              <path d="M19 12H5"/>
+            </svg>
+            Back to Overview
+          </Button>
+        </div>
+      )}
+      {renderContent()}
     </Layout>
   );
 }
