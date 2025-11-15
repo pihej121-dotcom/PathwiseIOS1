@@ -915,8 +915,8 @@ export default function Dashboard() {
     </>
   );
 
-  // Render the selected feature component or overview
-  const renderContent = () => {
+  // Render the selected feature component below the overview cards
+  const renderSelectedFeature = () => {
     switch (selectedCard) {
       case 'upload':
         return <ResumeUpload />;
@@ -939,29 +939,41 @@ export default function Dashboard() {
       case 'contact':
         return <ContactUsContent />;
       default:
-        return <OverviewContent />;
+        return null;
     }
   };
 
   return (
     <Layout title={user ? `Welcome back, ${user.firstName}!` : "Welcome to Pathwise!"} subtitle="Your career command center">
-      {selectedCard && selectedCard !== 'overview' && (
-        <div className="mb-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => setSelectedCard(null)} 
-            data-testid="button-back-to-overview"
-            className="gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m12 19-7-7 7-7"/>
-              <path d="M19 12H5"/>
-            </svg>
-            Back to Overview
-          </Button>
+      <OverviewContent />
+      
+      {selectedCard && (
+        <div className="mt-8 pt-8 border-t">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-2xl font-bold">
+              {selectedCard === 'upload' && 'Resume Upload'}
+              {selectedCard === 'resume' && 'Resume Analysis'}
+              {selectedCard === 'roadmap' && 'Career Roadmap'}
+              {selectedCard === 'jobs' && 'Job Match Assistant'}
+              {selectedCard === 'projects' && 'Projects'}
+              {selectedCard === 'copilot' && 'AI Copilot'}
+              {selectedCard === 'applications' && 'Applications'}
+              {selectedCard === 'interview' && 'Interview Prep'}
+              {selectedCard === 'about' && 'About Us'}
+              {selectedCard === 'contact' && 'Contact Us'}
+            </h2>
+            <Button 
+              variant="ghost" 
+              onClick={() => setSelectedCard(null)} 
+              data-testid="button-close-feature"
+              className="gap-2"
+            >
+              Close
+            </Button>
+          </div>
+          {renderSelectedFeature()}
         </div>
       )}
-      {renderContent()}
     </Layout>
   );
 }
