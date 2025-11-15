@@ -77,6 +77,367 @@ const contactFormSchema = z.object({
 
 type ContactFormData = z.infer<typeof contactFormSchema>;
 
+// About Us Content Component
+function AboutUsContent() {
+  return (
+    <div className="space-y-8">
+      {/* Hero */}
+      <div className="text-center space-y-6">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+          <Sparkles className="w-4 h-4" />
+          AI-Powered Career Development
+        </div>
+        
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+          Navigate Your Career Path
+          <br />
+          With Confidence
+        </h1>
+        
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Transform your career journey with AI-powered insights, personalized roadmaps, 
+          and intelligent job matching designed specifically for students and new graduates.
+        </p>
+
+        {/* Demo Video */}
+        <div className="pt-8 max-w-4xl mx-auto">
+          <div className="relative rounded-xl overflow-hidden shadow-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-1">
+            <video 
+              className="w-full h-auto rounded-lg"
+              controls
+              playsInline
+              preload="metadata"
+              data-testid="demo-video"
+            >
+              <source src={demoVideo} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Everything You Need to Launch Your Career
+        </h2>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="p-6 rounded-lg bg-muted/30">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+              <FileText className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">AI Resume Analysis</h3>
+            <p className="text-sm text-muted-foreground">
+              Get instant feedback on your resume with AI-powered scoring and actionable suggestions.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-lg bg-muted/30">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+              <TrendingUp className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Personalized Roadmaps</h3>
+            <p className="text-sm text-muted-foreground">
+              Create custom career development plans tailored to your goals and timeline.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-lg bg-muted/30">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+              <Briefcase className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Smart Job Matching</h3>
+            <p className="text-sm text-muted-foreground">
+              Discover opportunities that align with your skills using AI-powered matching.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-lg bg-muted/30">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+              <Lightbulb className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Micro-Projects</h3>
+            <p className="text-sm text-muted-foreground">
+              Build your portfolio with AI-generated project ideas for your target role.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-lg bg-muted/30">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+              <Target className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Application Tracking</h3>
+            <p className="text-sm text-muted-foreground">
+              Organize and monitor your job applications with built-in progress tracking.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-lg bg-muted/30">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+              <GraduationCap className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Student-Focused</h3>
+            <p className="text-sm text-muted-foreground">
+              Designed for institutions to support students throughout their career journey.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials */}
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          What Students Are Saying
+        </h2>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="p-6 rounded-lg border bg-card">
+            <Quote className="w-6 h-6 text-primary/20 mb-3" />
+            <div className="flex gap-1 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              "The AI resume analysis was a game-changer! I improved my score from 65 to 89 and landed three interviews in two weeks."
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                SM
+              </div>
+              <div>
+                <p className="text-xs font-semibold">Sarah Martinez</p>
+                <p className="text-xs text-muted-foreground">CS, Class of 2024</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border bg-card">
+            <Quote className="w-6 h-6 text-primary/20 mb-3" />
+            <div className="flex gap-1 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              "The micro-projects feature helped me build a portfolio from scratch. Employers were really impressed!"
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                JC
+              </div>
+              <div>
+                <p className="text-xs font-semibold">James Chen</p>
+                <p className="text-xs text-muted-foreground">Data Science, '25</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-lg border bg-card">
+            <Quote className="w-6 h-6 text-primary/20 mb-3" />
+            <div className="flex gap-1 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              "Finally, a tool that understands career development! The roadmap gave me clear direction."
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                EP
+              </div>
+              <div>
+                <p className="text-xs font-semibold">Emily Park</p>
+                <p className="text-xs text-muted-foreground">Business, '24</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Contact Us Content Component  
+function ContactUsContent() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const form = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const onContactSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      await apiRequest("POST", "/api/contact", data);
+      toast({
+        title: "Message sent successfully!",
+        description: "We'll get back to you as soon as possible.",
+      });
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Failed to send message",
+        description:
+          "Please try again later or email us directly at patrick@pathwiseinstitutions.org",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
+        <p className="text-muted-foreground">
+          Have questions or need support? We're here to help!
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Info Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <MessageSquare className="h-6 w-6 text-primary" />
+              <CardTitle>Response Time</CardTitle>
+            </div>
+            <CardDescription>
+              We aim to respond to all inquiries as quickly as possible.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="font-medium mb-2">Typically within 24–48 hours</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Monday – Friday, 9 AM – 5 PM EST
+            </p>
+            <p className="text-sm text-muted-foreground">
+              For urgent issues, please include "URGENT" in your subject line.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Contact Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Send us a message</CardTitle>
+            <CardDescription>
+              Fill out the form below and we'll get back to you soon.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onContactSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your name"
+                          {...field}
+                          data-testid="input-name"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="your.email@example.com"
+                          {...field}
+                          data-testid="input-email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="What is this regarding?"
+                          {...field}
+                          data-testid="input-subject"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Message</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Please describe your question or issue..."
+                          className="min-h-[120px]"
+                          {...field}
+                          data-testid="input-message"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                  data-testid="button-submit"
+                >
+                  {isSubmitting ? "Sending..." : (
+                    <>
+                      Send Message
+                      <Send className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 // Public Experience Component for non-authenticated users
 function PublicExperience() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -491,6 +852,12 @@ export default function Dashboard() {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [failedVerification, setFailedVerification] = useState<{sessionId: string, feature: string, error: string} | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+
+  // Helper function to handle card selection
+  const handleCardSelect = (cardValue: string) => {
+    setSelectedCard(cardValue);
+    setActiveTab(cardValue);
+  };
   
   // Guard queries with user authentication
   const { data: stats = {}, isLoading } = useQuery({
@@ -711,7 +1078,7 @@ export default function Dashboard() {
       <div className="flex flex-wrap justify-center gap-4 mb-6">
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'upload' ? 'ring-2 ring-cyan-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('upload')} 
+          onClick={() => handleCardSelect('upload')} 
           data-testid="card-upload"
         >
           <CardContent className="pt-6 text-center">
@@ -725,7 +1092,7 @@ export default function Dashboard() {
 
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'resume' ? 'ring-2 ring-blue-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('resume')} 
+          onClick={() => handleCardSelect('resume')} 
           data-testid="card-resume"
         >
           <CardContent className="pt-6 text-center">
@@ -739,7 +1106,7 @@ export default function Dashboard() {
 
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'roadmap' ? 'ring-2 ring-green-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('roadmap')} 
+          onClick={() => handleCardSelect('roadmap')} 
           data-testid="card-roadmap"
         >
           <CardContent className="pt-6 text-center">
@@ -753,7 +1120,7 @@ export default function Dashboard() {
 
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'jobs' ? 'ring-2 ring-purple-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('jobs')} 
+          onClick={() => handleCardSelect('jobs')} 
           data-testid="card-jobs"
         >
           <CardContent className="pt-6 text-center">
@@ -770,7 +1137,7 @@ export default function Dashboard() {
 
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'projects' ? 'ring-2 ring-orange-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('projects')} 
+          onClick={() => handleCardSelect('projects')} 
           data-testid="card-projects"
         >
           <CardContent className="pt-6 text-center">
@@ -784,7 +1151,7 @@ export default function Dashboard() {
 
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'copilot' ? 'ring-2 ring-indigo-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('copilot')} 
+          onClick={() => handleCardSelect('copilot')} 
           data-testid="card-copilot"
         >
           <CardContent className="pt-6 text-center">
@@ -798,7 +1165,7 @@ export default function Dashboard() {
 
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'applications' ? 'ring-2 ring-pink-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('applications')} 
+          onClick={() => handleCardSelect('applications')} 
           data-testid="card-applications"
         >
           <CardContent className="pt-6 text-center">
@@ -812,7 +1179,7 @@ export default function Dashboard() {
 
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'interview' ? 'ring-2 ring-amber-500 shadow-lg' : ''}`} 
-          onClick={() => setSelectedCard('interview')} 
+          onClick={() => handleCardSelect('interview')} 
           data-testid="card-interview"
         >
           <CardContent className="pt-6 text-center">
@@ -821,6 +1188,34 @@ export default function Dashboard() {
             </div>
             <h3 className="font-semibold mb-1">Interview Prep</h3>
             <p className="text-xs text-muted-foreground">Practice & prepare</p>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'about' ? 'ring-2 ring-teal-500 shadow-lg' : ''}`} 
+          onClick={() => handleCardSelect('about')} 
+          data-testid="card-about"
+        >
+          <CardContent className="pt-6 text-center">
+            <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Sparkles className="w-6 h-6 text-teal-600" />
+            </div>
+            <h3 className="font-semibold mb-1">About Us</h3>
+            <p className="text-xs text-muted-foreground">Learn more</p>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'contact' ? 'ring-2 ring-rose-500 shadow-lg' : ''}`} 
+          onClick={() => handleCardSelect('contact')} 
+          data-testid="card-contact"
+        >
+          <CardContent className="pt-6 text-center">
+            <div className="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Send className="w-6 h-6 text-rose-600" />
+            </div>
+            <h3 className="font-semibold mb-1">Contact Us</h3>
+            <p className="text-xs text-muted-foreground">Get in touch</p>
           </CardContent>
         </Card>
       </div>
@@ -863,7 +1258,7 @@ export default function Dashboard() {
   return (
     <Layout title={`Welcome back, ${user.firstName}!`} subtitle="Your career command center">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-9 mb-6">
+        <TabsList className="grid w-full grid-cols-11 mb-6">
           <TabsTrigger value="overview" data-testid="tab-overview">Overview</TabsTrigger>
           <TabsTrigger value="upload" data-testid="tab-upload">Upload</TabsTrigger>
           <TabsTrigger value="resume" data-testid="tab-resume">Resume</TabsTrigger>
@@ -873,6 +1268,8 @@ export default function Dashboard() {
           <TabsTrigger value="copilot" data-testid="tab-copilot">Copilot</TabsTrigger>
           <TabsTrigger value="applications" data-testid="tab-applications">Apps</TabsTrigger>
           <TabsTrigger value="interview" data-testid="tab-interview">Interview</TabsTrigger>
+          <TabsTrigger value="about" data-testid="tab-about">About</TabsTrigger>
+          <TabsTrigger value="contact" data-testid="tab-contact">Contact</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">{<OverviewContent />}</TabsContent>
@@ -884,6 +1281,8 @@ export default function Dashboard() {
         <TabsContent value="copilot">{selectedCard === 'copilot' ? <AICopilot /> : <OverviewContent />}</TabsContent>
         <TabsContent value="applications">{selectedCard === 'applications' ? <Applications /> : <OverviewContent />}</TabsContent>
         <TabsContent value="interview">{selectedCard === 'interview' ? <InterviewPrep /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="about">{selectedCard === 'about' ? <AboutUsContent /> : <OverviewContent />}</TabsContent>
+        <TabsContent value="contact">{selectedCard === 'contact' ? <ContactUsContent /> : <OverviewContent />}</TabsContent>
       </Tabs>
     </Layout>
   );
