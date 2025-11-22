@@ -316,33 +316,42 @@ function AboutUsContent() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-3">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Overall Score (0-100)</p>
-                  <p className="text-xs text-muted-foreground">Clear benchmark for improvement</p>
+            <CardContent className="pt-6 space-y-4">
+              {/* Visual Example of Resume Score */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium">Your Resume Score</span>
+                  <span className="text-2xl font-bold text-primary">85/100</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2 mb-3">
+                  <div className="bg-primary h-2 rounded-full" style={{ width: '85%' }}></div>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Format & Structure</span>
+                    <span className="font-medium">92/100</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Content Quality</span>
+                    <span className="font-medium">88/100</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">ATS Compatibility</span>
+                    <span className="font-medium">76/100</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Section-by-Section Feedback</p>
-                  <p className="text-xs text-muted-foreground">Specific suggestions for each part</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">ATS Optimization Tips</p>
-                  <p className="text-xs text-muted-foreground">Make it past screening software</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Rewrite Suggestions</p>
-                  <p className="text-xs text-muted-foreground">Better bullet points instantly</p>
+
+              {/* Example Feedback */}
+              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                <div className="flex items-start gap-2 mb-2">
+                  <TrendingUp className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold">Improvement Suggestion</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      "Managed team of 5" → "Led cross-functional team of 5 engineers to deliver 3 products, increasing efficiency by 40%"
+                    </p>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -361,33 +370,58 @@ function AboutUsContent() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-3">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">30-Day Action Plan</p>
-                  <p className="text-xs text-muted-foreground">Immediate steps to take this month</p>
+            <CardContent className="pt-6 space-y-4">
+              {/* Visual Timeline Example */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
+                        1
+                      </div>
+                      <div className="w-0.5 h-8 bg-primary/30"></div>
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <p className="text-xs font-semibold">Month 1: Foundation</p>
+                      <p className="text-xs text-muted-foreground">Complete React course, build 2 portfolio projects</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="w-8 h-8 rounded-full bg-primary/50 flex items-center justify-center text-xs font-bold text-primary-foreground">
+                        2
+                      </div>
+                      <div className="w-0.5 h-8 bg-primary/30"></div>
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <p className="text-xs font-semibold">Month 3: Specialization</p>
+                      <p className="text-xs text-muted-foreground">Master TypeScript, contribute to open source</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-xs font-bold">
+                        3
+                      </div>
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <p className="text-xs font-semibold">Month 6: Job Ready</p>
+                      <p className="text-xs text-muted-foreground">Apply to top companies, ace interviews</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">3-Month Milestone Tracker</p>
-                  <p className="text-xs text-muted-foreground">Skills to learn, projects to build</p>
+
+              {/* Progress Indicator */}
+              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium">Your Progress</span>
+                  <span className="text-xs text-accent font-semibold">40% Complete</span>
                 </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">6-Month Career Timeline</p>
-                  <p className="text-xs text-muted-foreground">Path to your target role</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Resource Recommendations</p>
-                  <p className="text-xs text-muted-foreground">Courses, certifications, events</p>
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div className="bg-accent h-1.5 rounded-full" style={{ width: '40%' }}></div>
                 </div>
               </div>
             </CardContent>
@@ -406,33 +440,48 @@ function AboutUsContent() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-3">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Compatibility Score (0-100)</p>
-                  <p className="text-xs text-muted-foreground">How well each job fits you</p>
+            <CardContent className="pt-6 space-y-4">
+              {/* Visual Job Match Card */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm">Frontend Developer</p>
+                    <p className="text-xs text-muted-foreground">Google • Mountain View, CA</p>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div className="text-lg font-bold text-primary">92</div>
+                    <div className="text-xs text-muted-foreground">Match</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-muted rounded-full h-1.5">
+                      <div className="bg-primary h-1.5 rounded-full" style={{ width: '92%' }}></div>
+                    </div>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">92%</span>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">React</div>
+                    <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">TypeScript</div>
+                    <div className="px-2 py-0.5 bg-muted rounded text-xs">GraphQL</div>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Skills Gap Analysis</p>
-                  <p className="text-xs text-muted-foreground">What you have vs what's needed</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Tailored Cover Letter</p>
-                  <p className="text-xs text-muted-foreground">AI-generated for each position</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Interview Prep Questions</p>
-                  <p className="text-xs text-muted-foreground">Practice for this specific role</p>
+
+              {/* Skills Gap */}
+              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                <p className="text-xs font-semibold mb-2">Skills to Develop</p>
+                <div className="flex flex-wrap gap-1">
+                  <div className="px-2 py-1 bg-accent/10 rounded text-xs flex items-center gap-1">
+                    <Target className="w-3 h-3" />
+                    GraphQL
+                  </div>
+                  <div className="px-2 py-1 bg-accent/10 rounded text-xs flex items-center gap-1">
+                    <Target className="w-3 h-3" />
+                    Testing
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -451,33 +500,53 @@ function AboutUsContent() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-3">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">5+ Custom Project Ideas</p>
-                  <p className="text-xs text-muted-foreground">Matched to your target role</p>
+            <CardContent className="pt-6 space-y-4">
+              {/* Visual Project Card Example */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm">Real-Time Chat Application</p>
+                    <p className="text-xs text-muted-foreground">Build a WebSocket-based messaging app</p>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    <span>2-3 weeks</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs font-medium mb-1">Skills You'll Demonstrate:</p>
+                    <div className="flex flex-wrap gap-1">
+                      <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">WebSockets</div>
+                      <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">Real-time</div>
+                      <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">Node.js</div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-xs">
+                    <p className="font-medium mb-1">Why Employers Love It:</p>
+                    <p className="text-muted-foreground">Shows async programming & scalable architecture</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Implementation Guide</p>
-                  <p className="text-xs text-muted-foreground">Step-by-step instructions</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Estimated Timeline</p>
-                  <p className="text-xs text-muted-foreground">How long each will take</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Skills Demonstrated</p>
-                  <p className="text-xs text-muted-foreground">What employers will notice</p>
+
+              {/* Steps Preview */}
+              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                <p className="text-xs font-semibold mb-2">Step-by-Step Guide Included</p>
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3 h-3 text-accent" />
+                    <span>Setup & architecture planning</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3 h-3 text-accent" />
+                    <span>Implementation milestones</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3 h-3 text-accent" />
+                    <span>Testing & deployment guide</span>
+                  </div>
                 </div>
               </div>
             </CardContent>
