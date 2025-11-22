@@ -120,17 +120,17 @@ function AboutUsContent() {
           <Link href="/register">
             <Button size="lg" className="text-lg px-8" data-testid="button-get-started-hero">
               <Sparkles className="w-5 h-5 mr-2" />
-              Get Started Free
+              Get Started Now
             </Button>
           </Link>
           <Link href="/register">
             <Button size="lg" variant="outline" className="text-lg px-8" data-testid="button-try-premium">
-              Try Premium Features
+              View Plans & Pricing
             </Button>
           </Link>
         </div>
         <p className="text-sm text-muted-foreground">
-          No credit card required • Start building your career today
+          Join thousands of students landing their dream jobs
         </p>
       </div>
 
@@ -711,12 +711,12 @@ function AboutUsContent() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                 <Link href="/register">
                   <Button size="lg" className="text-lg px-8 min-w-[200px]" data-testid="button-start-free-trial">
-                    Start Free Trial
+                    Create Your Account
                   </Button>
                 </Link>
                 <Link href="/register">
                   <Button size="lg" variant="outline" className="text-lg px-8 min-w-[200px]" data-testid="button-view-pricing">
-                    View Pricing
+                    View Plans & Pricing
                   </Button>
                 </Link>
               </div>
@@ -724,15 +724,15 @@ function AboutUsContent() {
               <div className="flex flex-wrap items-center justify-center gap-6 pt-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>No credit card required</span>
+                  <span>Trusted by thousands of students</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Start in under 2 minutes</span>
+                  <span>Setup in under 2 minutes</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Cancel anytime</span>
+                  <span>AI-powered career guidance</span>
                 </div>
               </div>
             </div>
