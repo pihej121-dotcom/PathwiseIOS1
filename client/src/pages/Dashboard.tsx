@@ -80,7 +80,7 @@ type ContactFormData = z.infer<typeof contactFormSchema>;
 // About Us Content Component
 function AboutUsContent() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Hero */}
       <div className="text-center space-y-6">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
@@ -114,6 +114,24 @@ function AboutUsContent() {
             </video>
           </div>
         </div>
+
+        {/* Primary CTA after video */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link href="/register">
+            <Button size="lg" className="text-lg px-8" data-testid="button-get-started-hero">
+              <Sparkles className="w-5 h-5 mr-2" />
+              Get Started Free
+            </Button>
+          </Link>
+          <Link href="/register">
+            <Button size="lg" variant="outline" className="text-lg px-8" data-testid="button-try-premium">
+              Try Premium Features
+            </Button>
+          </Link>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          No credit card required • Start building your career today
+        </p>
       </div>
 
       {/* Features */}
@@ -273,6 +291,200 @@ function AboutUsContent() {
         </div>
       </div>
 
+      {/* Deliverables Preview Section */}
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">
+            See What You Actually Get
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            No guesswork. Here's exactly what Pathwise delivers to help you land your dream job.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Resume Analysis Preview */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Resume Analysis Report</CardTitle>
+                  <CardDescription>Comprehensive feedback in seconds</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Overall Score (0-100)</p>
+                  <p className="text-xs text-muted-foreground">Clear benchmark for improvement</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Section-by-Section Feedback</p>
+                  <p className="text-xs text-muted-foreground">Specific suggestions for each part</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">ATS Optimization Tips</p>
+                  <p className="text-xs text-muted-foreground">Make it past screening software</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Rewrite Suggestions</p>
+                  <p className="text-xs text-muted-foreground">Better bullet points instantly</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Career Roadmap Preview */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Route className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Personalized Career Roadmap</CardTitle>
+                  <CardDescription>Custom plan for your goals</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">30-Day Action Plan</p>
+                  <p className="text-xs text-muted-foreground">Immediate steps to take this month</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">3-Month Milestone Tracker</p>
+                  <p className="text-xs text-muted-foreground">Skills to learn, projects to build</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">6-Month Career Timeline</p>
+                  <p className="text-xs text-muted-foreground">Path to your target role</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Resource Recommendations</p>
+                  <p className="text-xs text-muted-foreground">Courses, certifications, events</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Job Match Preview */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Smart Job Matches</CardTitle>
+                  <CardDescription>Opportunities ranked by fit</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Compatibility Score (0-100)</p>
+                  <p className="text-xs text-muted-foreground">How well each job fits you</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Skills Gap Analysis</p>
+                  <p className="text-xs text-muted-foreground">What you have vs what's needed</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Tailored Cover Letter</p>
+                  <p className="text-xs text-muted-foreground">AI-generated for each position</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Interview Prep Questions</p>
+                  <p className="text-xs text-muted-foreground">Practice for this specific role</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Micro-Projects Preview */}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Lightbulb className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Portfolio Project Ideas</CardTitle>
+                  <CardDescription>Build what employers want to see</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-3">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">5+ Custom Project Ideas</p>
+                  <p className="text-xs text-muted-foreground">Matched to your target role</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Implementation Guide</p>
+                  <p className="text-xs text-muted-foreground">Step-by-step instructions</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Estimated Timeline</p>
+                  <p className="text-xs text-muted-foreground">How long each will take</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-sm">Skills Demonstrated</p>
+                  <p className="text-xs text-muted-foreground">What employers will notice</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Testimonials */}
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-8">
@@ -406,6 +618,57 @@ function AboutUsContent() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Final CTA Section */}
+      <div className="max-w-4xl mx-auto">
+        <Card className="overflow-hidden border-2 border-primary/20">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                <Sparkles className="w-4 h-4" />
+                Join thousands of successful students
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Ready to Launch Your Career?
+              </h2>
+              
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Don't leave your career to chance. Get personalized AI-powered guidance, 
+                actionable insights, and the tools you need to land your dream job.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <Link href="/register">
+                  <Button size="lg" className="text-lg px-8 min-w-[200px]" data-testid="button-start-free-trial">
+                    Start Free Trial
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="lg" variant="outline" className="text-lg px-8 min-w-[200px]" data-testid="button-view-pricing">
+                    View Pricing
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-6 pt-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span>No credit card required</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span>Start in under 2 minutes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span>Cancel anytime</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
