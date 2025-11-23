@@ -123,11 +123,6 @@ function AboutUsContent() {
               Get Started Now
             </Button>
           </Link>
-          <Link href="/register">
-            <Button size="lg" variant="outline" className="text-lg px-8" data-testid="button-try-premium">
-              View Plans & Pricing
-            </Button>
-          </Link>
         </div>
         <p className="text-sm text-muted-foreground">
           Join thousands of students landing their dream jobs
@@ -1565,11 +1560,6 @@ function AboutUsContent() {
                 <Link href="/register">
                   <Button size="lg" className="text-lg px-8 min-w-[200px]" data-testid="button-start-free-trial">
                     Create Your Account
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="lg" variant="outline" className="text-lg px-8 min-w-[200px]" data-testid="button-view-pricing">
-                    View Plans & Pricing
                   </Button>
                 </Link>
               </div>
