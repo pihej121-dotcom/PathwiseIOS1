@@ -523,197 +523,891 @@ function AboutUsContent() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-
-          {/* Career Roadmap Preview */}
-          <Card className="overflow-hidden">
+        {/* Full Career Roadmap Example */}
+        <div className="space-y-8 mb-12">
+          <Card className="overflow-hidden border-2">
             <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                   <Route className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Personalized Career Roadmap</CardTitle>
-                  <CardDescription>Custom plan for your goals</CardDescription>
+                  <CardTitle className="text-lg">6-Month Career Roadmap: Frontend Developer</CardTitle>
+                  <CardDescription>Example: Computer Science Senior → React Developer at Tech Startup</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              {/* Visual Timeline Example */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
-                        1
-                      </div>
-                      <div className="w-0.5 h-8 bg-primary/30"></div>
+            <CardContent className="pt-6 space-y-6">
+              {/* Roadmap Overview */}
+              <div className="flex items-center justify-between pb-4 border-b">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">CURRENT ROLE</p>
+                  <p className="text-lg font-semibold">Computer Science Student</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">→</div>
+                  <p className="text-xs text-muted-foreground mt-1">6 months</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium text-muted-foreground">TARGET ROLE</p>
+                  <p className="text-lg font-semibold">Frontend Developer</p>
+                </div>
+              </div>
+
+              {/* Detailed Timeline */}
+              <div className="space-y-6">
+                {/* Phase 1 */}
+                <div className="border-l-2 border-primary pl-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                      <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
                     </div>
-                    <div className="flex-1 pt-1">
-                      <p className="text-xs font-semibold">Month 1: Foundation</p>
-                      <p className="text-xs text-muted-foreground">Complete React course, build 2 portfolio projects</p>
+                    <div>
+                      <p className="font-bold text-sm">Phase 1: Foundation (Weeks 1-4)</p>
+                      <p className="text-xs text-muted-foreground">Master core frontend technologies</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-primary/50 flex items-center justify-center text-xs font-bold text-primary-foreground">
-                        2
+                  <div className="bg-muted/30 rounded-lg p-3 space-y-3">
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold">Week 1-2: React Fundamentals</p>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Complete "React - The Complete Guide" on Udemy (40 hours)</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Build: Todo app with state management, API integration</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Study: Component lifecycle, hooks, context API</span>
+                        </div>
                       </div>
-                      <div className="w-0.5 h-8 bg-primary/30"></div>
+                      <div className="flex items-center gap-2 pt-1">
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px] font-bold">DEADLINE</div>
+                        <span className="text-xs text-muted-foreground">Jan 14, 2026</span>
+                      </div>
                     </div>
-                    <div className="flex-1 pt-1">
-                      <p className="text-xs font-semibold">Month 3: Specialization</p>
-                      <p className="text-xs text-muted-foreground">Master TypeScript, contribute to open source</p>
+
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold">Week 3-4: TypeScript & Modern Tooling</p>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Complete TypeScript course (20 hours) - TypeScript Handbook</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Convert previous project to TypeScript</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Learn Vite, ESLint, Prettier configuration</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 pt-1">
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px] font-bold">DEADLINE</div>
+                        <span className="text-xs text-muted-foreground">Jan 28, 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phase 2 */}
+                <div className="border-l-2 border-accent pl-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-accent-foreground">2</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Phase 2: Portfolio Projects (Weeks 5-12)</p>
+                      <p className="text-xs text-muted-foreground">Build 2 production-quality apps</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3">
-                    <div className="flex flex-col items-center">
-                      <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center text-xs font-bold">
-                        3
+                  <div className="bg-muted/30 rounded-lg p-3 space-y-3">
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold">Project 1: E-Commerce Dashboard (Weeks 5-8)</p>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Tech stack: React, TypeScript, TanStack Query, Chart.js</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Features: Real-time analytics, data visualization, responsive design</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Deploy to Vercel, write comprehensive README</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">React</div>
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">TypeScript</div>
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">API Integration</div>
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">Data Viz</div>
                       </div>
                     </div>
-                    <div className="flex-1 pt-1">
-                      <p className="text-xs font-semibold">Month 6: Job Ready</p>
-                      <p className="text-xs text-muted-foreground">Apply to top companies, ace interviews</p>
+
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold">Project 2: Social Media App (Weeks 9-12)</p>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Tech stack: React, Firebase, Tailwind CSS, Framer Motion</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Features: Authentication, real-time posts, image uploads, animations</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                          <span>Write tests with Vitest, deploy with CI/CD pipeline</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">Authentication</div>
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">Real-time</div>
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">Testing</div>
+                        <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">Animations</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phase 3 */}
+                <div className="border-l-2 border-primary pl-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-primary-foreground">3</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Phase 3: Open Source & Networking (Weeks 13-18)</p>
+                      <p className="text-xs text-muted-foreground">Build credibility and connections</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-muted/30 rounded-lg p-3 space-y-2">
+                    <div className="space-y-1 text-xs">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">Contribute to 3 open source projects</p>
+                          <p className="text-muted-foreground">React, Vite, or popular UI libraries on GitHub</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">Write 2 technical blog posts</p>
+                          <p className="text-muted-foreground">Share learnings on Dev.to or Medium</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">Attend 2 local tech meetups</p>
+                          <p className="text-muted-foreground">React meetups or web dev conferences</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phase 4 */}
+                <div className="border-l-2 border-accent pl-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-accent-foreground">4</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Phase 4: Job Hunt (Weeks 19-24)</p>
+                      <p className="text-xs text-muted-foreground">Land your first role</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-muted/30 rounded-lg p-3 space-y-2">
+                    <div className="space-y-1 text-xs">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">Week 19-20: Interview Prep</p>
+                          <p className="text-muted-foreground">Practice 50 LeetCode problems, system design basics</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">Week 21-22: Applications</p>
+                          <p className="text-muted-foreground">Apply to 30 companies, tailor resume for each</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">Week 23-24: Interviews & Offers</p>
+                          <p className="text-muted-foreground">Complete interview rounds, negotiate offers</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Progress Indicator */}
-              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium">Your Progress</span>
-                  <span className="text-xs text-accent font-semibold">40% Complete</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-1.5">
-                  <div className="bg-accent h-1.5 rounded-full" style={{ width: '40%' }}></div>
+              {/* Skills Progress Tracker */}
+              <div className="bg-accent/5 rounded-lg p-4 border border-accent/20">
+                <p className="text-sm font-semibold mb-3">Skills You'll Master</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs">React/TypeScript</span>
+                      <span className="text-xs font-bold text-primary">Expert</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1">
+                      <div className="bg-primary h-1 rounded-full" style={{ width: '100%' }}></div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs">State Management</span>
+                      <span className="text-xs font-bold text-primary">Advanced</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1">
+                      <div className="bg-primary h-1 rounded-full" style={{ width: '85%' }}></div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs">Testing</span>
+                      <span className="text-xs font-bold text-accent">Intermediate</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1">
+                      <div className="bg-accent h-1 rounded-full" style={{ width: '70%' }}></div>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs">System Design</span>
+                      <span className="text-xs font-bold text-accent">Beginner+</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1">
+                      <div className="bg-accent h-1 rounded-full" style={{ width: '50%' }}></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          {/* Job Match Preview */}
-          <Card className="overflow-hidden">
+        {/* Full Job Match Analysis Example */}
+        <div className="space-y-8 mb-12">
+          <Card className="overflow-hidden border-2">
             <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                   <Briefcase className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Smart Job Matches</CardTitle>
-                  <CardDescription>Opportunities ranked by fit</CardDescription>
+                  <CardTitle className="text-lg">Complete Job Match Analysis</CardTitle>
+                  <CardDescription>Example: Software Engineer II at Stripe</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              {/* Visual Job Match Card */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
-                <div className="flex items-start justify-between mb-3">
+            <CardContent className="pt-6 space-y-6">
+              {/* Job Overview */}
+              <div className="space-y-4">
+                <div className="flex items-start justify-between pb-4 border-b">
                   <div className="flex-1">
-                    <p className="font-semibold text-sm">Frontend Developer</p>
-                    <p className="text-xs text-muted-foreground">Google • Mountain View, CA</p>
+                    <p className="text-xl font-bold">Software Engineer II - Payments Platform</p>
+                    <p className="text-sm text-muted-foreground mt-1">Stripe • San Francisco, CA (Hybrid)</p>
+                    <p className="text-sm text-muted-foreground">$150,000 - $220,000 • Full-time</p>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className="text-lg font-bold text-primary">92</div>
-                    <div className="text-xs text-muted-foreground">Match</div>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-primary">87</div>
+                    <p className="text-xs text-muted-foreground mt-1">MATCH SCORE</p>
+                    <div className="px-3 py-1 bg-primary/10 rounded-full text-xs font-semibold text-primary mt-2">
+                      Highly Compatible
+                    </div>
                   </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-full bg-muted rounded-full h-1.5">
+
+                {/* Match Breakdown */}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <Target className="w-4 h-4 text-primary" />
+                      <span className="text-2xl font-bold text-primary">92%</span>
+                    </div>
+                    <p className="text-xs font-medium">SKILLS MATCH</p>
+                    <div className="w-full bg-muted rounded-full h-1.5 mt-2">
                       <div className="bg-primary h-1.5 rounded-full" style={{ width: '92%' }}></div>
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">92%</span>
                   </div>
                   
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">React</div>
-                    <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">TypeScript</div>
-                    <div className="px-2 py-0.5 bg-muted rounded text-xs">GraphQL</div>
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <Briefcase className="w-4 h-4 text-accent" />
+                      <span className="text-2xl font-bold text-accent">78%</span>
+                    </div>
+                    <p className="text-xs font-medium">EXPERIENCE MATCH</p>
+                    <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                      <div className="bg-accent h-1.5 rounded-full" style={{ width: '78%' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <TrendingUp className="w-4 h-4 text-primary" />
+                      <span className="text-2xl font-bold text-primary">91%</span>
+                    </div>
+                    <p className="text-xs font-medium">CULTURE FIT</p>
+                    <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                      <div className="bg-primary h-1.5 rounded-full" style={{ width: '91%' }}></div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Skills Gap */}
-              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
-                <p className="text-xs font-semibold mb-2">Skills to Develop</p>
-                <div className="flex flex-wrap gap-1">
-                  <div className="px-2 py-1 bg-accent/10 rounded text-xs flex items-center gap-1">
-                    <Target className="w-3 h-3" />
-                    GraphQL
+              {/* Skills Analysis */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Skills Analysis
+                </h3>
+
+                {/* Strong Matches */}
+                <div className="border border-primary/20 bg-primary/5 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-xs font-bold">STRONG MATCH</div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-sm font-semibold">Your Skills Align Perfectly</p>
+                      <div className="flex flex-wrap gap-2">
+                        <div className="px-2 py-1 bg-primary/20 border border-primary/30 rounded text-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Python
+                        </div>
+                        <div className="px-2 py-1 bg-primary/20 border border-primary/30 rounded text-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          TypeScript
+                        </div>
+                        <div className="px-2 py-1 bg-primary/20 border border-primary/30 rounded text-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          React
+                        </div>
+                        <div className="px-2 py-1 bg-primary/20 border border-primary/30 rounded text-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          PostgreSQL
+                        </div>
+                        <div className="px-2 py-1 bg-primary/20 border border-primary/30 rounded text-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          REST APIs
+                        </div>
+                        <div className="px-2 py-1 bg-primary/20 border border-primary/30 rounded text-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Git
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="px-2 py-1 bg-accent/10 rounded text-xs flex items-center gap-1">
-                    <Target className="w-3 h-3" />
-                    Testing
+                </div>
+
+                {/* Partial Matches */}
+                <div className="border border-accent/20 bg-accent/5 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="px-2 py-0.5 rounded bg-accent/50 text-accent-foreground text-xs font-bold">PARTIAL MATCH</div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-sm font-semibold">Skills You Can Quickly Learn</p>
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <div className="px-2 py-1 bg-accent/20 border border-accent/30 rounded text-xs">Kubernetes</div>
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground">You have Docker experience. Kubernetes is similar container orchestration.</p>
+                            <p className="text-xs text-accent font-semibold mt-1">→ 2-week learning path available</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <div className="px-2 py-1 bg-accent/20 border border-accent/30 rounded text-xs">Go</div>
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground">Your Python background transfers well. Go syntax is straightforward.</p>
+                            <p className="text-xs text-accent font-semibold mt-1">→ 3-week learning path available</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Missing Skills */}
+                <div className="border border-destructive/20 bg-destructive/5 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="px-2 py-0.5 rounded bg-destructive text-destructive-foreground text-xs font-bold">TO DEVELOP</div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-sm font-semibold">Skills Worth Adding</p>
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <div className="px-2 py-1 bg-destructive/20 border border-destructive/30 rounded text-xs">GraphQL</div>
+                          <div className="flex-1">
+                            <p className="text-xs text-muted-foreground">Preferred but not required. Stripe uses GraphQL for some internal APIs.</p>
+                            <p className="text-xs font-semibold mt-1">Impact: <span className="text-accent">+8 match points</span></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Experience Match */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <Briefcase className="w-4 h-4" />
+                  Experience Match
+                </h3>
+
+                {/* Relevant Experience */}
+                <div className="border border-primary/20 bg-primary/5 rounded-lg p-4">
+                  <p className="text-sm font-semibold mb-2">Your Relevant Experience</p>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">3 years building payment systems at fintech startup</p>
+                        <p className="text-muted-foreground">Directly applicable to Stripe's payments platform role</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">Led API redesign serving 50K requests/min</p>
+                        <p className="text-muted-foreground">Demonstrates scale and performance optimization skills</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">Worked with cross-functional teams of 15+</p>
+                        <p className="text-muted-foreground">Matches Stripe's collaborative engineering culture</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Experience Gaps */}
+                <div className="border border-accent/20 bg-accent/5 rounded-lg p-4">
+                  <p className="text-sm font-semibold mb-2">Areas to Emphasize in Interview</p>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-start gap-2">
+                      <Target className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">Financial compliance & regulations</p>
+                        <p className="text-muted-foreground">Study PCI-DSS, PSD2 basics before interview. Show willingness to learn.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Target className="w-3 h-3 text-accent mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold">Global payment infrastructure</p>
+                        <p className="text-muted-foreground">Highlight your API work. Connect it to multi-region payment processing.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Application Strategy */}
+              <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                <div className="flex items-start gap-2 mb-3">
+                  <Lightbulb className="w-4 h-4 text-primary mt-0.5" />
+                  <p className="text-sm font-bold">Your Application Strategy</p>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-start gap-2">
+                    <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">1</div>
+                    <div>
+                      <p className="font-semibold">Tailor your resume bullet points</p>
+                      <p className="text-muted-foreground">Emphasize payment system work, API performance metrics, and scale.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">2</div>
+                    <div>
+                      <p className="font-semibold">Mention these keywords in cover letter</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <span className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">payment processing</span>
+                        <span className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">API design</span>
+                        <span className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">financial systems</span>
+                        <span className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">high availability</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">3</div>
+                    <div>
+                      <p className="font-semibold">Prepare for behavioral questions</p>
+                      <p className="text-muted-foreground">Focus on: handling system outages, scaling challenges, cross-team collaboration</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          {/* Micro-Projects Preview */}
-          <Card className="overflow-hidden">
+        {/* Full Portfolio Project Specification */}
+        <div className="space-y-8 mb-12">
+          <Card className="overflow-hidden border-2">
             <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                   <Lightbulb className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Portfolio Project Ideas</CardTitle>
-                  <CardDescription>Build what employers want to see</CardDescription>
+                  <CardTitle className="text-lg">Complete Project Specification</CardTitle>
+                  <CardDescription>Example: Real-Time Collaboration Platform</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              {/* Visual Project Card Example */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm">Real-Time Chat Application</p>
-                    <p className="text-xs text-muted-foreground">Build a WebSocket-based messaging app</p>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    <span>2-3 weeks</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-xs font-medium mb-1">Skills You'll Demonstrate:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">WebSockets</div>
-                      <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">Real-time</div>
-                      <div className="px-2 py-0.5 bg-primary/10 rounded text-xs">Node.js</div>
+            <CardContent className="pt-6 space-y-6">
+              {/* Project Overview */}
+              <div className="space-y-4">
+                <div className="pb-4 border-b">
+                  <p className="text-xl font-bold mb-2">Real-Time Collaboration Platform</p>
+                  <p className="text-sm text-muted-foreground">Build a Figma-like collaborative whiteboard with live cursor tracking, comments, and multiplayer editing</p>
+                  <div className="flex items-center gap-4 mt-3 text-sm">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">3-4 weeks</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Target className="w-4 h-4 text-primary" />
+                      <span className="font-semibold text-primary">Advanced Difficulty</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="w-4 h-4 text-accent" />
+                      <span className="text-accent font-semibold">High Interview Value</span>
                     </div>
                   </div>
-                  
-                  <div className="text-xs">
-                    <p className="font-medium mb-1">Why Employers Love It:</p>
-                    <p className="text-muted-foreground">Shows async programming & scalable architecture</p>
+                </div>
+
+                {/* Why Employers Want This */}
+                <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                  <div className="flex items-start gap-2 mb-2">
+                    <Briefcase className="w-4 h-4 text-primary mt-0.5" />
+                    <p className="text-sm font-bold">Why Employers Love This Project</p>
+                  </div>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Demonstrates real-time systems knowledge - critical for modern web apps</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Shows full-stack capabilities: frontend UI + backend infrastructure</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Proves you can handle complex state synchronization across clients</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                      <span>Perfect talking point for system design interviews</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Steps Preview */}
-              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
-                <p className="text-xs font-semibold mb-2">Step-by-Step Guide Included</p>
-                <div className="space-y-1 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3 h-3 text-accent" />
-                    <span>Setup & architecture planning</span>
+              {/* Tech Stack */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Tech Stack & Architecture
+                </h3>
+
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <p className="text-xs font-semibold mb-2">Frontend</p>
+                    <div className="flex flex-wrap gap-1">
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">React 18</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">TypeScript</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">Tailwind CSS</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">Zustand</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">Canvas API</div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3 h-3 text-accent" />
-                    <span>Implementation milestones</span>
+
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <p className="text-xs font-semibold mb-2">Backend</p>
+                    <div className="flex flex-wrap gap-1">
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">Node.js</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">Express</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">Socket.io</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">Redis</div>
+                      <div className="px-2 py-1 bg-primary/10 rounded text-[10px]">PostgreSQL</div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3 h-3 text-accent" />
-                    <span>Testing & deployment guide</span>
+                </div>
+              </div>
+
+              {/* Core Features */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4" />
+                  Core Features to Build
+                </h3>
+
+                <div className="space-y-2">
+                  {/* Feature 1 */}
+                  <div className="border border-primary/20 bg-primary/5 rounded-lg p-3">
+                    <div className="flex items-start gap-2 mb-2">
+                      <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">1</div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold">Live Cursor Tracking</p>
+                        <p className="text-xs text-muted-foreground">Show all connected users' cursors in real-time with names and colors</p>
+                      </div>
+                    </div>
+                    <div className="ml-6 space-y-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Broadcast cursor position via WebSocket every 50ms</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Implement throttling to avoid overwhelming server</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Use SVG cursors with user initials and unique colors</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feature 2 */}
+                  <div className="border border-primary/20 bg-primary/5 rounded-lg p-3">
+                    <div className="flex items-start gap-2 mb-2">
+                      <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">2</div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold">Collaborative Drawing Canvas</p>
+                        <p className="text-xs text-muted-foreground">Allow multiple users to draw shapes simultaneously</p>
+                      </div>
+                    </div>
+                    <div className="ml-6 space-y-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Support rectangles, circles, arrows, and freehand drawing</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Implement operational transformation for conflict resolution</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Persist shapes to database for session recovery</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feature 3 */}
+                  <div className="border border-primary/20 bg-primary/5 rounded-lg p-3">
+                    <div className="flex items-start gap-2 mb-2">
+                      <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">3</div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold">Real-Time Comments</p>
+                        <p className="text-xs text-muted-foreground">Pin comments to specific canvas locations</p>
+                      </div>
+                    </div>
+                    <div className="ml-6 space-y-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Click-to-comment with thread support</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Live updates when others add/edit comments</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Resolve/unresolve comment threads</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feature 4 */}
+                  <div className="border border-primary/20 bg-primary/5 rounded-lg p-3">
+                    <div className="flex items-start gap-2 mb-2">
+                      <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">4</div>
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold">Presence & Authentication</p>
+                        <p className="text-xs text-muted-foreground">Show who's online and manage sessions</p>
+                      </div>
+                    </div>
+                    <div className="ml-6 space-y-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>JWT authentication with refresh tokens</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Active users list with join/leave notifications</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Session management with Redis for scalability</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Implementation Timeline */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  4-Week Implementation Plan
+                </h3>
+
+                <div className="space-y-2">
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <div className="flex items-start gap-2 mb-1">
+                      <div className="px-2 py-0.5 rounded bg-accent text-accent-foreground text-[10px] font-bold">WEEK 1</div>
+                      <p className="text-xs font-semibold flex-1">Setup & Basic Infrastructure</p>
+                    </div>
+                    <div className="ml-6 text-[10px] text-muted-foreground space-y-0.5">
+                      <p>• Initialize monorepo with pnpm workspaces</p>
+                      <p>• Set up Express server + Socket.io</p>
+                      <p>• Create React app with Canvas API basics</p>
+                      <p>• Implement basic authentication flow</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <div className="flex items-start gap-2 mb-1">
+                      <div className="px-2 py-0.5 rounded bg-accent text-accent-foreground text-[10px] font-bold">WEEK 2</div>
+                      <p className="text-xs font-semibold flex-1">Real-Time Features</p>
+                    </div>
+                    <div className="ml-6 text-[10px] text-muted-foreground space-y-0.5">
+                      <p>• Build live cursor tracking system</p>
+                      <p>• Implement drawing tools (shapes, freehand)</p>
+                      <p>• Add presence system (active users list)</p>
+                      <p>• Set up Redis for session management</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <div className="flex items-start gap-2 mb-1">
+                      <div className="px-2 py-0.5 rounded bg-accent text-accent-foreground text-[10px] font-bold">WEEK 3</div>
+                      <p className="text-xs font-semibold flex-1">Collaboration & Persistence</p>
+                    </div>
+                    <div className="ml-6 text-[10px] text-muted-foreground space-y-0.5">
+                      <p>• Build comment system with threads</p>
+                      <p>• Implement operational transformation</p>
+                      <p>• Add PostgreSQL for data persistence</p>
+                      <p>• Create room management system</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/30 rounded-lg p-3 border">
+                    <div className="flex items-start gap-2 mb-1">
+                      <div className="px-2 py-0.5 rounded bg-accent text-accent-foreground text-[10px] font-bold">WEEK 4</div>
+                      <p className="text-xs font-semibold flex-1">Polish & Deployment</p>
+                    </div>
+                    <div className="ml-6 text-[10px] text-muted-foreground space-y-0.5">
+                      <p>• Write tests (Vitest + Playwright)</p>
+                      <p>• Add error handling & loading states</p>
+                      <p>• Deploy to Railway (backend) + Vercel (frontend)</p>
+                      <p>• Create demo video & comprehensive README</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Skills Gained */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Skills You'll Master
+                </h3>
+
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                    <p className="text-xs font-semibold mb-2">Technical Skills</p>
+                    <div className="space-y-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>WebSocket programming & real-time systems</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Canvas API & graphics programming</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>State synchronization & conflict resolution</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Redis caching & session management</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                    <p className="text-xs font-semibold mb-2">System Design</p>
+                    <div className="space-y-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Scalable WebSocket architecture</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Database schema design for collaboration</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Performance optimization (throttling, debouncing)</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-2 h-2 text-accent" />
+                        <span>Monorepo architecture & code sharing</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Resources */}
+              <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                <div className="flex items-start gap-2 mb-3">
+                  <FileText className="w-4 h-4 text-primary mt-0.5" />
+                  <p className="text-sm font-bold">Resources Provided</p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-start gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Complete starter template with boilerplate</span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Socket.io best practices guide</span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Operational transformation tutorial</span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Deployment checklist & CI/CD setup</span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Interview talking points document</span>
+                  </div>
+                  <div className="flex items-start gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Demo video script template</span>
                   </div>
                 </div>
               </div>
