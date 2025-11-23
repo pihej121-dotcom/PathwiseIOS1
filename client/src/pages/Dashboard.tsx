@@ -136,67 +136,58 @@ function AboutUsContent() {
 
       {/* Features */}
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-8">
+        <h2 className="text-3xl font-bold text-center mb-4">
           Everything You Need to Launch Your Career
         </h2>
+        <p className="text-center text-muted-foreground mb-12">
+          All the tools and insights you need in one intelligent platform
+        </p>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-6 rounded-lg bg-muted/30">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <FileText className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">AI Resume Analysis</h3>
-            <p className="text-sm text-muted-foreground">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
+            <FileText className="w-5 h-5 text-primary mb-4" />
+            <h3 className="text-base font-semibold mb-2">AI Resume Analysis</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Get instant feedback on your resume with AI-powered scoring and actionable suggestions.
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-muted/30">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <TrendingUp className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Personalized Roadmaps</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
+            <TrendingUp className="w-5 h-5 text-primary mb-4" />
+            <h3 className="text-base font-semibold mb-2">Personalized Roadmaps</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Create custom career development plans tailored to your goals and timeline.
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-muted/30">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <Briefcase className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Smart Job Matching</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
+            <Briefcase className="w-5 h-5 text-primary mb-4" />
+            <h3 className="text-base font-semibold mb-2">Smart Job Matching</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Discover opportunities that align with your skills using AI-powered matching.
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-muted/30">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <Lightbulb className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Micro-Projects</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
+            <Lightbulb className="w-5 h-5 text-primary mb-4" />
+            <h3 className="text-base font-semibold mb-2">Micro-Projects</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Build your portfolio with AI-generated project ideas for your target role.
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-muted/30">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <Target className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Application Tracking</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
+            <Target className="w-5 h-5 text-primary mb-4" />
+            <h3 className="text-base font-semibold mb-2">Application Tracking</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Organize and monitor your job applications with built-in progress tracking.
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-muted/30">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <GraduationCap className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Student-Focused</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
+            <GraduationCap className="w-5 h-5 text-primary mb-4" />
+            <h3 className="text-base font-semibold mb-2">Student-Focused</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Designed for institutions to support students throughout their career journey.
             </p>
           </div>
