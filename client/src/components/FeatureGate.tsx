@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { usePurchaseFeature, useSubscribe } from "@/hooks/use-payment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Lock, Sparkles, ShoppingCart, LogIn, CheckCircle2, DollarSign, TrendingUp, Briefcase, Target, FileText, MessageSquare } from "lucide-react";
 import { FEATURE_CATALOG, type FeatureKey } from "@shared/schema";
 
@@ -247,15 +248,18 @@ export function FeatureGate({ featureKey, children, loadingFallback }: FeatureGa
                 <CardContent className="pt-6 space-y-4">
                   <div className="text-center">
                     <Sparkles className="w-8 h-8 mx-auto mb-2 text-primary" />
-                    <h3 className="font-bold text-xl mb-1">Unlimited Access</h3>
+                    <h3 className="font-bold text-xl mb-1 flex items-center justify-center gap-2">
+                      Unlimited Access
+                      <Badge className="bg-orange-600 hover:bg-orange-700">BLACK FRIDAY</Badge>
+                    </h3>
                     <p className="text-sm text-muted-foreground mb-3">
                       Unlimited use + all features
                     </p>
                     <div className="text-3xl font-bold text-primary mb-1">
-                      $15<span className="text-lg text-muted-foreground">/mo</span>
+                      $4.99<span className="text-lg text-muted-foreground">/mo</span>
                     </div>
-                    <div className="text-sm text-muted-foreground mb-4">
-                      or $120/year
+                    <div className="text-xs text-muted-foreground line-through mb-1">
+                      Regular price: $15/mo
                     </div>
                   </div>
                   <Button
@@ -273,7 +277,7 @@ export function FeatureGate({ featureKey, children, loadingFallback }: FeatureGa
                     ) : (
                       <>
                         <Sparkles className="mr-2 h-4 w-4" />
-                        Start Free Trial
+                        Subscribe Now
                       </>
                     )}
                   </Button>

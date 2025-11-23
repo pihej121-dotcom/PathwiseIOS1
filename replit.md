@@ -8,6 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 # Recent Changes
 
+## Black Friday Subscription Promotion (November 2025)
+- **Promotional Pricing**: Reduced Pro subscription from $15/month to $4.99/month
+- **Updated Components**:
+  - UserSettingsDialog.tsx: Upgrade card now shows $4.99/month with "BLACK FRIDAY SALE" badge
+  - TermsOfService.tsx: Updated subscription pricing to $4.99/month and removed free trial mention
+  - FeatureGate.tsx: Subscription card displays $4.99/month with BLACK FRIDAY badge and strikethrough of regular $15/mo price
+  - PaywallOverlay.tsx: Subscription card displays $4.99/month with BLACK FRIDAY badge and strikethrough of regular $15/mo price
+- **Button Text Updates**: Changed "Start Free Trial" to "Subscribe Now" and "Upgrade Now" across all payment flows
+- **Visual Indicators**: Orange "BLACK FRIDAY SALE" badges added to all subscription upgrade prompts
+
 ## Freemium Model with Individual Feature Purchases (November 2025)
 - **Complete freemium transformation**: Users can register for free and purchase individual AI features
 - **Free Registration**: All new users default to free tier without requiring payment

@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { usePurchaseFeature, useSubscribe } from "@/hooks/use-payment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Lock, Sparkles, ShoppingCart, LogIn } from "lucide-react";
 import { FEATURE_CATALOG, type FeatureKey } from "@shared/schema";
 
@@ -151,15 +152,18 @@ export function PaywallOverlay({ children, showPaywall, onUpgrade, featureKey }:
                 <CardContent className="pt-4 pb-4 space-y-3">
                   <div className="text-center">
                     <Sparkles className="w-6 h-6 mx-auto mb-2 text-primary" />
-                    <h4 className="font-bold text-lg mb-1">Unlimited Access</h4>
+                    <h4 className="font-bold text-lg mb-1 flex items-center justify-center gap-2">
+                      Unlimited Access
+                      <Badge className="bg-orange-600 hover:bg-orange-700 text-xs">BLACK FRIDAY</Badge>
+                    </h4>
                     <p className="text-xs text-muted-foreground mb-2">
                       Unlimited use + all features
                     </p>
                     <div className="text-2xl font-bold text-primary mb-1">
-                      $15<span className="text-sm text-muted-foreground">/mo</span>
+                      $4.99<span className="text-sm text-muted-foreground">/mo</span>
                     </div>
-                    <div className="text-xs text-muted-foreground mb-3">
-                      or $120/year
+                    <div className="text-[10px] text-muted-foreground line-through mb-2">
+                      Regular price: $15/mo
                     </div>
                   </div>
                   <Button
@@ -176,7 +180,7 @@ export function PaywallOverlay({ children, showPaywall, onUpgrade, featureKey }:
                     ) : (
                       <>
                         <Sparkles className="mr-2 h-4 w-4" />
-                        Start Free Trial
+                        Subscribe Now
                       </>
                     )}
                   </Button>
