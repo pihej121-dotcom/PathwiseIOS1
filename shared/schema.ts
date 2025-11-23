@@ -378,13 +378,15 @@ export const deliverableSchema = z.object({
 
 export const coreFeatureSchema = z.object({
   title: z.string(),
+  description: z.string().optional(),
   details: z.array(z.string())
 });
 
 export const weekPlanSchema = z.object({
   week: z.number(),
   title: z.string(),
-  tasks: z.array(z.string())
+  tasks: z.array(z.string()),
+  resources: z.array(resourceLinkSchema).optional()
 });
 
 export const projectInstructionsSchema = z.object({

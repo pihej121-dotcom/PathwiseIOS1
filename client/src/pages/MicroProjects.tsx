@@ -19,7 +19,10 @@ import {
   Award,
   Target,
   Clock,
-  Trash2
+  Trash2,
+  Lightbulb,
+  TrendingUp,
+  FileText
 } from "lucide-react";
 import { LoadingExperience } from "@/components/LoadingExperience";
 import { FeatureGate } from "@/components/FeatureGate";
@@ -405,16 +408,27 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
                         {/* Core Features to Build */}
                         {project.instructions?.coreFeatures && project.instructions.coreFeatures.length > 0 && (
                           <div className="space-y-3">
-                            <h4 className="text-sm font-bold">Core Features to Build</h4>
-                            <div className="space-y-3">
+                            <h4 className="text-sm font-bold flex items-center gap-2">
+                              <Lightbulb className="w-4 h-4" />
+                              Core Features to Build
+                            </h4>
+                            <div className="space-y-2">
                               {project.instructions.coreFeatures.map((feature, idx) => (
-                                <div key={idx} className="border-l-2 border-primary pl-4 space-y-2">
-                                  <p className="text-sm font-semibold">{idx + 1}. {feature.title}</p>
+                                <div key={idx} className="border border-primary/20 bg-primary/5 rounded-lg p-3">
+                                  <div className="flex items-start gap-2 mb-2">
+                                    <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-[10px] font-bold">{idx + 1}</div>
+                                    <div className="flex-1">
+                                      <p className="text-xs font-semibold">{feature.title}</p>
+                                      {feature.description && (
+                                        <p className="text-xs text-muted-foreground mt-1">{feature.description}</p>
+                                      )}
+                                    </div>
+                                  </div>
                                   {feature.details && feature.details.length > 0 && (
-                                    <div className="space-y-1">
+                                    <div className="ml-6 space-y-1 text-[10px] text-muted-foreground">
                                       {feature.details.map((detail, detailIdx) => (
-                                        <div key={detailIdx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                          <span className="text-xs">○</span>
+                                        <div key={detailIdx} className="flex items-center gap-1">
+                                          <CheckCircle2 className="w-2 h-2 text-accent flex-shrink-0" />
                                           <span>{detail}</span>
                                         </div>
                                       ))}
@@ -429,19 +443,38 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
                         {/* Implementation Plan */}
                         {project.instructions?.implementationPlan && project.instructions.implementationPlan.length > 0 && (
                           <div className="space-y-3">
-                            <h4 className="text-sm font-bold">Implementation Plan</h4>
-                            <div className="space-y-3">
+                            <h4 className="text-sm font-bold flex items-center gap-2">
+                              <Clock className="w-4 h-4" />
+                              {project.instructions.implementationPlan.length}-Week Implementation Plan
+                            </h4>
+                            <div className="space-y-2">
                               {project.instructions.implementationPlan.map((week, idx) => (
-                                <div key={idx} className="p-3 rounded-md bg-muted/30 space-y-2">
-                                  <Badge variant="outline" className="text-xs">Week {week.week}</Badge>
-                                  <p className="text-sm font-semibold">{week.title}</p>
+                                <div key={idx} className="bg-muted/30 rounded-lg p-3 border">
+                                  <div className="flex items-start gap-2 mb-1">
+                                    <div className="px-2 py-0.5 rounded bg-accent text-accent-foreground text-[10px] font-bold">WEEK {week.week}</div>
+                                    <p className="text-xs font-semibold flex-1">{week.title}</p>
+                                  </div>
                                   {week.tasks && week.tasks.length > 0 && (
-                                    <div className="space-y-1 pl-3">
+                                    <div className="ml-6 text-[10px] text-muted-foreground space-y-0.5">
                                       {week.tasks.map((task, taskIdx) => (
-                                        <div key={taskIdx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                          <span className="text-xs">•</span>
-                                          <span>{task}</span>
-                                        </div>
+                                        <p key={taskIdx}>• {task}</p>
+                                      ))}
+                                    </div>
+                                  )}
+                                  {week.resources && week.resources.length > 0 && (
+                                    <div className="ml-6 mt-2 flex flex-wrap gap-2">
+                                      {week.resources.map((resource, resIdx) => (
+                                        <a
+                                          key={resIdx}
+                                          href={resource.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+                                          data-testid={`week-${idx}-resource-${resIdx}`}
+                                        >
+                                          <ExternalLink className="w-2.5 h-2.5" />
+                                          {resource.title}
+                                        </a>
                                       ))}
                                     </div>
                                   )}
@@ -454,15 +487,18 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
                         {/* Skills You'll Master */}
                         {project.instructions?.skillsMastered && (
                           <div className="space-y-3">
-                            <h4 className="text-sm font-bold">Skills You'll Master</h4>
-                            <div className="grid md:grid-cols-2 gap-4">
+                            <h4 className="text-sm font-bold flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4" />
+                              Skills You'll Master
+                            </h4>
+                            <div className="grid md:grid-cols-2 gap-3">
                               {project.instructions.skillsMastered.technicalSkills && project.instructions.skillsMastered.technicalSkills.length > 0 && (
-                                <div className="space-y-2">
-                                  <p className="text-xs font-semibold">Technical Skills</p>
-                                  <div className="space-y-1">
+                                <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                                  <p className="text-xs font-semibold mb-2">Technical Skills</p>
+                                  <div className="space-y-1 text-[10px] text-muted-foreground">
                                     {project.instructions.skillsMastered.technicalSkills.map((skill, idx) => (
-                                      <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                        <CheckCircle2 className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                      <div key={idx} className="flex items-center gap-1">
+                                        <CheckCircle2 className="w-2 h-2 text-accent flex-shrink-0" />
                                         <span>{skill}</span>
                                       </div>
                                     ))}
@@ -470,12 +506,25 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
                                 </div>
                               )}
                               {project.instructions.skillsMastered.systemDesign && project.instructions.skillsMastered.systemDesign.length > 0 && (
-                                <div className="space-y-2">
-                                  <p className="text-xs font-semibold">System Design</p>
-                                  <div className="space-y-1">
+                                <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                                  <p className="text-xs font-semibold mb-2">System Design</p>
+                                  <div className="space-y-1 text-[10px] text-muted-foreground">
                                     {project.instructions.skillsMastered.systemDesign.map((skill, idx) => (
-                                      <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                        <CheckCircle2 className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                      <div key={idx} className="flex items-center gap-1">
+                                        <CheckCircle2 className="w-2 h-2 text-accent flex-shrink-0" />
+                                        <span>{skill}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {project.instructions.skillsMastered.bestPractices && project.instructions.skillsMastered.bestPractices.length > 0 && (
+                                <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                                  <p className="text-xs font-semibold mb-2">Best Practices</p>
+                                  <div className="space-y-1 text-[10px] text-muted-foreground">
+                                    {project.instructions.skillsMastered.bestPractices.map((skill, idx) => (
+                                      <div key={idx} className="flex items-center gap-1">
+                                        <CheckCircle2 className="w-2 h-2 text-accent flex-shrink-0" />
                                         <span>{skill}</span>
                                       </div>
                                     ))}
@@ -522,12 +571,15 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
 
                         {/* Resources Provided */}
                         {project.instructions?.resourcesProvided && project.instructions.resourcesProvided.length > 0 && (
-                          <div className="space-y-3">
-                            <h4 className="text-sm font-bold">Resources Provided</h4>
-                            <div className="space-y-2">
+                          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                            <div className="flex items-start gap-2 mb-3">
+                              <FileText className="w-4 h-4 text-primary mt-0.5" />
+                              <p className="text-sm font-bold">Resources Provided</p>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-2 text-xs">
                               {project.instructions.resourcesProvided.map((resource, idx) => (
-                                <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                  <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                                <div key={idx} className="flex items-start gap-1">
+                                  <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
                                   <span>{resource}</span>
                                 </div>
                               ))}
