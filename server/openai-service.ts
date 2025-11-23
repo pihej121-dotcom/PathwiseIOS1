@@ -53,7 +53,7 @@ export class OpenAIProjectService {
   // ▼ Robust JSON parsing and normalization with step-by-step instructions
   async generateDetailedProject(
     request: ProjectGenerationRequest
-  ): Promise<Omit<InsertMicroProject, 'id' | 'createdAt' | 'updatedAt'>> {
+  ): Promise<Omit<InsertMicroProject, 'id' | 'createdAt' | 'updatedAt' | 'userId'>> {
     const prompt = `You are an expert career coach. The user is a ${request.userBackground} who wants to become a ${request.targetRole}. Their resume analysis shows they lack "${request.skillGap}" skills.
 
 Create a step-by-step practice project that will help them build this skill. Each step must include:
@@ -293,63 +293,97 @@ Return JSON only in this schema (do not rename keys):
   // NEW: Role-based project generation following the exact format from requirements
   async generateProjectsFromRole(
     request: RoleBasedProjectRequest
-  ): Promise<Omit<InsertMicroProject, 'id' | 'createdAt' | 'updatedAt'>[]> {
+  ): Promise<Omit<InsertMicroProject, 'id' | 'createdAt' | 'updatedAt' | 'userId'>[]> {
     const projectCount = request.count || 2;
-    const prompt = `Help students or early-career professionals strengthen their resumes by completing small, realistic, and targeted projects aligned with their target role: ${request.targetRole}.
+    const prompt = `Generate ${projectCount} comprehensive, portfolio-ready micro-project${projectCount > 1 ? 's' : ''} for students/early-career professionals targeting the ${request.targetRole} role.
 
-Generate ${projectCount} micro-project idea${projectCount > 1 ? 's' : ''} that are:
-- Directly relevant to the ${request.targetRole} role's common skills and responsibilities
-- Realistic to complete in 1–2 weeks (not a full-time job or thesis-level work)
-- Producing tangible, showcaseable deliverables (e.g., GitHub repo, slides, case study, prototype, report)
-- Resume/portfolio-ready (phrased in a way the user could later add to LinkedIn or a resume)
+Each project must be:
+- Realistic to complete in 1-2 weeks (8-12 hours/week)
+- Producing tangible deliverables for portfolio/resume
+- Tied to real-world datasets, APIs, or tools
+- Demonstrating skills directly relevant to ${request.targetRole}
 
-For each project, provide:
+For each project, provide COMPREHENSIVE details in this EXACT schema:
 
-1. **Title**: Clear, resume-friendly title (e.g., "Customer Churn Prediction Using Machine Learning")
-
-2. **Description**: A short 2–3 sentence summary of what the project involves and its purpose
-
-3. **Deliverables**: Step-by-step details of what the student should build/do. Each step should be:
-   - Actionable (e.g., "Download the Telco Customer Churn dataset from Kaggle", not "do data cleaning")
-   - Include links to real resources (datasets, APIs, tutorials, repos, videos) whenever possible
-   Format as array of objects with: stepNumber, instruction, resourceLinks: [{title, url, type}]
-
-4. **Skills Gained**: List the key skills, tools, or technologies this project demonstrates (align with job requirements)
-
-5. **Difficulty**: One of: "beginner", "intermediate", or "advanced"
-
-6. **Relevance to Role**: 1–2 sentences explaining why this project matters for career goals and how it strengthens resume/portfolio
-
-Requirements:
-- Avoid vague project ideas. Be specific and outcome-driven
-- Keep projects realistic to complete without major external resources (free datasets, open APIs, FOSS tools)
-- Tie projects to real datasets/APIs/scenarios (Kaggle datasets, government open data portals, GitHub repos, etc.)
-- Ensure diversity in project types: some technical builds, some analytical/strategic projects, some communication-focused
-
-Return JSON array of projects in this exact schema:
 {
   "projects": [
     {
-      "title": "string",
-      "description": "string (2-3 sentences)",
+      "title": "Clear, resume-friendly title",
+      "description": "2-3 sentence overview of the project",
       "targetRole": "${request.targetRole}",
-      "deliverables": [
+      "difficulty": "beginner|intermediate|advanced",
+      "estimatedHours": 10-40,
+      "projectType": "data-analysis|coding|design|research|business",
+      
+      "whyEmployersLove": [
+        "Demonstrates X skill - critical for modern Y",
+        "Shows full-stack capabilities: A + B",
+        "Proves you can handle Z"
+      ],
+      
+      "techStack": {
+        "frontend": ["React", "TypeScript", "Tailwind CSS"],
+        "backend": ["Node.js", "Express", "PostgreSQL"]
+      },
+      
+      "coreFeatures": [
         {
-          "stepNumber": 1,
-          "instruction": "Actionable step description",
-          "resourceLinks": [
-            {"title": "Resource name", "url": "https://...", "type": "dataset|tutorial|api|documentation"}
+          "title": "Feature Name",
+          "details": [
+            "Specific implementation detail",
+            "Another important aspect"
           ]
         }
       ],
-      "skillsGained": ["Skill 1", "Tool 2", "Technology 3"],
-      "difficulty": "beginner|intermediate|advanced",
-      "estimatedHours": 10-40,
-      "relevanceToRole": "Why this matters for the role",
-      "projectType": "data-analysis|coding|design|research|business"
+      
+      "implementationPlan": [
+        {
+          "week": 1,
+          "title": "Setup & Basic Infrastructure",
+          "tasks": [
+            "Task description with tech/approach",
+            "Another specific task"
+          ]
+        }
+      ],
+      
+      "skillsMastered": {
+        "technicalSkills": ["Skill 1", "Skill 2"],
+        "systemDesign": ["Pattern 1", "Approach 2"],
+        "bestPractices": ["Practice 1", "Practice 2"]
+      },
+      
+      "deliverables": [
+        {
+          "stepNumber": 1,
+          "instruction": "Download the dataset from Kaggle",
+          "resourceLinks": [
+            {"title": "Titanic Dataset", "url": "https://www.kaggle.com/c/titanic", "type": "dataset"}
+          ]
+        }
+      ],
+      
+      "resourcesProvided": [
+        "Complete starter template with boilerplate",
+        "Step-by-step tutorial document",
+        "Example solution repository"
+      ],
+      
+      "skillsGained": ["Python", "Pandas", "Data Visualization"],
+      "relevanceToRole": "Why this project matters for ${request.targetRole}"
     }
   ]
-}`;
+}
+
+CRITICAL REQUIREMENTS:
+1. Include ALL sections above - whyEmployersLove, techStack, coreFeatures, implementationPlan, skillsMastered, resourcesProvided
+2. techStack should have both frontend AND backend (even if backend is simple Node.js + API)
+3. implementationPlan should have 2-4 weeks of structured tasks
+4. resourceLinks must have REAL, working URLs (Kaggle, GitHub, official docs, MDN, etc.)
+5. Be specific and actionable - no vague descriptions
+6. Make it portfolio-worthy and impressive to hiring managers
+
+Return ONLY valid JSON with no markdown formatting.`;
 
     try {
       console.log(`Generating ${projectCount} role-based projects for ${request.targetRole}...`);
@@ -386,20 +420,28 @@ Return JSON array of projects in this exact schema:
 
       console.log(`Successfully generated ${jsonData.projects.length} projects`);
       
-      // Convert to InsertMicroProject format
+      // Convert to InsertMicroProject format, preserving comprehensive project data
       return jsonData.projects.map((project: any) => ({
         title: project.title,
         description: project.description,
         targetRole: project.targetRole || request.targetRole,
-        targetSkill: null, // Optional field, not used in role-based generation
-        skillCategory: null, // Optional field
+        targetSkill: null,
+        skillCategory: null,
         difficultyLevel: project.difficulty || 'intermediate',
         estimatedHours: project.estimatedHours || 20,
         projectType: project.projectType || 'general',
-        deliverables: project.deliverables || [], // New structured format with embedded links
+        deliverables: project.deliverables || [],
         skillsGained: project.skillsGained || [],
         relevanceToRole: project.relevanceToRole || '',
-        instructions: null, // Deprecated in favor of deliverables
+        // Store comprehensive project data in instructions field
+        instructions: {
+          whyEmployersLove: project.whyEmployersLove || [],
+          techStack: project.techStack || { frontend: [], backend: [] },
+          coreFeatures: project.coreFeatures || [],
+          implementationPlan: project.implementationPlan || [],
+          skillsMastered: project.skillsMastered || { technicalSkills: [], systemDesign: [], bestPractices: [] },
+          resourcesProvided: project.resourcesProvided || []
+        },
         evaluationCriteria: project.evaluationCriteria || [],
         exampleArtifacts: project.exampleArtifacts || [],
         datasetUrl: null,

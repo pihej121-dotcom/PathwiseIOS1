@@ -363,6 +363,53 @@ export const skillGapAnalyses = pgTable("skill_gap_analyses", {
 });
 
 // Role-focused micro-projects for portfolio building
+// Comprehensive Project Format Types
+export const resourceLinkSchema = z.object({
+  title: z.string(),
+  url: z.string().url(),
+  type: z.string()
+});
+
+export const deliverableSchema = z.object({
+  stepNumber: z.number(),
+  instruction: z.string(),
+  resourceLinks: z.array(resourceLinkSchema)
+});
+
+export const coreFeatureSchema = z.object({
+  title: z.string(),
+  details: z.array(z.string())
+});
+
+export const weekPlanSchema = z.object({
+  week: z.number(),
+  title: z.string(),
+  tasks: z.array(z.string())
+});
+
+export const projectInstructionsSchema = z.object({
+  whyEmployersLove: z.array(z.string()).optional(),
+  techStack: z.object({
+    frontend: z.array(z.string()).optional(),
+    backend: z.array(z.string()).optional()
+  }).optional(),
+  coreFeatures: z.array(coreFeatureSchema).optional(),
+  implementationPlan: z.array(weekPlanSchema).optional(),
+  skillsMastered: z.object({
+    technicalSkills: z.array(z.string()).optional(),
+    systemDesign: z.array(z.string()).optional(),
+    bestPractices: z.array(z.string()).optional()
+  }).optional(),
+  resourcesProvided: z.array(z.string()).optional()
+});
+
+// Type exports
+export type ResourceLink = z.infer<typeof resourceLinkSchema>;
+export type Deliverable = z.infer<typeof deliverableSchema>;
+export type CoreFeature = z.infer<typeof coreFeatureSchema>;
+export type WeekPlan = z.infer<typeof weekPlanSchema>;
+export type ProjectInstructions = z.infer<typeof projectInstructionsSchema>;
+
 export const microProjects = pgTable("micro_projects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -376,7 +423,7 @@ export const microProjects = pgTable("micro_projects", {
   projectType: text("project_type").notNull(), // data-analysis, coding, design, writing, research
   // Step-by-step deliverables with embedded resource links
   // Format: [{stepNumber, instruction, resourceLinks: [{title, url, type}]}]
-  deliverables: jsonb("deliverables").notNull(), // Actionable steps with resource links
+  deliverables: jsonb("deliverables").$type<Deliverable[]>().notNull(), // Actionable steps with resource links
   skillsGained: text("skills_gained").array().notNull(), // Skills/tools demonstrated (e.g., "Python", "Pandas", "Scikit-learn")
   relevanceToRole: text("relevance_to_role").notNull(), // Why this matters for the target role
   // Legacy fields for backward compatibility
@@ -384,7 +431,8 @@ export const microProjects = pgTable("micro_projects", {
   templateUrl: text("template_url"), 
   repositoryUrl: text("repository_url"),
   tutorialUrl: text("tutorial_url"),
-  instructions: jsonb("instructions"), // Deprecated in favor of deliverables
+  // Comprehensive project specification (stored as JSONB for flexibility)
+  instructions: jsonb("instructions").$type<ProjectInstructions>(), // Rich project format with sections
   evaluationCriteria: text("evaluation_criteria").array(),
   // Portfolio integration  
   portfolioTemplate: text("portfolio_template"), // How to present the artifact
@@ -792,6 +840,9 @@ export const insertMicroProjectSchema = createInsertSchema(microProjects).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  deliverables: z.array(deliverableSchema),
+  instructions: projectInstructionsSchema.optional()
 });
 
 export const insertProjectCompletionSchema = createInsertSchema(projectCompletions).omit({
