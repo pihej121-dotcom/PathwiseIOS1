@@ -298,64 +298,232 @@ function AboutUsContent() {
             See What You Actually Get
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            No guesswork. Here's exactly what Pathwise delivers to help you land your dream job.
+            No guesswork. Here's exactly what Pathwise delivers - real analysis reports, real recommendations, real results.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Resume Analysis Preview */}
-          <Card className="overflow-hidden">
+        {/* Full Resume Analysis Example */}
+        <div className="space-y-8 mb-12">
+          <Card className="overflow-hidden border-2">
             <CardHeader className="bg-gradient-to-br from-primary/10 to-accent/10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">Resume Analysis Report</CardTitle>
-                  <CardDescription>Comprehensive feedback in seconds</CardDescription>
+                  <CardTitle className="text-lg">Complete Resume Analysis Report</CardTitle>
+                  <CardDescription>Example: Investment Banking Resume for Morgan Stanley</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              {/* Visual Example of Resume Score */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-primary/10">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium">Your Resume Score</span>
-                  <span className="text-2xl font-bold text-primary">85/100</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2 mb-3">
-                  <div className="bg-primary h-2 rounded-full" style={{ width: '85%' }}></div>
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Format & Structure</span>
-                    <span className="font-medium">92/100</span>
+            <CardContent className="pt-6 space-y-6">
+              {/* Overall Score and Target Context */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-4 border-b">
+                  <div>
+                    <p className="text-3xl font-bold text-primary">60</p>
+                    <p className="text-sm text-muted-foreground">OVERALL MATCH SCORE</p>
+                    <p className="text-xs text-muted-foreground mt-1">Nov 13, 2025</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Content Quality</span>
-                    <span className="font-medium">88/100</span>
+                  <div className="text-right space-y-2">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">TARGET ROLE</p>
+                      <p className="text-sm font-semibold">Investment Banking</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">TARGET INDUSTRY</p>
+                      <p className="text-sm font-semibold">Finance</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">TARGET COMPANIES</p>
+                      <p className="text-sm font-semibold">Morgan Stanley</p>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">ATS Compatibility</span>
-                    <span className="font-medium">76/100</span>
+                </div>
+
+                {/* Detailed Subsection Scores */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-muted/30 rounded-lg p-4 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <Target className="w-4 h-4 text-primary" />
+                      <span className="text-2xl font-bold text-primary">70</span>
+                    </div>
+                    <p className="text-xs font-medium">SKILLS</p>
+                    <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                      <div className="bg-primary h-1.5 rounded-full" style={{ width: '70%' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-muted/30 rounded-lg p-4 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <Briefcase className="w-4 h-4 text-accent" />
+                      <span className="text-2xl font-bold text-accent">55</span>
+                    </div>
+                    <p className="text-xs font-medium">EXPERIENCE</p>
+                    <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                      <div className="bg-accent h-1.5 rounded-full" style={{ width: '55%' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-muted/30 rounded-lg p-4 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <GraduationCap className="w-4 h-4 text-primary" />
+                      <span className="text-2xl font-bold text-primary">75</span>
+                    </div>
+                    <p className="text-xs font-medium">EDUCATION</p>
+                    <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                      <div className="bg-primary h-1.5 rounded-full" style={{ width: '75%' }}></div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-muted/30 rounded-lg p-4 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <FileText className="w-4 h-4 text-accent" />
+                      <span className="text-2xl font-bold text-accent">50</span>
+                    </div>
+                    <p className="text-xs font-medium">KEYWORDS</p>
+                    <div className="w-full bg-muted rounded-full h-1.5 mt-2">
+                      <div className="bg-accent h-1.5 rounded-full" style={{ width: '50%' }}></div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Example Feedback */}
-              <div className="bg-accent/5 rounded-lg p-3 border border-accent/20">
-                <div className="flex items-start gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs font-semibold">Improvement Suggestion</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      "Managed team of 5" → "Led cross-functional team of 5 engineers to deliver 3 products, increasing efficiency by 40%"
-                    </p>
+              {/* Real Improvement Recommendations */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Improvement Recommendations
+                </h3>
+                
+                {/* High Priority Recommendation */}
+                <div className="border border-destructive/20 bg-destructive/5 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="px-2 py-0.5 rounded bg-destructive text-destructive-foreground text-xs font-bold">HIGH</div>
+                    <div className="flex-1 space-y-2">
+                      <p className="text-sm font-semibold">Financial Modeling Expertise</p>
+                      <p className="text-xs text-muted-foreground">
+                        Essential for performing complex valuations, market analyses, and financial forecasting needed in investment banking.
+                      </p>
+                      <div className="bg-background/50 rounded-md p-3 space-y-2">
+                        <p className="text-xs font-medium">Recommended Resources:</p>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3 h-3 text-primary mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-xs font-semibold">Financial Modeling & Valuation Analyst (FMVA) Certification</p>
+                            <p className="text-xs text-muted-foreground">Corporate Finance Institute</p>
+                            <a href="#" className="text-xs text-primary hover:underline">Free with audit option • View</a>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-accent font-semibold">+15 points</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Before/After Bullet Examples */}
+                <div className="border border-primary/20 bg-primary/5 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="px-2 py-0.5 rounded bg-primary text-primary-foreground text-xs font-bold">MEDIUM</div>
+                    <div className="flex-1 space-y-3">
+                      <p className="text-sm font-semibold">Quantify Your Impact</p>
+                      <p className="text-xs text-muted-foreground">
+                        Your accomplishments need specific metrics and business outcomes.
+                      </p>
+                      
+                      <div className="space-y-3">
+                        {/* Example 1 */}
+                        <div className="bg-background/50 rounded-md p-3">
+                          <div className="flex items-start gap-2 mb-2">
+                            <div className="px-2 py-0.5 rounded bg-destructive/10 text-destructive text-[10px] font-bold">BEFORE</div>
+                            <p className="text-xs text-muted-foreground italic flex-1">
+                              "Managed team of 5 analysts"
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <div className="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold">AFTER</div>
+                            <p className="text-xs font-medium flex-1">
+                              "Led cross-functional team of 5 analysts to deliver 3 M&A valuations totaling $2.4B, reducing analysis time by 40% through streamlined DCF models"
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Example 2 */}
+                        <div className="bg-background/50 rounded-md p-3">
+                          <div className="flex items-start gap-2 mb-2">
+                            <div className="px-2 py-0.5 rounded bg-destructive/10 text-destructive text-[10px] font-bold">BEFORE</div>
+                            <p className="text-xs text-muted-foreground italic flex-1">
+                              "Performed financial analysis and research"
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <div className="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold">AFTER</div>
+                            <p className="text-xs font-medium flex-1">
+                              "Conducted comprehensive financial analysis of 12 tech sector companies using comparable company analysis and precedent transactions, informing $850M acquisition decision"
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Example 3 */}
+                        <div className="bg-background/50 rounded-md p-3">
+                          <div className="flex items-start gap-2 mb-2">
+                            <div className="px-2 py-0.5 rounded bg-destructive/10 text-destructive text-[10px] font-bold">BEFORE</div>
+                            <p className="text-xs text-muted-foreground italic flex-1">
+                              "Created Excel models"
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <div className="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold">AFTER</div>
+                            <p className="text-xs font-medium flex-1">
+                              "Built dynamic 3-statement financial models with sensitivity analysis for 8 healthcare IPOs, achieving 95% accuracy in revenue projections vs. actual Q1 results"
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-accent font-semibold">+12 points</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Keyword Gap Analysis */}
+                <div className="border border-accent/20 bg-accent/5 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="px-2 py-0.5 rounded bg-accent/50 text-accent-foreground text-xs font-bold">LOW</div>
+                    <div className="flex-1 space-y-3">
+                      <p className="text-sm font-semibold">Missing Keywords for Investment Banking</p>
+                      <p className="text-xs text-muted-foreground">
+                        Add these industry-standard terms to improve ATS compatibility and demonstrate domain knowledge.
+                      </p>
+                      
+                      <div className="bg-background/50 rounded-md p-3">
+                        <p className="text-xs font-medium mb-2">Critical Keywords to Add:</p>
+                        <div className="flex flex-wrap gap-2">
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">DCF Modeling</div>
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">LBO Analysis</div>
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">Pitch Book Creation</div>
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">Comparable Company Analysis</div>
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">Precedent Transactions</div>
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">Capital Markets</div>
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">Equity Research</div>
+                          <div className="px-2 py-1 bg-primary/10 rounded text-xs">Bloomberg Terminal</div>
+                        </div>
+                        
+                        <p className="text-xs text-muted-foreground mt-3">
+                          Where to add: Integrate these naturally into your bullet points when describing your financial analysis and modeling work.
+                        </p>
+                      </div>
+                      
+                      <p className="text-xs text-accent font-semibold">+8 points</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
 
           {/* Career Roadmap Preview */}
           <Card className="overflow-hidden">
