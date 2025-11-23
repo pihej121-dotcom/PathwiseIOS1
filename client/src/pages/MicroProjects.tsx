@@ -205,18 +205,19 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
       <div className="space-y-8" data-testid="micro-projects-page">
 
         {/* Project Generation Section */}
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-blue-600" />
-              Generate Projects for Your Target Role
-            </CardTitle>
-            <CardDescription>
-              Get AI-generated micro-projects with actionable steps, real resources, and portfolio deliverables
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="p-6 rounded-md border border-border hover-elevate transition-all">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Generate Projects for Your Target Role</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Get AI-generated micro-projects with actionable steps, real resources, and portfolio deliverables
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4">
               <div className="md:col-span-2 space-y-2">
                 <label htmlFor="targetRole" className="text-sm font-medium">Target Role</label>
                 <Input
@@ -262,7 +263,7 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
               {generateProjects.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generating Projects...
+                  Generating...
                 </>
               ) : (
                 <>
@@ -271,8 +272,8 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
                 </>
               )}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Available Projects Section */}
         <div className="space-y-6">
@@ -304,145 +305,132 @@ export default function MicroProjects({ embedded = false }: { embedded?: boolean
           </div>
           
           {allProjects.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Target className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No Projects Yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Generate your first micro-project by entering your target role above
-                </p>
-              </CardContent>
-            </Card>
+            <div className="py-12 text-center border border-border rounded-md">
+              <Target className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-semibold mb-2">No Projects Yet</h3>
+              <p className="text-muted-foreground">
+                Generate your first micro-project by entering your target role above
+              </p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               {allProjects.map((project) => {
                 const status = getProjectStatus(project.id);
                 const isStarted = status !== "not_started";
                 
                 return (
-                  <Card key={project.id} className="overflow-hidden" data-testid={`project-card-${project.id}`}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <CardTitle className="text-xl mb-2">{project.title}</CardTitle>
-                          <CardDescription className="text-base">{project.description}</CardDescription>
-                        </div>
-                        <div className="flex flex-col gap-2 items-end">
-                          <Badge className={getDifficultyColor(project.difficultyLevel)}>
-                            {project.difficultyLevel}
+                  <div key={project.id} className="p-6 rounded-md border border-border hover-elevate transition-all space-y-4" data-testid={`project-card-${project.id}`}>
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold mb-1">{project.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{project.description}</p>
+                      </div>
+                      <div className="flex flex-col gap-2 items-end flex-shrink-0">
+                        <Badge className={getDifficultyColor(project.difficultyLevel)}>
+                          {project.difficultyLevel}
+                        </Badge>
+                        {isStarted && (
+                          <Badge className={getStatusColor(status)}>
+                            {status.replace('_', ' ')}
                           </Badge>
-                          {isStarted && (
-                            <Badge className={getStatusColor(status)}>
-                              {status.replace('_', ' ')}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      {/* Target Role & Time */}
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <Briefcase className="w-4 h-4" />
-                          <span>Target Role: <strong>{project.targetRole}</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          <span>~{project.estimatedHours} hours</span>
-                        </div>
-                      </div>
-
-                      {/* Skills Gained */}
-                      {project.skillsGained && project.skillsGained.length > 0 && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            <Award className="w-4 h-4" />
-                            Skills Gained
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {project.skillsGained.map((skill, idx) => (
-                              <Badge key={idx} variant="secondary" data-testid={`skill-badge-${idx}`}>
-                                {skill}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Deliverables */}
-                      {project.deliverables && Array.isArray(project.deliverables) && project.deliverables.length > 0 && (
-                        <div className="space-y-3">
-                          <h4 className="text-sm font-semibold">Deliverables & Steps:</h4>
-                          <div className="space-y-4">
-                            {project.deliverables.map((deliverable, idx) => (
-                              <div key={idx} className="pl-4 border-l-2 border-blue-200 dark:border-blue-800 space-y-2">
-                                <div className="flex gap-3">
-                                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 flex items-center justify-center text-sm font-semibold">
-                                    {deliverable.stepNumber || idx + 1}
-                                  </span>
-                                  <p className="text-sm flex-1">{deliverable.instruction}</p>
-                                </div>
-                                {deliverable.resourceLinks && deliverable.resourceLinks.length > 0 && (
-                                  <div className="ml-9 flex flex-wrap gap-2">
-                                    {deliverable.resourceLinks.map((resource, resIdx) => (
-                                      <a
-                                        key={resIdx}
-                                        href={resource.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                                        data-testid={`resource-link-${idx}-${resIdx}`}
-                                      >
-                                        <ExternalLink className="w-3 h-3" />
-                                        {resource.title}
-                                        <Badge variant="outline" className="text-xs py-0">
-                                          {resource.type}
-                                        </Badge>
-                                      </a>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Relevance to Role */}
-                      {project.relevanceToRole && (
-                        <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg space-y-2">
-                          <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                            Why This Matters
-                          </h4>
-                          <p className="text-sm text-blue-800 dark:text-blue-200">
-                            {project.relevanceToRole}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Action Button */}
-                      <div className="pt-4 border-t">
-                        {!isStarted ? (
-                          <Button
-                            onClick={() => startProject(project.id)}
-                            data-testid={`button-start-${project.id}`}
-                          >
-                            <PlayCircle className="w-4 h-4 mr-2" />
-                            Start Project
-                          </Button>
-                        ) : status === "completed" ? (
-                          <Button variant="outline" disabled>
-                            <CheckCircle2 className="w-4 h-4 mr-2" />
-                            Completed
-                          </Button>
-                        ) : (
-                          <Button variant="outline" data-testid={`button-continue-${project.id}`}>
-                            Continue Project
-                          </Button>
                         )}
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+
+                    {/* Meta Info */}
+                    <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <Briefcase className="w-4 h-4" />
+                        <span>{project.targetRole}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4" />
+                        <span>~{project.estimatedHours} hours</span>
+                      </div>
+                    </div>
+
+                    {/* Skills Gained */}
+                    {project.skillsGained && project.skillsGained.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs font-semibold">
+                          <Award className="w-3.5 h-3.5" />
+                          Skills Gained
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {project.skillsGained.map((skill, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-xs" data-testid={`skill-badge-${idx}`}>
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Deliverables */}
+                    {project.deliverables && Array.isArray(project.deliverables) && project.deliverables.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-semibold">Steps:</h4>
+                        <div className="space-y-3">
+                          {project.deliverables.map((deliverable, idx) => (
+                            <div key={idx} className="text-sm space-y-1.5">
+                              <div className="flex gap-2">
+                                <span className="flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                                  {deliverable.stepNumber || idx + 1}
+                                </span>
+                                <p className="flex-1">{deliverable.instruction}</p>
+                              </div>
+                              {deliverable.resourceLinks && deliverable.resourceLinks.length > 0 && (
+                                <div className="ml-7 flex flex-wrap gap-2">
+                                  {deliverable.resourceLinks.map((resource, resIdx) => (
+                                    <a
+                                      key={resIdx}
+                                      href={resource.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                                      data-testid={`resource-link-${idx}-${resIdx}`}
+                                    >
+                                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                                      {resource.title}
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Relevance */}
+                    {project.relevanceToRole && (
+                      <p className="text-xs text-muted-foreground italic border-t pt-3">
+                        {project.relevanceToRole}
+                      </p>
+                    )}
+
+                    {/* Action Button */}
+                    {!isStarted ? (
+                      <Button
+                        onClick={() => startProject(project.id)}
+                        className="w-full"
+                        data-testid={`button-start-${project.id}`}
+                      >
+                        <PlayCircle className="w-4 h-4 mr-2" />
+                        Start Project
+                      </Button>
+                    ) : status === "completed" ? (
+                      <Button variant="outline" disabled className="w-full">
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Completed
+                      </Button>
+                    ) : (
+                      <Button variant="outline" className="w-full" data-testid={`button-continue-${project.id}`}>
+                        Continue Project
+                      </Button>
+                    )}
+                  </div>
                 );
               })}
             </div>
