@@ -390,6 +390,63 @@ function AboutUsContent() {
                       </div>
                     </div>
 
+                    {/* Skills Analysis Section */}
+                    <div className="border rounded-lg p-4 space-y-4">
+                      <h3 className="text-sm font-bold flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Skills Analysis
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        <p className="text-xs text-muted-foreground">
+                          Skills align with foundational requirements, but advanced financial tools and modeling capabilities are essential for investment banking roles.
+                        </p>
+
+                        {/* Strengths */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-500 flex-shrink-0" />
+                            <p className="text-xs font-semibold">Strengths</p>
+                          </div>
+                          <ul className="space-y-1 pl-6">
+                            <li className="text-xs text-muted-foreground">Proficient in Excel for building financial models and data analysis</li>
+                            <li className="text-xs text-muted-foreground">Basic Python and C++ skills</li>
+                            <li className="text-xs text-muted-foreground">Fluent in multiple languages: Russian, Kazakh, English</li>
+                            <li className="text-xs text-muted-foreground">Skill in transforming data into actionable insights</li>
+                            <li className="text-xs text-muted-foreground">Experience in credit risk assessment and market analysis</li>
+                          </ul>
+                        </div>
+
+                        {/* Gaps */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Target className="w-4 h-4 text-amber-600 dark:text-amber-500 flex-shrink-0" />
+                            <p className="text-xs font-semibold">Gaps</p>
+                          </div>
+                          <ul className="space-y-1 pl-6">
+                            <li className="text-xs text-muted-foreground">No experience with financial modeling software like Bloomberg Terminal or FactSet</li>
+                            <li className="text-xs text-muted-foreground">Lacks advanced financial modeling skills, especially in valuation techniques</li>
+                            <li className="text-xs text-muted-foreground">No exposure to mergers and acquisitions (M&A), which is crucial for investment banking</li>
+                            <li className="text-xs text-muted-foreground">Does not have expertise in SQL, often required for data manipulation in finance</li>
+                            <li className="text-xs text-muted-foreground">Missing skills in advanced Excel functions like VBA and PivotTables</li>
+                          </ul>
+                        </div>
+
+                        {/* How to Improve */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Lightbulb className="w-4 h-4 text-primary flex-shrink-0" />
+                            <p className="text-xs font-semibold">How to Improve</p>
+                          </div>
+                          <ul className="space-y-1 pl-6">
+                            <li className="text-xs text-muted-foreground">Take financial modeling advanced courses on platforms like Coursera or LinkedIn Learning</li>
+                            <li className="text-xs text-muted-foreground">Gain exposure to Bloomberg Terminal through workshops or university resources</li>
+                            <li className="text-xs text-muted-foreground">Complete online certification in Financial Modeling & Valuation Analyst (FMVA)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Detailed Improvement Recommendations */}
                     <div className="space-y-3">
                       <h3 className="text-sm font-bold">Top Improvement Recommendations</h3>
