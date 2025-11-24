@@ -390,21 +390,71 @@ function AboutUsContent() {
                       </div>
                     </div>
 
-                    {/* Key Recommendations Preview */}
+                    {/* Detailed Improvement Recommendations */}
                     <div className="space-y-3">
                       <h3 className="text-sm font-bold">Top Improvement Recommendations</h3>
+                      
+                      {/* HIGH Priority */}
                       <div className="border border-destructive/20 bg-destructive/5 rounded-lg p-4">
                         <div className="flex items-start gap-3">
                           <div className="px-2 py-0.5 rounded bg-destructive text-destructive-foreground text-xs font-bold">HIGH</div>
                           <div className="flex-1">
                             <p className="text-sm font-semibold">Financial Modeling Expertise</p>
                             <p className="text-xs text-muted-foreground">Essential for complex valuations and market analyses</p>
-                            <p className="text-xs text-accent font-semibold mt-2">+15 points</p>
+                            <p className="text-xs text-primary font-semibold mt-2">+15 points</p>
                           </div>
                         </div>
                       </div>
-                      <div className="text-xs text-muted-foreground text-center py-2">
-                        And 8 more detailed recommendations with examples...
+
+                      {/* MEDIUM Priority */}
+                      <div className="border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="px-2 py-0.5 rounded bg-amber-600 text-white text-xs font-bold">MEDIUM</div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">Deal Execution Experience</p>
+                            <p className="text-xs text-muted-foreground">Highlight M&A transaction experience and due diligence work</p>
+                            <p className="text-xs text-primary font-semibold mt-2">+12 points</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="px-2 py-0.5 rounded bg-amber-600 text-white text-xs font-bold">MEDIUM</div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">Industry-Specific Keywords</p>
+                            <p className="text-xs text-muted-foreground">Add terms like "pitch book", "valuation multiples", "DCF analysis"</p>
+                            <p className="text-xs text-primary font-semibold mt-2">+10 points</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* LOW Priority */}
+                      <div className="border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="px-2 py-0.5 rounded bg-blue-600 text-white text-xs font-bold">LOW</div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">Leadership & Teamwork</p>
+                            <p className="text-xs text-muted-foreground">Quantify team leadership experience with specific metrics</p>
+                            <p className="text-xs text-primary font-semibold mt-2">+8 points</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="px-2 py-0.5 rounded bg-blue-600 text-white text-xs font-bold">LOW</div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">Format Optimization</p>
+                            <p className="text-xs text-muted-foreground">Use bullet points starting with action verbs for better ATS parsing</p>
+                            <p className="text-xs text-primary font-semibold mt-2">+5 points</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Additional Recommendations Indicator */}
+                      <div className="text-xs text-muted-foreground text-center py-2 border-t">
+                        Plus 4 more recommendations with specific examples and implementation guides
                       </div>
                     </div>
                   </div>
@@ -501,10 +551,91 @@ function AboutUsContent() {
                           <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px]">Charts</div>
                         </div>
                       </div>
+                      <div className="bg-muted/30 rounded-lg p-3 mt-2">
+                        <p className="text-xs font-semibold mb-2">Week 5-8: First Production App</p>
+                        <div className="space-y-1 text-xs text-muted-foreground">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3 h-3 text-accent mt-0.5" />
+                            <span>Build e-commerce dashboard with data visualization</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3 h-3 text-accent mt-0.5" />
+                            <span>Implement user authentication and state management</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="text-xs text-muted-foreground text-center py-2">
-                      Plus 2 more phases with detailed weekly tasks...
+                    {/* Phase 3 */}
+                    <div className="border-l-2 border-green-500 pl-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                          <span className="text-[10px] font-bold text-white">3</span>
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm">Phase 3: Advanced Skills (Weeks 13-20)</p>
+                          <p className="text-xs text-muted-foreground">Master testing & deployment</p>
+                        </div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3">
+                        <p className="text-xs font-semibold mb-2">Testing & CI/CD</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          <div className="px-2 py-0.5 bg-green-500/10 rounded text-[10px]">Jest</div>
+                          <div className="px-2 py-0.5 bg-green-500/10 rounded text-[10px]">React Testing Library</div>
+                          <div className="px-2 py-0.5 bg-green-500/10 rounded text-[10px]">GitHub Actions</div>
+                        </div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3 mt-2">
+                        <p className="text-xs font-semibold mb-2">Week 13-16: Quality & DevOps</p>
+                        <div className="space-y-1 text-xs text-muted-foreground">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3 h-3 text-green-500 mt-0.5" />
+                            <span>Write unit & integration tests (80% coverage)</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3 h-3 text-green-500 mt-0.5" />
+                            <span>Set up automated deployment pipeline</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Phase 4 */}
+                    <div className="border-l-2 border-orange-500 pl-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
+                          <span className="text-[10px] font-bold text-white">4</span>
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm">Phase 4: Job Ready (Weeks 21-26)</p>
+                          <p className="text-xs text-muted-foreground">Polish portfolio & apply</p>
+                        </div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3">
+                        <p className="text-xs font-semibold mb-2">Final Portfolio Project</p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          <div className="px-2 py-0.5 bg-orange-500/10 rounded text-[10px]">Next.js</div>
+                          <div className="px-2 py-0.5 bg-orange-500/10 rounded text-[10px]">PostgreSQL</div>
+                          <div className="px-2 py-0.5 bg-orange-500/10 rounded text-[10px]">AWS</div>
+                        </div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3 mt-2">
+                        <p className="text-xs font-semibold mb-2">Week 21-26: Launch Phase</p>
+                        <div className="space-y-1 text-xs text-muted-foreground">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3 h-3 text-orange-500 mt-0.5" />
+                            <span>Build full-stack SaaS app with payments integration</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3 h-3 text-orange-500 mt-0.5" />
+                            <span>Create portfolio site & start applying to roles</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground text-center py-2 border-t mt-4">
+                      All phases include weekly check-ins, code reviews, and personalized feedback
                     </div>
                   </div>
                 </ScrollArea>
@@ -582,11 +713,61 @@ function AboutUsContent() {
                             <p className="text-xs text-muted-foreground">Built high-throughput APIs handling 50K req/sec</p>
                           </div>
                         </div>
+                        <div className="flex items-start gap-2 p-3 bg-primary/5 rounded-lg">
+                          <CheckCircle2 className="w-4 h-4 text-primary mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">API Architecture</p>
+                            <p className="text-xs text-muted-foreground">Designed RESTful APIs used by 100K+ developers</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 p-3 bg-primary/5 rounded-lg">
+                          <CheckCircle2 className="w-4 h-4 text-primary mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">Security Best Practices</p>
+                            <p className="text-xs text-muted-foreground">Implemented PCI-DSS compliance and data encryption</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="text-xs text-muted-foreground text-center py-2">
-                      Plus gap analysis and application tips...
+                    {/* Gap Analysis */}
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-bold">Areas to Improve</h3>
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                          <div className="w-4 h-4 rounded-full border-2 border-amber-600 mt-0.5"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">Go Programming</p>
+                            <p className="text-xs text-muted-foreground">Stripe uses Go extensively - consider learning basics</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                          <div className="w-4 h-4 rounded-full border-2 border-amber-600 mt-0.5"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold">Distributed Systems</p>
+                            <p className="text-xs text-muted-foreground">Add experience with microservices and event-driven architecture</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Application Tips */}
+                    <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                      <h3 className="text-sm font-bold mb-2">Application Tips</h3>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary font-bold">•</span>
+                          <span>Highlight your payment systems experience prominently in your cover letter</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary font-bold">•</span>
+                          <span>Mention specific metrics: API throughput, user scale, uptime percentages</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary font-bold">•</span>
+                          <span>Showcase side projects that demonstrate distributed systems knowledge</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </ScrollArea>
@@ -674,8 +855,77 @@ function AboutUsContent() {
                       </div>
                     </div>
 
-                    <div className="text-xs text-muted-foreground text-center py-2">
-                      Plus detailed features, implementation guides, and resources...
+                    {/* Core Features */}
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-bold">Core Features to Build</h3>
+                      <div className="space-y-2">
+                        <div className="p-3 bg-muted/30 rounded-lg border">
+                          <p className="text-xs font-semibold mb-1">1. Live Canvas Collaboration</p>
+                          <p className="text-xs text-muted-foreground">Multiple users drawing simultaneously with real-time cursor tracking</p>
+                        </div>
+                        <div className="p-3 bg-muted/30 rounded-lg border">
+                          <p className="text-xs font-semibold mb-1">2. Presence Indicators</p>
+                          <p className="text-xs text-muted-foreground">Show active users with avatars and live cursor positions</p>
+                        </div>
+                        <div className="p-3 bg-muted/30 rounded-lg border">
+                          <p className="text-xs font-semibold mb-1">3. Shape Tools & Drawing</p>
+                          <p className="text-xs text-muted-foreground">Rectangle, circle, line, text with color picker and styling</p>
+                        </div>
+                        <div className="p-3 bg-muted/30 rounded-lg border">
+                          <p className="text-xs font-semibold mb-1">4. Undo/Redo System</p>
+                          <p className="text-xs text-muted-foreground">Conflict-free replicated data type (CRDT) for collaborative editing</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Implementation Guide */}
+                    <div className="bg-accent/5 rounded-lg p-4 border border-accent/20">
+                      <h3 className="text-sm font-bold mb-2">Implementation Roadmap</h3>
+                      <div className="space-y-2 text-xs">
+                        <div>
+                          <p className="font-semibold text-accent">Week 1: Setup & Basic Canvas</p>
+                          <p className="text-muted-foreground">Set up React canvas, basic drawing tools, local state management</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-accent">Week 2: Real-time Sync</p>
+                          <p className="text-muted-foreground">Implement Socket.io, broadcast drawing events, cursor tracking</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-accent">Week 3: Advanced Features</p>
+                          <p className="text-muted-foreground">Add shape tools, color picker, undo/redo with CRDT</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-accent">Week 4: Polish & Deploy</p>
+                          <p className="text-muted-foreground">Optimize performance, add persistence with Redis, deploy to production</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Learning Resources */}
+                    <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
+                      <h3 className="text-sm font-bold mb-2">Learning Resources</h3>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary font-bold">📚</span>
+                          <span>Socket.io documentation - Real-time communication patterns</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary font-bold">📚</span>
+                          <span>CRDT tutorial - Conflict-free collaborative editing</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary font-bold">📚</span>
+                          <span>Canvas API guide - Advanced drawing techniques</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-primary font-bold">📚</span>
+                          <span>Redis pub/sub - Scaling real-time applications</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground text-center py-2 border-t">
+                      Complete project includes: starter code, step-by-step guide, and deployment checklist
                     </div>
                   </div>
                 </ScrollArea>
