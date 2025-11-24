@@ -286,33 +286,50 @@ function AboutUsContent() {
         </div>
       </div>
 
-      {/* Deliverables Preview Section - Horizontal Scroll */}
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-4">
-            See What You Actually Get
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Tap any feature to see real examples of what Pathwise delivers
-          </p>
-        </div>
+      {/* Deliverables Preview Section - MOST PROMINENT SECTION */}
+      <div className="py-20 bg-gradient-to-br from-primary/5 via-background to-accent/5">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12 space-y-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+              <Sparkles className="w-4 h-4" />
+              See Real Examples
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+              See What You Actually Get
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Click any card below to see real, detailed examples of what Pathwise delivers
+            </p>
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-2">
+              <div className="flex items-center gap-1 animate-pulse">
+                <div className="w-2 h-2 rounded-full bg-primary"></div>
+                <span className="font-medium">Click to explore</span>
+              </div>
+            </div>
+          </div>
 
-        {/* Horizontal Scrollable Feature Chips */}
-        <div className="relative">
-          <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+          {/* Grid Layout - Large Clickable Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Feature 1: Resume Analysis */}
             <Dialog>
               <DialogTrigger asChild>
                 <button 
-                  className="flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-lg border bg-card hover-elevate active-elevate-2 transition-all w-[180px] snap-start"
+                  className="group relative flex flex-col items-center gap-4 p-8 rounded-xl border-2 bg-card hover-elevate active-elevate-2 transition-all cursor-pointer overflow-visible"
                   data-testid="button-feature-resume-analysis"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-primary" />
+                  <div className="absolute -top-1 -right-1 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg">
+                    CLICK ME
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold">Resume Analysis</p>
-                    <p className="text-xs text-muted-foreground mt-1">AI-powered scoring & feedback</p>
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <FileText className="w-10 h-10 text-primary" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-lg font-bold">Resume Analysis</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">AI-powered scoring & feedback</p>
+                  </div>
+                  <div className="text-xs text-primary font-semibold flex items-center gap-1">
+                    View Example
+                    <Sparkles className="w-3 h-3" />
                   </div>
                 </button>
               </DialogTrigger>
@@ -523,15 +540,22 @@ function AboutUsContent() {
             <Dialog>
               <DialogTrigger asChild>
                 <button 
-                  className="flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-lg border bg-card hover-elevate active-elevate-2 transition-all w-[180px] snap-start"
+                  className="group relative flex flex-col items-center gap-4 p-8 rounded-xl border-2 bg-card hover-elevate active-elevate-2 transition-all cursor-pointer overflow-visible"
                   data-testid="button-feature-career-roadmap"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Route className="w-6 h-6 text-primary" />
+                  <div className="absolute -top-1 -right-1 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg">
+                    CLICK ME
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold">Career Roadmap</p>
-                    <p className="text-xs text-muted-foreground mt-1">Personalized development plan</p>
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Route className="w-10 h-10 text-accent" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-lg font-bold">Career Roadmap</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">Personalized development plan</p>
+                  </div>
+                  <div className="text-xs text-primary font-semibold flex items-center gap-1">
+                    View Example
+                    <Sparkles className="w-3 h-3" />
                   </div>
                 </button>
               </DialogTrigger>
@@ -703,15 +727,22 @@ function AboutUsContent() {
             <Dialog>
               <DialogTrigger asChild>
                 <button 
-                  className="flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-lg border bg-card hover-elevate active-elevate-2 transition-all w-[180px] snap-start"
+                  className="group relative flex flex-col items-center gap-4 p-8 rounded-xl border-2 bg-card hover-elevate active-elevate-2 transition-all cursor-pointer overflow-visible"
                   data-testid="button-feature-job-matching"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Briefcase className="w-6 h-6 text-primary" />
+                  <div className="absolute -top-1 -right-1 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg">
+                    CLICK ME
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold">Job Matching</p>
-                    <p className="text-xs text-muted-foreground mt-1">AI skill compatibility</p>
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Briefcase className="w-10 h-10 text-primary" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-lg font-bold">Job Matching</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">AI skill compatibility</p>
+                  </div>
+                  <div className="text-xs text-primary font-semibold flex items-center gap-1">
+                    View Example
+                    <Sparkles className="w-3 h-3" />
                   </div>
                 </button>
               </DialogTrigger>
@@ -835,15 +866,22 @@ function AboutUsContent() {
             <Dialog>
               <DialogTrigger asChild>
                 <button 
-                  className="flex-shrink-0 flex flex-col items-center gap-2 p-4 rounded-lg border bg-card hover-elevate active-elevate-2 transition-all w-[180px] snap-start"
+                  className="group relative flex flex-col items-center gap-4 p-8 rounded-xl border-2 bg-card hover-elevate active-elevate-2 transition-all cursor-pointer overflow-visible"
                   data-testid="button-feature-portfolio-projects"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Lightbulb className="w-6 h-6 text-primary" />
+                  <div className="absolute -top-1 -right-1 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full shadow-lg">
+                    CLICK ME
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold">Micro-Projects</p>
-                    <p className="text-xs text-muted-foreground mt-1">AI-generated ideas</p>
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Lightbulb className="w-10 h-10 text-accent" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-lg font-bold">Micro-Projects</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">AI-generated ideas</p>
+                  </div>
+                  <div className="text-xs text-primary font-semibold flex items-center gap-1">
+                    View Example
+                    <Sparkles className="w-3 h-3" />
                   </div>
                 </button>
               </DialogTrigger>
@@ -990,14 +1028,6 @@ function AboutUsContent() {
             </Dialog>
           </div>
         </div>
-
-        {/* Mobile scroll hint */}
-        <p className="text-xs text-center text-muted-foreground mt-4">
-          <span className="inline-flex items-center gap-1">
-            Swipe to explore all features
-            <span className="text-primary">→</span>
-          </span>
-        </p>
       </div>
 
       {/* Testimonials */}
