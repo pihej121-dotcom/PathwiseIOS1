@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ProgressRing } from "@/components/ProgressRing";
-import { PaywallOverlay } from "@/components/PaywallOverlay";
+import { FeatureGate } from "@/components/FeatureGate";
 import { TourButton } from "@/components/TourButton";
 import { apiRequest, queryClient as globalQueryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -196,7 +196,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
   }
 
   const content = (
-    <>
+    <FeatureGate featureKey="resume_analysis">
       <div className="flex justify-end mb-4">
         <TourButton 
           tourId="resume-analysis"
@@ -476,8 +476,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
 
             {/* Section Details */}
             {selectedSection && (activeResume as any)?.sectionAnalysis?.[selectedSection] && (
-              <PaywallOverlay featureKey="resume_analysis">
-                <Card className="mt-6 border-none shadow-sm" data-testid="section-details">
+              <Card className="mt-6 border-none shadow-sm" data-testid="section-details">
                   <CardHeader>
                     <CardTitle className="text-base font-medium flex items-center gap-2 capitalize">
                       {selectedSection === 'skills' && <Target className="w-4 h-4" />}
@@ -547,13 +546,11 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
                     </div>
                   </CardContent>
                 </Card>
-              </PaywallOverlay>
             )}
 
             {/* Improvement Recommendations */}
             {(activeResume as any)?.gaps && Array.isArray((activeResume as any)?.gaps) && (activeResume as any)?.gaps.length > 0 && (
-              <PaywallOverlay featureKey="resume_analysis">
-                <Card className="border-none shadow-sm">
+              <Card className="border-none shadow-sm">
                   <CardHeader>
                     <CardTitle className="text-base font-medium flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
@@ -625,7 +622,6 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
                     </div>
                   </CardContent>
                 </Card>
-              </PaywallOverlay>
             )}
 
           </>
@@ -648,7 +644,7 @@ export default function ResumeAnalysis({ embedded = false }: { embedded?: boolea
           />
         </div>
       </div>
-    </>
+    </FeatureGate>
   );
 
   return embedded ? content : (
