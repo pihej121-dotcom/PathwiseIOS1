@@ -59,46 +59,86 @@ export const dashboardTour: TourConfig = {
   steps: [
     {
       id: "welcome",
-      title: "Welcome! 👋",
-      text: "This is your Career Dashboard - your central hub for tracking progress, analyzing your resume, and building your career path. Let's take a quick tour!",
+      title: "Welcome to Pathwise! 👋",
+      text: "Your all-in-one career development platform. Let's explore the powerful tools at your fingertips!",
       buttons: [buttons.skip, buttons.next],
     },
     {
-      id: "rms-score",
-      title: "Resume Match Score",
-      text: "Your Resume Match Score (RMS) shows how well your resume aligns with your target role. Higher scores mean better job matches. Upload your resume to get started!",
-      attachTo: {
-        element: "[data-testid='rms-score']",
-        on: "bottom",
-      },
-      buttons: [buttons.back, buttons.skip, buttons.next],
-    },
-    {
-      id: "applications-count",
-      title: "Applications Tracker",
-      text: "Track how many jobs you've applied to. Stay organized and monitor your job search progress from one central location.",
-      attachTo: {
-        element: "[data-testid='applications-count']",
-        on: "bottom",
-      },
-      buttons: [buttons.back, buttons.skip, buttons.next],
-    },
-    {
-      id: "roadmap-progress",
-      title: "Roadmap Progress",
-      text: "Your career roadmap completion percentage. Complete tasks to build momentum and advance toward your career goals!",
-      attachTo: {
-        element: "[data-testid='roadmap-progress']",
-        on: "bottom",
-      },
-      buttons: [buttons.back, buttons.skip, buttons.next],
-    },
-    {
-      id: "feature-cards",
-      title: "Career Tools",
-      text: "Click any card below to access powerful career development tools. Upload resumes, analyze jobs, build roadmaps, practice interviews, and more!",
+      id: "resume-upload",
+      title: "Resume Upload",
+      text: "Start here! Upload and manage your resumes. This is the foundation for all AI-powered features on the platform.",
       attachTo: {
         element: "[data-testid='card-upload']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "resume-analysis",
+      title: "Resume Analysis",
+      text: "Get instant AI-powered feedback on your resume with detailed scoring and actionable improvement recommendations.",
+      attachTo: {
+        element: "[data-testid='card-resume']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "career-roadmap",
+      title: "Career Roadmap",
+      text: "Generate personalized career development plans with 30-day, 3-month, and 6-month actionable milestones tailored to your goals.",
+      attachTo: {
+        element: "[data-testid='card-roadmap']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "job-match",
+      title: "Job Match Assistant",
+      text: "Analyze job postings, get compatibility scores, tailor your resume, and generate custom cover letters—all powered by AI.",
+      attachTo: {
+        element: "[data-testid='card-jobs']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "projects",
+      title: "Portfolio Projects",
+      text: "Build your portfolio with AI-generated micro-projects designed to close skills gaps and showcase your abilities to employers.",
+      attachTo: {
+        element: "[data-testid='card-projects']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "compensation",
+      title: "Compensation Insights",
+      text: "Get personalized salary negotiation strategies based on your resume, target role, and market data. Negotiate with confidence!",
+      attachTo: {
+        element: "[data-testid='card-copilot']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "applications",
+      title: "Application Tracker",
+      text: "Organize and track all your job applications in one place. Monitor status, add notes, and stay on top of your job search.",
+      attachTo: {
+        element: "[data-testid='card-applications']",
+        on: "bottom",
+      },
+      buttons: [buttons.back, buttons.skip, buttons.next],
+    },
+    {
+      id: "interview-prep",
+      title: "Interview Prep",
+      text: "Practice with AI-generated interview questions tailored to your applications. Get tips, resources, and ace your interviews!",
+      attachTo: {
+        element: "[data-testid='card-interview']",
         on: "top",
       },
       buttons: [buttons.back, buttons.skip, buttons.finish],
