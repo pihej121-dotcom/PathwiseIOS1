@@ -105,8 +105,8 @@ export const users = pgTable("users", {
   location: text("location"),
   remoteOk: boolean("remote_ok").default(false),
   // Subscription fields
-  subscriptionTier: subscriptionTierEnum("subscription_tier").notNull().default("free"),
-  subscriptionStatus: subscriptionStatusEnum("subscription_status"),
+  subscriptionTier: subscriptionTierEnum("subscription_tier").notNull().default("paid"),
+  subscriptionStatus: subscriptionStatusEnum("subscription_status").notNull().default("active"),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionEndsAt: timestamp("subscription_ends_at"),
