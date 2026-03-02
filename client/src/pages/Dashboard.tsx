@@ -132,6 +132,21 @@ function AboutUsContent() {
               Get Started Now
             </Button>
           </Link>
+        
+          <a
+            href="https://donate.stripe.com/00wdR8ab1gSxbQygjLak001"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-lg px-8 border-primary text-primary hover:bg-primary hover:text-white transition-all"
+              data-testid="button-donate-hero"
+            >
+              Support the Mission
+            </Button>
+          </a>
         </div>
         <p className="text-sm text-muted-foreground">
           Join thousands of students landing their dream jobs
