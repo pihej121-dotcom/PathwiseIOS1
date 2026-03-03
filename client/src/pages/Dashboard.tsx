@@ -1822,24 +1822,6 @@ export default function Dashboard() {
             <p className="text-xs text-muted-foreground">Track progress</p>
           </CardContent>
         </Card>
-
-        <a
-          href="https://donate.stripe.com/00wdR8ab1gSxbQygjLak001"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]"
-          data-testid="card-donate-link"
-        >
-          <Card className="cursor-pointer hover:shadow-lg transition-all h-full" data-testid="card-donate">
-            <CardContent className="pt-6 text-center">
-              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Heart className="w-6 h-6 text-red-600" />
-              </div>
-              <h3 className="font-semibold mb-1">Donate</h3>
-              <p className="text-xs text-muted-foreground">Support the mission</p>
-            </CardContent>
-          </Card>
-        </a>
         
         <Card 
           className={`cursor-pointer hover:shadow-lg transition-all w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)] ${selectedCard === 'interview' ? 'ring-2 ring-amber-500 shadow-lg' : ''}`} 
@@ -1884,6 +1866,24 @@ export default function Dashboard() {
         </Card>
       </div>
 
+        <a
+          href="https://donate.stripe.com/00wdR8ab1gSxbQygjLak001"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]"
+          data-testid="card-donate-link"
+        >
+          <Card className="cursor-pointer hover:shadow-lg transition-all h-full" data-testid="card-donate">
+            <CardContent className="pt-6 text-center">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Heart className="w-6 h-6 text-red-600" />
+              </div>
+              <h3 className="font-semibold mb-1">Donate</h3>
+              <p className="text-xs text-muted-foreground">Support the mission</p>
+            </CardContent>
+          </Card>
+        </a>
+      
       {/* Recent Activity */}
       <Card>
         <CardHeader>
