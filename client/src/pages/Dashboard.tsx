@@ -61,7 +61,8 @@ import {
   Star,
   Quote,
   CheckCircle2,
-  User
+  User,
+  Heart
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
@@ -186,22 +187,38 @@ function AboutUsContent() {
               Discover opportunities that align with your skills using AI-powered matching.
             </p>
           </div>
-
+        
           <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
-            <Lightbulb className="w-5 h-5 text-primary mb-4" />
-            <h3 className="text-base font-semibold mb-2">Micro-Projects</h3>
+          <Lightbulb className="w-5 h-5 text-primary mb-4" />
+          <h3 className="text-base font-semibold mb-2">Micro-Projects</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Build your portfolio with AI-generated project ideas for your target role.
+          </p>
+        </div>
+        
+        <a
+          href="https://donate.stripe.com/00wdR8ab1gSxbQygjLak001"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group p-6 rounded-md border border-border hover-elevate transition-all block"
+          data-testid="link-donate-card"
+        >
+          <div className="flex flex-col items-start">
+            <Heart className="w-5 h-5 text-red-600 mb-4" />
+            <h3 className="text-base font-semibold mb-2">Donate</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Build your portfolio with AI-generated project ideas for your target role.
+              Support the mission and help students launch their careers.
             </p>
           </div>
-
-          <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
-            <Target className="w-5 h-5 text-primary mb-4" />
-            <h3 className="text-base font-semibold mb-2">Application Tracking</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Organize and monitor your job applications with built-in progress tracking.
-            </p>
-          </div>
+        </a>
+        
+        <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
+          <Target className="w-5 h-5 text-primary mb-4" />
+          <h3 className="text-base font-semibold mb-2">Application Tracking</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Organize and monitor your job applications with built-in progress tracking.
+          </p>
+        </div>
 
           <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
             <GraduationCap className="w-5 h-5 text-primary mb-4" />
