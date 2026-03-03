@@ -1864,7 +1864,6 @@ export default function Dashboard() {
             <p className="text-xs text-muted-foreground">Get in touch</p>
           </CardContent>
         </Card>
-      </div>
 
         <a
           href="https://donate.stripe.com/00wdR8ab1gSxbQygjLak001"
@@ -1883,6 +1882,8 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </a>
+        
+      </div>
       
       {/* Recent Activity */}
       <Card>
