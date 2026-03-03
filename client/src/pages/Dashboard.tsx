@@ -61,7 +61,8 @@ import {
   Star,
   Quote,
   CheckCircle2,
-  User
+  User,
+  Heart
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
@@ -179,6 +180,31 @@ function AboutUsContent() {
             </p>
           </div>
 
+{/* Feature Cards */}
+<div className="flex flex-wrap justify-center gap-4 mb-6">
+  {/* ...existing cards... */}
+
+          {/* Donate */}
+          <a
+            href="https://donate.stripe.com/00wdR8ab1gSxbQygjLak001"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.67rem)] lg:w-[calc(25%-0.75rem)]"
+          >
+            <Card
+              className="cursor-pointer hover:shadow-lg transition-all h-full"
+              data-testid="card-donate"
+            >
+              <CardContent className="pt-6 text-center">
+                <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Heart className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="font-semibold mb-1">Donate</h3>
+                <p className="text-xs text-muted-foreground">Support the mission</p>
+              </CardContent>
+            </Card>
+          </a>
+          
           <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
             <Briefcase className="w-5 h-5 text-primary mb-4" />
             <h3 className="text-base font-semibold mb-2">Smart Job Matching</h3>
