@@ -61,8 +61,7 @@ import {
   Star,
   Quote,
   CheckCircle2,
-  User,
-  Heart
+  User
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
@@ -180,10 +179,6 @@ function AboutUsContent() {
             </p>
           </div>
 
-{/* Feature Cards */}
-<div className="flex flex-wrap justify-center gap-4 mb-6">
-  {/* ...existing cards... */}
-          
           <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
             <Briefcase className="w-5 h-5 text-primary mb-4" />
             <h3 className="text-base font-semibold mb-2">Smart Job Matching</h3>
