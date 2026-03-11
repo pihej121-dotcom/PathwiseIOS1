@@ -179,22 +179,6 @@ function AboutUsContent() {
           </p>
         </div>
         
-        <a
-          href="https://donate.stripe.com/00wdR8ab1gSxbQygjLak001"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group p-6 rounded-md border border-border hover-elevate transition-all block"
-          data-testid="link-donate-card"
-        >
-          <div className="flex flex-col items-start">
-            <Heart className="w-5 h-5 text-red-600 mb-4" />
-            <h3 className="text-base font-semibold mb-2">Donate</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Support the mission and help students launch their careers.
-            </p>
-          </div>
-        </a>
-        
         <div className="group p-6 rounded-md border border-border hover-elevate transition-all">
           <Target className="w-5 h-5 text-primary mb-4" />
           <h3 className="text-base font-semibold mb-2">Application Tracking</h3>
