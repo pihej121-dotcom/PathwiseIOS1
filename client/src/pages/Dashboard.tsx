@@ -66,7 +66,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { format } from "date-fns";
-import demoVideo from "@assets/Pathwise_16_9_AspectRatio_2025_1763228723323.mp4";
 
 // Import feature components
 import ResumeUpload from "./ResumeUpload";
@@ -108,22 +107,6 @@ function AboutUsContent() {
           Transform your career journey with AI-powered insights, personalized roadmaps, 
           and intelligent job matching designed specifically for students and new graduates.
         </p>
-
-        {/* Demo Video */}
-        <div className="pt-8 max-w-4xl mx-auto">
-          <div className="relative rounded-xl overflow-hidden shadow-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-1">
-            <video 
-              className="w-full h-auto rounded-lg"
-              controls
-              playsInline
-              preload="metadata"
-              data-testid="demo-video"
-            >
-              <source src={demoVideo} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
 
         {/* Primary CTA after video */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
